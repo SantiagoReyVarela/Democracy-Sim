@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -38,6 +39,12 @@ public class CountryState : MonoBehaviour
 
     [SerializeField, Range(0f, 100f)]
     private float stability = 50f;
+
+    [Header("History")] // historial de datos para la grafica
+
+    [SerializeField]
+    private List<CountrySnapshot> history = new List<CountrySnapshot>();
+    public IReadOnlyList<CountrySnapshot> History => history;
 
 
     /// <summary>
@@ -176,13 +183,18 @@ public class CountryState : MonoBehaviour
     {
         if (HasReachedFinalTurn)
         {
-            Debug.LogWarning("The simulation has already reached its final turn.");
+            Debug.LogWarning(
+                "The simulation has already reached its final turn."
+            );
+
             return false;
         }
 
         currentTurn++;
 
         ApplyAutomaticRelations();
+
+        RecordSnapshot();
         NotifyStateChanged();
 
         return true;
@@ -311,6 +323,9 @@ public class CountryState : MonoBehaviour
         education = ClampParameter(initialEducation);
         stability = ClampParameter(initialStability);
 
+        history.Clear();
+        RecordSnapshot();
+
         NotifyStateChanged();
     }
 
@@ -337,6 +352,39 @@ public class CountryState : MonoBehaviour
     private void NotifyStateChanged()
     {
         OnStateChanged?.Invoke();
+    }
+
+    private void Awake()
+    {
+        history.Clear();
+        RecordSnapshot();
+    }
+
+    /// <summary>
+    /// Guarda una copia del estado actual del país.
+    /// </summary>
+    private void RecordSnapshot()
+    {
+        CountrySnapshot snapshot = new CountrySnapshot(
+            currentTurn,
+            prosperity,
+            equality,
+            employment,
+            education,
+            stability
+        );
+
+        if (
+            history.Count > 0 &&
+            history[history.Count - 1].Turn == currentTurn
+        )
+        {
+            history[history.Count - 1] = snapshot;
+        }
+        else
+        {
+            history.Add(snapshot);
+        }
     }
 
 
