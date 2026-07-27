@@ -9,24 +9,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b87beb9fb5feb3744bf1e189b156e4a1, type: 3}
+  m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
   m_Name: Policy_InvestmentInEducation
   m_EditorClassIdentifier: Assembly-CSharp::PolicyInvestmentInEducationSO
-  policyId: investment_in_education
-  policyName: "Iversi\xF3n_en_educaci\xF3n"
-  description: "El Gobierno aumenta la inversi\xF3n destinada a centros educativos,\r\nprofesorado,
-    becas e infraestructuras."
-  politicalCost: 10
+  policyId: policy_investmentineducation
+  policyName: "Inversi\xF3n en educaci\xF3n"
+  description: "El gobierno invierte en educaci\xF3n."
+  politicalCost: 1
   effects:
   - parameter: 3
-    amount: 6
-    delayInTurns: 0
-    durationInTurns: 0
-  - parameter: 0
-    amount: -2
+    amount: 2
     delayInTurns: 0
     durationInTurns: 0
   - parameter: 2
     amount: 1
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 0
+    amount: -1
     delayInTurns: 0
     durationInTurns: 0
