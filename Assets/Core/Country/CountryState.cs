@@ -46,6 +46,11 @@ public class CountryState : MonoBehaviour
     private List<CountrySnapshot> history = new List<CountrySnapshot>();
     public IReadOnlyList<CountrySnapshot> History => history;
 
+    [Header("Active policy effects")]
+
+    [SerializeField]
+    private List<ActivePolicyEffect> activePolicyEffects = new List<ActivePolicyEffect>();
+    public IReadOnlyList<ActivePolicyEffect> ActivePolicyEffects => activePolicyEffects;
 
     /// <summary>
     /// Se ejecuta siempre que cambia el estado del país.
@@ -157,7 +162,8 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Aplica todos los efectos inmediatos de una política.
+    /// Aplica los efectos inmediatos y registra los efectos
+    /// retrasados o recurrentes de una política.
     /// </summary>
     public void ApplyPolicy(PolicyDefinitionSO policy)
     {
@@ -169,10 +175,65 @@ public class CountryState : MonoBehaviour
 
         foreach (PolicyEffect effect in policy.Effects)
         {
-            ModifyParameter(effect.Parameter, effect.Amount);
+            /*
+            * Duration 0 representa un efecto único.
+            * Duration superior a 0 indica el número total de aplicaciones.
+            */
+            int totalApplications =
+                effect.DurationInTurns > 0
+                    ? effect.DurationInTurns
+                    : 1;
+
+            if (effect.DelayInTurns == 0)
+            {
+                // Primera aplicación inmediata.
+                ModifyParameterWithoutNotification(
+                    effect.Parameter,
+                    effect.Amount
+                );
+
+                totalApplications--;
+
+                /*
+                * Si todavía quedan aplicaciones, guardamos el efecto.
+                * skipNextProcessing evita aplicarlo otra vez durante
+                * el AdvanceTurn que ocurre inmediatamente después.
+                */
+                if (totalApplications > 0)
+                {
+                    ActivePolicyEffect activeEffect =
+                        new ActivePolicyEffect(
+                            policy.PolicyName,
+                            effect.Parameter,
+                            effect.Amount,
+                            remainingDelay: 0,
+                            remainingApplications: totalApplications,
+                            skipNextProcessing: true
+                        );
+
+                    activePolicyEffects.Add(activeEffect);
+                }
+            }
+            else
+            {
+                // El efecto completo queda pendiente.
+                ActivePolicyEffect delayedEffect =
+                    new ActivePolicyEffect(
+                        policy.PolicyName,
+                        effect.Parameter,
+                        effect.Amount,
+                        effect.DelayInTurns,
+                        totalApplications,
+                        skipNextProcessing: true //si el efecto tiene delay, lo saltamos hasta que toque
+                    );
+
+                activePolicyEffects.Add(delayedEffect);
+            }
         }
 
         Debug.Log($"Policy applied: {policy.PolicyName}");
+
+        NotifyStateChanged();
     }
 
 
@@ -192,9 +253,15 @@ public class CountryState : MonoBehaviour
 
         currentTurn++;
 
+        // Primero se procesan las políticas de turnos anteriores.
+        ProcessActivePolicyEffects();
+
+        // Después se calculan las relaciones internas del país.
         ApplyAutomaticRelations();
 
+        // Finalmente se guarda el estado resultante.
         RecordSnapshot();
+
         NotifyStateChanged();
 
         return true;
@@ -261,6 +328,43 @@ public class CountryState : MonoBehaviour
             );
         }
     }
+    /// <summary>
+    /// Procesa todos los efectos retrasados y recurrentes
+    /// correspondientes al nuevo turno.
+    /// </summary>
+    private void ProcessActivePolicyEffects()
+    {
+        for (int i = activePolicyEffects.Count - 1; i >= 0; i--)
+        {
+            ActivePolicyEffect activeEffect =
+                activePolicyEffects[i];
+
+            bool shouldApply = activeEffect.ProcessTurn(
+                out CountryParameter parameter,
+                out float amount
+            );
+
+            if (shouldApply)
+            {
+                ModifyParameterWithoutNotification(
+                    parameter,
+                    amount
+                );
+
+                Debug.Log(
+                    $"Active effect applied | " +
+                    $"Policy: {activeEffect.SourcePolicyName} | " +
+                    $"Parameter: {parameter} | " +
+                    $"Amount: {amount}"
+                );
+            }
+
+            if (activeEffect.IsCompleted)
+            {
+                activePolicyEffects.RemoveAt(i);
+            }
+        }
+    }
 
 
     /// <summary>
@@ -323,6 +427,7 @@ public class CountryState : MonoBehaviour
         education = ClampParameter(initialEducation);
         stability = ClampParameter(initialStability);
 
+        activePolicyEffects.Clear();
         history.Clear();
         RecordSnapshot();
 
@@ -356,6 +461,7 @@ public class CountryState : MonoBehaviour
 
     private void Awake()
     {
+        activePolicyEffects.Clear();
         history.Clear();
         RecordSnapshot();
     }
