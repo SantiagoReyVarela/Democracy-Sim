@@ -1,10 +1,9 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
-/// Conecta el estado de la simulación con la interfaz.
-/// Muestra los parámetros del país y permite aplicar una política.
+/// Conecta el estado del país con la interfaz gráfica.
+/// También recibe las políticas seleccionadas por los botones.
 /// </summary>
 public class CountryUIController : MonoBehaviour
 {
@@ -12,9 +11,6 @@ public class CountryUIController : MonoBehaviour
 
     [SerializeField]
     private CountryState countryState;
-
-    [SerializeField]
-    private PolicyDefinitionSO selectedPolicy;
 
 
     [Header("Header")]
@@ -44,28 +40,17 @@ public class CountryUIController : MonoBehaviour
     private TMP_Text stabilityText;
 
 
-    [Header("Policy")]
-
-    [SerializeField]
-    private TMP_Text policyNameText;
-
-    [SerializeField]
-    private TMP_Text policyDescriptionText;
-
-    [SerializeField]
-    private Button applyPolicyButton;
+    [Header("Feedback")]
 
     [SerializeField]
     private TMP_Text feedbackText;
 
 
-    private void Awake()
-    {
-        if (applyPolicyButton != null)
-        {
-            applyPolicyButton.onClick.AddListener(ApplySelectedPolicy);
-        }
-    }
+    /// <summary>
+    /// Permite que otros componentes consulten el país asociado
+    /// sin poder sustituir la referencia.
+    /// </summary>
+    public CountryState CountryState => countryState;
 
 
     private void OnEnable()
@@ -80,6 +65,10 @@ public class CountryUIController : MonoBehaviour
     private void Start()
     {
         RefreshUI();
+
+        SetFeedback(
+            "Selecciona una política para avanzar el turno."
+        );
     }
 
 
@@ -92,19 +81,11 @@ public class CountryUIController : MonoBehaviour
     }
 
 
-    private void OnDestroy()
-    {
-        if (applyPolicyButton != null)
-        {
-            applyPolicyButton.onClick.RemoveListener(ApplySelectedPolicy);
-        }
-    }
-
-
     /// <summary>
-    /// Aplica la política seleccionada y avanza el turno.
+    /// Aplica la política recibida y avanza un turno.
+    /// Este método será llamado por cualquiera de los botones de políticas.
     /// </summary>
-    public void ApplySelectedPolicy()
+    public void ApplyPolicy(PolicyDefinitionSO policy)
     {
         if (countryState == null)
         {
@@ -115,39 +96,42 @@ public class CountryUIController : MonoBehaviour
             return;
         }
 
-        if (selectedPolicy == null)
+        if (policy == null)
         {
             Debug.LogError(
-                "CountryUIController: no hay ninguna política asignada."
+                "CountryUIController: la política recibida es nula."
             );
 
-            SetFeedback("No hay ninguna política seleccionada.");
+            SetFeedback(
+                "El botón no tiene una política asignada."
+            );
 
             return;
         }
 
         if (countryState.HasReachedFinalTurn)
         {
-            SetFeedback("La simulación ha terminado.");
-            RefreshUI();
+            SetFeedback(
+                "La simulación ha terminado."
+            );
 
             return;
         }
 
-        countryState.ApplyPolicy(selectedPolicy);
+        countryState.ApplyPolicy(policy);
 
         bool turnAdvanced = countryState.AdvanceTurn();
 
         if (turnAdvanced)
         {
             SetFeedback(
-                $"Se ha aplicado: {selectedPolicy.PolicyName}."
+                $"Se ha aplicado: {policy.PolicyName}."
             );
         }
         else
         {
             SetFeedback(
-                "La política se aplicó, pero no se pudo avanzar el turno."
+                "No se ha podido avanzar el turno."
             );
         }
 
@@ -156,7 +140,7 @@ public class CountryUIController : MonoBehaviour
 
 
     /// <summary>
-    /// Actualiza todos los textos de la interfaz.
+    /// Actualiza todos los textos relacionados con el país.
     /// </summary>
     public void RefreshUI()
     {
@@ -200,54 +184,6 @@ public class CountryUIController : MonoBehaviour
             stabilityText,
             $"Estabilidad: {countryState.Stability:0.#}"
         );
-
-        RefreshPolicyInformation();
-        RefreshButton();
-    }
-
-
-    private void RefreshPolicyInformation()
-    {
-        if (selectedPolicy == null)
-        {
-            SetText(
-                policyNameText,
-                "Ninguna política seleccionada"
-            );
-
-            SetText(
-                policyDescriptionText,
-                string.Empty
-            );
-
-            return;
-        }
-
-        SetText(
-            policyNameText,
-            selectedPolicy.PolicyName
-        );
-
-        SetText(
-            policyDescriptionText,
-            selectedPolicy.Description
-        );
-    }
-
-
-    private void RefreshButton()
-    {
-        if (applyPolicyButton == null)
-        {
-            return;
-        }
-
-        bool simulationCanContinue =
-            countryState != null &&
-            selectedPolicy != null &&
-            !countryState.HasReachedFinalTurn;
-
-        applyPolicyButton.interactable = simulationCanContinue;
     }
 
 
@@ -257,7 +193,10 @@ public class CountryUIController : MonoBehaviour
     }
 
 
-    private void SetText(TMP_Text textComponent, string value)
+    private void SetText(
+        TMP_Text textComponent,
+        string value
+    )
     {
         if (textComponent != null)
         {
