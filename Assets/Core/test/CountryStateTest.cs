@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CountryStateTest : MonoBehaviour
 {
@@ -10,19 +11,47 @@ public class CountryStateTest : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Keyboard.current == null)
         {
-            countryState.ApplyPolicy(testPolicy);
-            countryState.AdvanceTurn();
-
-            Debug.Log(
-                $"Turn: {countryState.CurrentTurn} | " +
-                $"Prosperity: {countryState.Prosperity} | " +
-                $"Equality: {countryState.Equality} | " +
-                $"Employment: {countryState.Employment} | " +
-                $"Education: {countryState.Education} | " +
-                $"Stability: {countryState.Stability}"
-            );
+            return;
         }
+
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            RunTest();
+        }
+    }
+
+    private void RunTest()
+    {
+        if (countryState == null)
+        {
+            Debug.LogError(
+                "CountryStateTest: no se ha asignado CountryState."
+            );
+
+            return;
+        }
+
+        if (testPolicy == null)
+        {
+            Debug.LogError(
+                "CountryStateTest: no se ha asignado la política de prueba."
+            );
+
+            return;
+        }
+
+        countryState.ApplyPolicy(testPolicy);
+        countryState.AdvanceTurn();
+
+        Debug.Log(
+            $"Turno: {countryState.CurrentTurn} | " +
+            $"Prosperidad: {countryState.Prosperity} | " +
+            $"Igualdad: {countryState.Equality} | " +
+            $"Empleo: {countryState.Employment} | " +
+            $"Educación: {countryState.Education} | " +
+            $"Estabilidad: {countryState.Stability}"
+        );
     }
 }
