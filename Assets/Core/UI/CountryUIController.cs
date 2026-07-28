@@ -40,6 +40,21 @@ public class CountryUIController : MonoBehaviour
     private TMP_Text stabilityText;
 
 
+
+    [Header("Economic parameters")]
+
+    [SerializeField]
+    private TMP_Text fiscalResultText;
+
+    [SerializeField]
+    private TMP_Text reservesText;
+
+    [SerializeField]
+    private TMP_Text debtText;
+
+    [SerializeField]
+    private TMP_Text inflationText;
+
     [Header("Feedback")]
 
     [SerializeField]
@@ -183,6 +198,26 @@ public class CountryUIController : MonoBehaviour
         SetText(
             stabilityText,
             $"Estabilidad: {countryState.Stability:0.#}"
+        );
+
+        SetText(
+            fiscalResultText,
+            $"Resultado fiscal: {countryState.FiscalResult:+0.#;-0.#;0}"
+        );
+
+        SetText(
+            reservesText,
+            $"Reservas: {countryState.Reserves:0.#}"
+        );
+
+        SetText(
+            debtText,
+            $"Deuda: {countryState.Debt:0.#}"
+        );
+
+        SetText(
+            inflationText,
+            $"Inflación: {countryState.Inflation:0.#}%"
         );
     }
 

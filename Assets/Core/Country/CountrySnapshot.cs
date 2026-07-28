@@ -2,14 +2,18 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Copia inmutable del estado del país en un turno concreto.
-/// Se utiliza para estadísticas, gráficas y resultados finales.
+/// Copia del estado completo del país en un turno concreto.
 /// </summary>
 [Serializable]
 public sealed class CountrySnapshot
 {
+    [Header("Turn")]
+
     [SerializeField]
     private int turn;
+
+
+    [Header("General parameters")]
 
     [SerializeField]
     private float prosperity;
@@ -27,17 +31,33 @@ public sealed class CountrySnapshot
     private float stability;
 
 
+    [Header("Economic parameters")]
+
+    [SerializeField]
+    private float fiscalResult;
+
+    [SerializeField]
+    private float reserves;
+
+    [SerializeField]
+    private float debt;
+
+    [SerializeField]
+    private float inflation;
+
+
     public int Turn => turn;
 
     public float Prosperity => prosperity;
-
     public float Equality => equality;
-
     public float Employment => employment;
-
     public float Education => education;
-
     public float Stability => stability;
+
+    public float FiscalResult => fiscalResult;
+    public float Reserves => reserves;
+    public float Debt => debt;
+    public float Inflation => inflation;
 
 
     public CountrySnapshot(
@@ -46,15 +66,25 @@ public sealed class CountrySnapshot
         float equality,
         float employment,
         float education,
-        float stability
+        float stability,
+        float fiscalResult,
+        float reserves,
+        float debt,
+        float inflation
     )
     {
         this.turn = turn;
+
         this.prosperity = prosperity;
         this.equality = equality;
         this.employment = employment;
         this.education = education;
         this.stability = stability;
+
+        this.fiscalResult = fiscalResult;
+        this.reserves = reserves;
+        this.debt = debt;
+        this.inflation = inflation;
     }
 
 
@@ -76,6 +106,18 @@ public sealed class CountrySnapshot
 
             case CountryParameter.Stability:
                 return stability;
+
+            case CountryParameter.FiscalResult:
+                return fiscalResult;
+
+            case CountryParameter.Reserves:
+                return reserves;
+
+            case CountryParameter.Debt:
+                return debt;
+
+            case CountryParameter.Inflation:
+                return inflation;
 
             default:
                 Debug.LogError(

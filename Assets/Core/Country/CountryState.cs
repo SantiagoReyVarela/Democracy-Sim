@@ -20,7 +20,7 @@ public class CountryState : MonoBehaviour
     private int currentTurn = 1;
 
     [SerializeField, Min(1)]
-    private int maximumTurns = 12;
+    private int maximumTurns = 48;
 
 
     [Header("Country parameters")]
@@ -40,11 +40,57 @@ public class CountryState : MonoBehaviour
     [SerializeField, Range(0f, 100f)]
     private float stability = 50f;
 
+
+
+
+    [Header("Fiscal economy")]
+
+    [SerializeField, Range(-100f, 100f)]
+    private float fiscalResult = -10f;
+
+    [SerializeField, Min(0f)]
+    private float reserves = 20f;
+
+    [SerializeField, Min(0f)]
+    private float debt = 100f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float inflation = 2f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float debtPaymentPercentage = 50f;
+
+    [SerializeField]
+    private DeficitFinancingMode deficitFinancingMode =
+        DeficitFinancingMode.Debt;
+
+    [SerializeField, Min(0f)]
+    private float inflationPerPrintedUnit = 0.1f;
+
+
+
+    [Header("Last fiscal result")]
+
+    [SerializeField]
+    private float lastReservesUsed;
+
+    [SerializeField]
+    private float lastDebtPayment;
+
+    [SerializeField]
+    private float lastDebtIssued;
+
+    [SerializeField]
+    private float lastMoneyPrinted;
+
+
     [Header("History")] // historial de datos para la grafica
 
     [SerializeField]
     private List<CountrySnapshot> history = new List<CountrySnapshot>();
     public IReadOnlyList<CountrySnapshot> History => history;
+
+
 
     [Header("Active policy effects")]
 
@@ -78,6 +124,26 @@ public class CountryState : MonoBehaviour
 
     public float Stability => stability;
 
+    public float FiscalResult => fiscalResult;
+
+    public float Reserves => reserves;
+
+    public float Debt => debt;
+
+    public float Inflation => inflation;
+
+    public float DebtPaymentPercentage => debtPaymentPercentage;
+
+    public DeficitFinancingMode DeficitFinancingMode => deficitFinancingMode;
+
+    public float LastReservesUsed => lastReservesUsed;
+
+    public float LastDebtPayment => lastDebtPayment;
+
+
+    public float LastDebtIssued => lastDebtIssued;
+
+    public float LastMoneyPrinted => lastMoneyPrinted;
 
     /// <summary>
     /// Devuelve el valor actual de un parámetro.
@@ -101,6 +167,20 @@ public class CountryState : MonoBehaviour
             case CountryParameter.Stability:
                 return stability;
 
+            // FISCAL 
+
+            case CountryParameter.FiscalResult:
+                return fiscalResult;
+
+            case CountryParameter.Reserves:
+                return reserves;
+
+            case CountryParameter.Debt:
+                return debt;
+
+            case CountryParameter.Inflation:
+                return inflation;
+
             default:
                 Debug.LogError($"Unknown country parameter: {parameter}");
                 return 0f;
@@ -112,34 +192,54 @@ public class CountryState : MonoBehaviour
     /// Sustituye directamente el valor de un parámetro.
     /// El valor siempre se limita entre 0 y 100.
     /// </summary>
-    public void SetParameter(CountryParameter parameter, float newValue)
+    public void SetParameter(
+        CountryParameter parameter,
+        float newValue
+    )
     {
-        float clampedValue = ClampParameter(newValue);
-
         switch (parameter)
         {
             case CountryParameter.Prosperity:
-                prosperity = clampedValue;
+                prosperity = ClampParameter(newValue);
                 break;
 
             case CountryParameter.Equality:
-                equality = clampedValue;
+                equality = ClampParameter(newValue);
                 break;
 
             case CountryParameter.Employment:
-                employment = clampedValue;
+                employment = ClampParameter(newValue);
                 break;
 
             case CountryParameter.Education:
-                education = clampedValue;
+                education = ClampParameter(newValue);
                 break;
 
             case CountryParameter.Stability:
-                stability = clampedValue;
+                stability = ClampParameter(newValue);
                 break;
 
+            // FISCAL
+
+            case CountryParameter.FiscalResult:
+            fiscalResult = Mathf.Clamp(newValue, -100f, 100f);
+                break;
+
+            case CountryParameter.Reserves:
+                reserves = Mathf.Max(0f, newValue);
+                break;
+
+            case CountryParameter.Debt:
+                debt = Mathf.Max(0f, newValue);
+                break;
+
+            case CountryParameter.Inflation:
+                inflation = Mathf.Clamp(newValue, 0f, 100f);
+                break;
             default:
-                Debug.LogError($"Unknown country parameter: {parameter}");
+                Debug.LogError(
+                    $"Unknown country parameter: {parameter}"
+                );
                 return;
         }
 
@@ -253,20 +353,15 @@ public class CountryState : MonoBehaviour
 
         currentTurn++;
 
-        // Primero se procesan las políticas de turnos anteriores.
         ProcessActivePolicyEffects();
-
-        // Después se calculan las relaciones internas del país.
         ApplyAutomaticRelations();
+        ProcessFiscalEconomy();
 
-        // Finalmente se guarda el estado resultante.
         RecordSnapshot();
-
         NotifyStateChanged();
 
         return true;
     }
-
 
     /// <summary>
     /// Relaciones básicas que se procesan automáticamente al avanzar de turno.
@@ -366,6 +461,96 @@ public class CountryState : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Procesa el presupuesto público correspondiente al turno.
+    /// </summary>
+    private void ProcessFiscalEconomy()
+    {
+        lastReservesUsed = 0f;
+        lastDebtPayment = 0f;
+        lastDebtIssued = 0f;
+        lastMoneyPrinted = 0f;
+
+        if (fiscalResult >= 0f)
+        {
+            float surplus = fiscalResult;
+
+            // Parte del superávit se utiliza para amortizar deuda.
+            lastDebtPayment = Mathf.Min(
+                debt,
+                surplus * debtPaymentPercentage / 100f
+            );
+
+            debt = Mathf.Max(
+                0f,
+                debt - lastDebtPayment
+            );
+
+            // El superávit restante aumenta las reservas.
+            float amountAddedToReserves =
+                surplus - lastDebtPayment;
+
+            reserves += amountAddedToReserves;
+        }
+        else
+        {
+            float deficit = -fiscalResult;
+
+            // Primero se utilizan las reservas disponibles.
+            lastReservesUsed = Mathf.Min(
+                reserves,
+                deficit
+            );
+
+            reserves -= lastReservesUsed;
+
+            float remainingDeficit =
+                deficit - lastReservesUsed;
+
+            if (remainingDeficit > 0f)
+            {
+                switch (deficitFinancingMode)
+                {
+                    case DeficitFinancingMode.Debt:
+
+                        lastDebtIssued = remainingDeficit;
+                        debt += remainingDeficit;
+
+                        break;
+
+                    case DeficitFinancingMode.MoneyPrinting:
+
+                        lastMoneyPrinted = remainingDeficit;
+
+                        inflation +=
+                            remainingDeficit *
+                            inflationPerPrintedUnit;
+
+                        inflation = Mathf.Clamp(
+                            inflation,
+                            0f,
+                            100f
+                        );
+
+                        break;
+                }
+            }
+        }
+
+        Debug.Log(
+            $"Fiscal result: {fiscalResult:0.##} | " +
+            $"Reserves used: {lastReservesUsed:0.##} | " +
+            $"Debt payment: {lastDebtPayment:0.##} | " +
+            $"Debt issued: {lastDebtIssued:0.##} | " +
+            $"Money printed: {lastMoneyPrinted:0.##} | " +
+            $"Reserves: {reserves:0.##} | " +
+            $"Debt: {debt:0.##} | " +
+            $"Inflation: {inflation:0.##}%"
+        );
+    }
+
+        
+    
 
     /// <summary>
     /// Versión interna que modifica un valor sin ejecutar el evento.
@@ -376,37 +561,78 @@ public class CountryState : MonoBehaviour
         float amount
     )
     {
-        float newValue = GetParameter(parameter) + amount;
-        newValue = ClampParameter(newValue);
-
         switch (parameter)
         {
             case CountryParameter.Prosperity:
-                prosperity = newValue;
+                prosperity = ClampParameter(prosperity + amount);
                 break;
 
             case CountryParameter.Equality:
-                equality = newValue;
+                equality = ClampParameter(equality + amount);
                 break;
 
             case CountryParameter.Employment:
-                employment = newValue;
+                employment = ClampParameter(employment + amount);
                 break;
 
             case CountryParameter.Education:
-                education = newValue;
+                education = ClampParameter(education + amount);
                 break;
 
             case CountryParameter.Stability:
-                stability = newValue;
+                stability = ClampParameter(stability + amount);
+                break;
+
+            case CountryParameter.FiscalResult:
+                fiscalResult = Mathf.Clamp(
+                    fiscalResult + amount,
+                    -100f,
+                    100f
+                );
+                break;
+
+            case CountryParameter.Reserves:
+                reserves = Mathf.Max(0f, reserves + amount);
+                break;
+
+            case CountryParameter.Debt:
+                debt = Mathf.Max(0f, debt + amount);
+                break;
+
+            case CountryParameter.Inflation:
+                inflation = Mathf.Clamp(
+                    inflation + amount,
+                    0f,
+                    100f
+                );
                 break;
 
             default:
-                Debug.LogError($"Unknown country parameter: {parameter}");
+                Debug.LogError(
+                    $"Unknown country parameter: {parameter}"
+                );
                 break;
         }
     }
 
+    public void SetDebtPaymentPercentage(float percentage)
+    {
+        debtPaymentPercentage = Mathf.Clamp(
+            percentage,
+            0f,
+            100f
+        );
+
+        NotifyStateChanged();
+    }
+    public void SetDeficitFinancingMode(
+        DeficitFinancingMode financingMode
+    )
+    {
+        deficitFinancingMode = financingMode;
+
+        NotifyStateChanged();
+    }
 
     /// <summary>
     /// Reinicia el país utilizando los valores indicados.
@@ -477,7 +703,11 @@ public class CountryState : MonoBehaviour
             equality,
             employment,
             education,
-            stability
+            stability,
+            fiscalResult,
+            reserves,
+            debt,
+            inflation
         );
 
         if (
@@ -508,6 +738,22 @@ public class CountryState : MonoBehaviour
         employment = ClampParameter(employment);
         education = ClampParameter(education);
         stability = ClampParameter(stability);
+
+        fiscalResult = Mathf.Clamp(
+            fiscalResult,
+            -100f,
+            100f
+        );
+
+        reserves = Mathf.Max(0f, reserves);
+        debt = Mathf.Max(0f, debt);
+        inflation = Mathf.Clamp(inflation, 0f, 100f);
+
+        debtPaymentPercentage = Mathf.Clamp(
+            debtPaymentPercentage,
+            0f,
+            100f
+        );
     }
 
 #endif
