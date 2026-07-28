@@ -83,6 +83,24 @@ public class CountryState : MonoBehaviour
     [SerializeField]
     private float lastMoneyPrinted;
 
+    [SerializeField, Min(1)]
+    private int inflationEffectDuration = 10;
+
+    [SerializeField, Min(1)]
+    private int inflationRecoveryDuration = 10;
+
+    [SerializeField, Range(0f, 100f)]
+    private float normalInflation = 2f;
+
+    [SerializeField]
+    private float pendingInflation;
+
+    [SerializeField]
+    private int inflationPressureTurnsRemaining;
+
+    [SerializeField]
+    private int inflationRecoveryTurnsRemaining;
+
 
     [Header("History")] // historial de datos para la grafica
 
@@ -357,7 +375,10 @@ public class CountryState : MonoBehaviour
         ApplyAutomaticRelations();
         ProcessFiscalEconomy();
 
-        RecordSnapshot();
+        ProcessFiscalEconomy();
+        ProcessInflation();
+
+        RecordSnapshot();   
         NotifyStateChanged();
 
         return true;
@@ -522,14 +543,8 @@ public class CountryState : MonoBehaviour
 
                         lastMoneyPrinted = remainingDeficit;
 
-                        inflation +=
-                            remainingDeficit *
-                            inflationPerPrintedUnit;
-
-                        inflation = Mathf.Clamp(
-                            inflation,
-                            0f,
-                            100f
+                        RegisterMoneyPrintingInflation(
+                            lastMoneyPrinted
                         );
 
                         break;
@@ -549,8 +564,63 @@ public class CountryState : MonoBehaviour
         );
     }
 
+    private void RegisterMoneyPrintingInflation(float moneyPrinted)
+    {
+        if (moneyPrinted <= 0f)
+        {
+            return;
+        }
+
+        pendingInflation +=
+            moneyPrinted * inflationPerPrintedUnit;
+
+        // La presión se reparte durante los próximos 10 turnos.
+        inflationPressureTurnsRemaining =
+            inflationEffectDuration;
+
+        // Una nueva emisión interrumpe la recuperación.
+        inflationRecoveryTurnsRemaining = 0;
+    }
+    private void ProcessInflation()
+    {
+        if (
+            inflationPressureTurnsRemaining > 0 &&
+            pendingInflation > 0f
+        )
+        {
+            float increase =
+                pendingInflation /
+                inflationPressureTurnsRemaining;
+
+            inflation += increase;
+            pendingInflation -= increase;
+            inflationPressureTurnsRemaining--;
+
+            inflationRecoveryTurnsRemaining = 0;
+        }
+        else if (inflation > normalInflation)
+        {
+            if (inflationRecoveryTurnsRemaining <= 0)
+            {
+                inflationRecoveryTurnsRemaining =
+                    inflationRecoveryDuration;
+            }
+
+            float decrease =
+                (inflation - normalInflation) /
+                inflationRecoveryTurnsRemaining;
+
+            inflation -= decrease;
+            inflationRecoveryTurnsRemaining--;
+        }
+
+        inflation = Mathf.Clamp(
+            inflation,
+            normalInflation,
+            100f
+        );
+    }
         
-    
 
     /// <summary>
     /// Versión interna que modifica un valor sin ejecutar el evento.
@@ -652,6 +722,10 @@ public class CountryState : MonoBehaviour
         employment = ClampParameter(initialEmployment);
         education = ClampParameter(initialEducation);
         stability = ClampParameter(initialStability);
+        
+        pendingInflation = 0f;
+        inflationPressureTurnsRemaining = 0;
+        inflationRecoveryTurnsRemaining = 0;
 
         activePolicyEffects.Clear();
         history.Clear();
@@ -687,6 +761,10 @@ public class CountryState : MonoBehaviour
 
     private void Awake()
     {
+        pendingInflation = 0f;
+        inflationPressureTurnsRemaining = 0;
+        inflationRecoveryTurnsRemaining = 0;
+
         activePolicyEffects.Clear();
         history.Clear();
         RecordSnapshot();
