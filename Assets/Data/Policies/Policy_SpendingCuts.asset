@@ -12,8 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
   m_Name: Policy_SpendingCuts
   m_EditorClassIdentifier: Assembly-CSharp::PolicyDefinitionSO
-  policyId: 
-  policyName: 
-  description: 
+  policyId: Spending_cuts
+  policyName: Recorte de gasto publico
+  description: El gobierno recorta gastos
   politicalCost: 0
-  effects: []
+  effects:
+  - parameter: 5
+    amount: 10
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 1
+    amount: -5
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 4
+    amount: -4
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 2
+    amount: -1
+    delayInTurns: 0
+    durationInTurns: 0

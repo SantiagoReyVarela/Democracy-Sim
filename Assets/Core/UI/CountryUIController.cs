@@ -80,6 +80,11 @@ public class CountryUIController : MonoBehaviour
     [SerializeField]
     private TMP_Text lastFiscalResultText;
 
+    [Header("Turn controls")]
+
+    [SerializeField]
+    private Button skipTurnButton;
+
 
     [Header("Feedback")]
 
@@ -246,6 +251,12 @@ public class CountryUIController : MonoBehaviour
             $"Inflación: {countryState.Inflation:0.#}%"
         );
 
+        if (skipTurnButton != null)
+        {
+            skipTurnButton.interactable =
+                !countryState.HasReachedFinalTurn;
+        }
+
         RefreshFiscalControls();
     }
 
@@ -278,6 +289,11 @@ public class CountryUIController : MonoBehaviour
             debtPaymentSlider.onValueChanged.AddListener(
                 HandleDebtPaymentChanged
             );
+
+            if (skipTurnButton != null)
+            {
+                skipTurnButton.onClick.AddListener(SkipTurn);
+            }
         }
 
         if (debtFinancingButton != null)
@@ -294,6 +310,36 @@ public class CountryUIController : MonoBehaviour
             );
         }
     }
+
+    public void SkipTurn()
+    {
+        if (countryState == null)
+        {
+            Debug.LogError(
+                "CountryUIController: CountryState no está asignado."
+            );
+
+            return;
+        }
+
+        if (countryState.HasReachedFinalTurn)
+        {
+            SetFeedback("La simulación ha terminado.");
+            return;
+        }
+
+        bool turnAdvanced = countryState.AdvanceTurn();
+
+        if (turnAdvanced)
+        {
+            SetFeedback(
+                "Ha pasado un turno sin aprobar nuevas políticas."
+            );
+        }
+
+        RefreshUI();
+    }
+
     private void HandleDebtPaymentChanged(float percentage)
     {
         if (countryState == null)
@@ -416,6 +462,11 @@ public class CountryUIController : MonoBehaviour
             moneyPrintingButton.onClick.RemoveListener(
                 SelectMoneyPrinting
             );
+        }
+        
+        if (skipTurnButton != null)
+        {
+            skipTurnButton.onClick.RemoveListener(SkipTurn);
         }
     }
 

@@ -54,8 +54,20 @@ public class CountryState : MonoBehaviour
     [SerializeField, Min(0f)]
     private float debt = 100f;
 
-    [SerializeField, Range(0f, 100f)]
+    [SerializeField, Range(-10f, 100f)]
     private float inflation = 2f;
+
+    [SerializeField]
+    private float minimumInflation = -10f;
+
+    [SerializeField, Min(0f)]
+    private float disinflationPerReserveUnit = 0.03f;
+
+    [SerializeField, Min(0f)]
+    private float highInflationMultiplier = 2f;
+
+    [SerializeField, Min(0f)]
+    private float highInflationThreshold = 5f;  // a partir de aqui es inflacion alta
 
     [SerializeField, Range(0f, 100f)]
     private float debtPaymentPercentage = 50f;
@@ -252,7 +264,7 @@ public class CountryState : MonoBehaviour
                 break;
 
             case CountryParameter.Inflation:
-                inflation = Mathf.Clamp(newValue, 0f, 100f);
+                inflation = Mathf.Clamp(newValue, minimumInflation, 100f);
                 break;
             default:
                 Debug.LogError(
@@ -373,12 +385,12 @@ public class CountryState : MonoBehaviour
 
         ProcessActivePolicyEffects();
         ApplyAutomaticRelations();
-        ProcessFiscalEconomy();
 
         ProcessFiscalEconomy();
         ProcessInflation();
+        ApplyInflationConsequences();
 
-        RecordSnapshot();   
+        RecordSnapshot();
         NotifyStateChanged();
 
         return true;
@@ -583,6 +595,7 @@ public class CountryState : MonoBehaviour
     }
     private void ProcessInflation()
     {
+        // Inflación pendiente provocada por emisiones anteriores.
         if (
             inflationPressureTurnsRemaining > 0 &&
             pendingInflation > 0f
@@ -600,6 +613,7 @@ public class CountryState : MonoBehaviour
         }
         else if (inflation > normalInflation)
         {
+            // Recuperación normal cuando ya no se imprime dinero.
             if (inflationRecoveryTurnsRemaining <= 0)
             {
                 inflationRecoveryTurnsRemaining =
@@ -614,13 +628,144 @@ public class CountryState : MonoBehaviour
             inflationRecoveryTurnsRemaining--;
         }
 
+        /*
+        * Parte del superávit que realmente ha aumentado las reservas.
+        * La parte destinada a pagar deuda no genera este efecto.
+        */
+        float reservesAddedThisTurn = 0f;
+
+        if (fiscalResult > 0f)
+        {
+            reservesAddedThisTurn = Mathf.Max(
+                0f,
+                fiscalResult - lastDebtPayment
+            );
+        }
+
+        if (reservesAddedThisTurn > 0f)
+        {
+            float multiplier =
+                inflation >= highInflationThreshold
+                    ? highInflationMultiplier
+                    : 1f;
+
+            float fiscalCooling =
+                reservesAddedThisTurn *
+                disinflationPerReserveUnit *
+                multiplier;
+
+            inflation -= fiscalCooling;
+        }
+
         inflation = Mathf.Clamp(
             inflation,
-            normalInflation,
+            minimumInflation,
             100f
         );
     }
-        
+            
+    /// <summary>
+    /// Aplica las consecuencias económicas y sociales de la inflación
+    /// o la deflación al final de cada turno.
+    /// </summary>
+    private void ApplyInflationConsequences()
+    {
+        // Deflación grave.
+        if (inflation < -3f)
+        {
+            ModifyParameterWithoutNotification(
+                CountryParameter.Prosperity,
+                -1.5f
+            );
+
+            ModifyParameterWithoutNotification(
+                CountryParameter.Employment,
+                -1f
+            );
+
+            ModifyParameterWithoutNotification(
+                CountryParameter.Stability,
+                -1f
+            );
+
+            return;
+        }
+
+        // Deflación moderada.
+        if (inflation < 0f)
+        {
+            ModifyParameterWithoutNotification(
+                CountryParameter.Prosperity,
+                -0.5f
+            );
+
+            ModifyParameterWithoutNotification(
+                CountryParameter.Employment,
+                -0.5f
+            );
+
+            return;
+        }
+
+        // Inflación considerada normal.
+        if (inflation <= 3f)
+        {
+            return;
+        }
+
+        // Inflación moderada.
+        if (inflation <= 7f)
+        {
+            ModifyParameterWithoutNotification(
+                CountryParameter.Stability,
+                -0.5f
+            );
+
+            return;
+        }
+
+        // Inflación alta.
+        if (inflation <= 15f)
+        {
+            ModifyParameterWithoutNotification(
+                CountryParameter.Prosperity,
+                -1f
+            );
+
+            ModifyParameterWithoutNotification(
+                CountryParameter.Equality,
+                -0.5f
+            );
+
+            ModifyParameterWithoutNotification(
+                CountryParameter.Stability,
+                -1f
+            );
+
+            return;
+        }
+
+        // Inflación muy alta.
+        ModifyParameterWithoutNotification(
+            CountryParameter.Prosperity,
+            -2f
+        );
+
+        ModifyParameterWithoutNotification(
+            CountryParameter.Employment,
+            -1f
+        );
+
+        ModifyParameterWithoutNotification(
+            CountryParameter.Equality,
+            -1f
+        );
+
+        ModifyParameterWithoutNotification(
+            CountryParameter.Stability,
+            -2f
+        );
+    }
 
     /// <summary>
     /// Versión interna que modifica un valor sin ejecutar el evento.
@@ -672,7 +817,7 @@ public class CountryState : MonoBehaviour
             case CountryParameter.Inflation:
                 inflation = Mathf.Clamp(
                     inflation + amount,
-                    0f,
+                    minimumInflation,
                     100f
                 );
                 break;
@@ -722,7 +867,7 @@ public class CountryState : MonoBehaviour
         employment = ClampParameter(initialEmployment);
         education = ClampParameter(initialEducation);
         stability = ClampParameter(initialStability);
-        
+
         pendingInflation = 0f;
         inflationPressureTurnsRemaining = 0;
         inflationRecoveryTurnsRemaining = 0;
@@ -825,7 +970,7 @@ public class CountryState : MonoBehaviour
 
         reserves = Mathf.Max(0f, reserves);
         debt = Mathf.Max(0f, debt);
-        inflation = Mathf.Clamp(inflation, 0f, 100f);
+        inflation = Mathf.Clamp(inflation, minimumInflation, 100f);
 
         debtPaymentPercentage = Mathf.Clamp(
             debtPaymentPercentage,

@@ -12,8 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
   m_Name: Policy_TaxIncrease
   m_EditorClassIdentifier: Assembly-CSharp::PolicyDefinitionSO
-  policyId: 
-  policyName: 
-  description: 
-  politicalCost: 0
-  effects: []
+  policyId: policy_taxincrease
+  policyName: Subida de impuestos
+  description: El Estado sube impuestos.
+  politicalCost: 1
+  effects:
+  - parameter: 5
+    amount: 8
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 0
+    amount: -2
+    delayInTurns: 0
+    durationInTurns: 4
+  - parameter: 1
+    amount: 2
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 4
+    amount: -1
+    delayInTurns: 0
+    durationInTurns: 0

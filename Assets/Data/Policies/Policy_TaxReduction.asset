@@ -19,13 +19,17 @@ MonoBehaviour:
   effects:
   - parameter: 0
     amount: 5
-    delayInTurns: 3
-    durationInTurns: 5
+    delayInTurns: 0
+    durationInTurns: 4
   - parameter: 1
     amount: -1
     delayInTurns: 0
     durationInTurns: 0
   - parameter: 4
-    amount: -1
+    amount: 1
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 5
+    amount: -8
     delayInTurns: 0
     durationInTurns: 0
