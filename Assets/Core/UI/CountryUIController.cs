@@ -1,5 +1,8 @@
 using TMPro;
 using UnityEngine;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Conecta el estado del país con la interfaz gráfica.
@@ -54,6 +57,29 @@ public class CountryUIController : MonoBehaviour
 
     [SerializeField]
     private TMP_Text inflationText;
+
+
+
+    [Header("Fiscal controls")]
+
+    [SerializeField]
+    private Slider debtPaymentSlider;
+
+    [SerializeField]
+    private TMP_Text debtPaymentLabel;
+
+    [SerializeField]
+    private Button debtFinancingButton;
+
+    [SerializeField]
+    private Button moneyPrintingButton;
+
+    [SerializeField]
+    private TMP_Text financingModeText;
+
+    [SerializeField]
+    private TMP_Text lastFiscalResultText;
+
 
     [Header("Feedback")]
 
@@ -219,6 +245,8 @@ public class CountryUIController : MonoBehaviour
             inflationText,
             $"Inflación: {countryState.Inflation:0.#}%"
         );
+
+        RefreshFiscalControls();
     }
 
 
@@ -238,4 +266,157 @@ public class CountryUIController : MonoBehaviour
             textComponent.text = value;
         }
     }
+
+        private void Awake()
+    {
+        if (debtPaymentSlider != null)
+        {
+            debtPaymentSlider.minValue = 0f;
+            debtPaymentSlider.maxValue = 100f;
+            debtPaymentSlider.wholeNumbers = true;
+
+            debtPaymentSlider.onValueChanged.AddListener(
+                HandleDebtPaymentChanged
+            );
+        }
+
+        if (debtFinancingButton != null)
+        {
+            debtFinancingButton.onClick.AddListener(
+                SelectDebtFinancing
+            );
+        }
+
+        if (moneyPrintingButton != null)
+        {
+            moneyPrintingButton.onClick.AddListener(
+                SelectMoneyPrinting
+            );
+        }
+    }
+    private void HandleDebtPaymentChanged(float percentage)
+    {
+        if (countryState == null)
+        {
+            return;
+        }
+
+        countryState.SetDebtPaymentPercentage(percentage);
+        RefreshFiscalControls();
+    }
+    private void SelectDebtFinancing()
+    {
+        if (countryState == null)
+        {
+            return;
+        }
+
+        countryState.SetDeficitFinancingMode(
+            DeficitFinancingMode.Debt
+        );
+
+        RefreshFiscalControls();
+    }
+    private void SelectMoneyPrinting()
+    {
+        if (countryState == null)
+        {
+            return;
+        }
+
+        countryState.SetDeficitFinancingMode(
+            DeficitFinancingMode.MoneyPrinting
+        );
+
+        RefreshFiscalControls();
+    }
+    private void RefreshFiscalControls()
+    {
+        if (countryState == null)
+        {
+            return;
+        }
+
+        if (debtPaymentSlider != null)
+        {
+            debtPaymentSlider.SetValueWithoutNotify(
+                countryState.DebtPaymentPercentage
+            );
+        }
+
+        SetText(
+            debtPaymentLabel,
+            "Porcentaje del superávit destinado a pagar deuda: " +
+            $"{countryState.DebtPaymentPercentage:0}%"
+        );
+
+        string financingMode =
+            countryState.DeficitFinancingMode ==
+            DeficitFinancingMode.Debt
+                ? "Deuda"
+                : "Impresión de dinero";
+
+        SetText(
+            financingModeText,
+            $"Financiación actual: {financingMode}"
+        );
+
+        RefreshLastFiscalResult();
+    }
+    private void RefreshLastFiscalResult()
+    {
+        if (countryState == null)
+        {
+            return;
+        }
+
+        string message;
+
+        if (countryState.FiscalResult >= 0f)
+        {
+            float amountAddedToReserves =
+                countryState.FiscalResult -
+                countryState.LastDebtPayment;
+
+            message =
+                $"Último turno: deuda amortizada " +
+                $"{countryState.LastDebtPayment:0.#} | " +
+                $"reservas añadidas {amountAddedToReserves:0.#}";
+        }
+        else
+        {
+            message =
+                $"Último turno: reservas utilizadas " +
+                $"{countryState.LastReservesUsed:0.#} | " +
+                $"deuda emitida {countryState.LastDebtIssued:0.#} | " +
+                $"dinero impreso {countryState.LastMoneyPrinted:0.#}";
+        }
+
+        SetText(lastFiscalResultText, message);
+    }
+
+    private void OnDestroy()
+    {
+        if (debtPaymentSlider != null)
+        {
+            debtPaymentSlider.onValueChanged.RemoveListener(
+                HandleDebtPaymentChanged
+            );
+        }
+
+        if (debtFinancingButton != null)
+        {
+            debtFinancingButton.onClick.RemoveListener(
+                SelectDebtFinancing
+            );
+        }
+
+        if (moneyPrintingButton != null)
+        {
+            moneyPrintingButton.onClick.RemoveListener(
+                SelectMoneyPrinting
+            );
+        }
+    }
+
 }
