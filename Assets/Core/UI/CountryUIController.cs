@@ -280,6 +280,11 @@ public class CountryUIController : MonoBehaviour
 
         private void Awake()
     {
+        if (countryState == null)
+        {
+            countryState = CountryState.Instance;
+        }
+
         if (debtPaymentSlider != null)
         {
             debtPaymentSlider.minValue = 0f;

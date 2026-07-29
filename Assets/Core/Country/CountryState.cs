@@ -11,6 +11,8 @@ using UnityEngine;
 /// </summary>
 public class CountryState : MonoBehaviour
 {
+    public static CountryState Instance { get; private set; }
+
     [Header("Country information")]
 
     [SerializeField]
@@ -906,13 +908,32 @@ public class CountryState : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+
+        DontDestroyOnLoad(gameObject);
+
+        activePolicyEffects.Clear();
+
         pendingInflation = 0f;
         inflationPressureTurnsRemaining = 0;
         inflationRecoveryTurnsRemaining = 0;
 
-        activePolicyEffects.Clear();
         history.Clear();
         RecordSnapshot();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     /// <summary>
