@@ -22,6 +22,9 @@ public class SceneNavigationUI : MonoBehaviour
     [SerializeField]
     private Button partiesButton;
 
+    [SerializeField]
+    private Button electionButton;
+
 
     private void Awake()
     {
@@ -43,6 +46,13 @@ public class SceneNavigationUI : MonoBehaviour
         {
             policiesButton.onClick.AddListener(
                 OpenPolicies
+            );
+        }
+
+        if (electionButton != null)
+        {
+            electionButton.onClick.AddListener(
+                OpenElection
             );
         }
 
@@ -78,6 +88,11 @@ public class SceneNavigationUI : MonoBehaviour
         LoadScene("Parties");
     }
 
+    public void OpenElection()
+    {
+        LoadScene("Election");
+    }
+
 
     private void LoadScene(string sceneName)
     {
@@ -110,6 +125,13 @@ public class SceneNavigationUI : MonoBehaviour
         {
             policiesButton.onClick.RemoveListener(
                 OpenPolicies
+            );
+        }
+
+        if (electionButton != null)
+        {
+            electionButton.onClick.RemoveListener(
+                OpenElection
             );
         }
 

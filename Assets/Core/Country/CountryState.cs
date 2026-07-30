@@ -122,6 +122,12 @@ public class CountryState : MonoBehaviour
     private List<CountrySnapshot> history = new List<CountrySnapshot>();
     public IReadOnlyList<CountrySnapshot> History => history;
 
+    [Header("Parameter relations")]
+
+    [SerializeField]
+    private List<ParameterRelationSO> parameterRelations =
+        new List<ParameterRelationSO>();
+        
 
 
     [Header("Active policy effects")]
@@ -386,11 +392,11 @@ public class CountryState : MonoBehaviour
         currentTurn++;
 
         ProcessActivePolicyEffects();
-        ApplyAutomaticRelations();
 
         ProcessFiscalEconomy();
         ProcessInflation();
-        ApplyInflationConsequences();
+
+        ApplyConfiguredRelations();
 
         RecordSnapshot();
         NotifyStateChanged();
@@ -964,6 +970,57 @@ public class CountryState : MonoBehaviour
         else
         {
             history.Add(snapshot);
+        }
+    }   
+
+    private void ApplyConfiguredRelations()
+    {
+        Dictionary<CountryParameter, float> sourceValues =
+            new Dictionary<CountryParameter, float>();
+
+        // Guardamos primero los valores de origen para que el orden
+        // de los assets no altere los cálculos.
+        foreach (ParameterRelationSO relation in parameterRelations)
+        {
+            if (relation == null || !relation.IsEnabled)
+            {
+                continue;
+            }
+
+            CountryParameter source =
+                relation.SourceParameter;
+
+            if (!sourceValues.ContainsKey(source))
+            {
+                sourceValues.Add(
+                    source,
+                    GetParameter(source)
+                );
+            }
+        }
+
+        foreach (ParameterRelationSO relation in parameterRelations)
+        {
+            if (relation == null || !relation.IsEnabled)
+            {
+                continue;
+            }
+
+            float sourceValue =
+                sourceValues[relation.SourceParameter];
+
+            float impact =
+                relation.Evaluate(sourceValue);
+
+            if (Mathf.Approximately(impact, 0f))
+            {
+                continue;
+            }
+
+            ModifyParameterWithoutNotification(
+                relation.TargetParameter,
+                impact
+            );
         }
     }
 
