@@ -4,8 +4,8 @@ using UnityEngine;
 [CustomEditor(typeof(ParameterRelationSO))]
 public sealed class ParameterRelationSOEditor : Editor
 {
-    private const float GraphHeight = 240f;
-    private const float GraphPadding = 28f;
+    private const float GraphHeight = 360f;     // altura de la grafica
+    private const float GraphPadding = 14f;     // borde externo de la grafica
     private const int SampleCount = 150;
 
     private SerializedProperty relationIdProperty;
@@ -16,12 +16,15 @@ public sealed class ParameterRelationSOEditor : Editor
     private SerializedProperty clampSplineProperty;
     private SerializedProperty multiplierProperty;
     private SerializedProperty isEnabledProperty;
+    
 
     private float graphZoom = 1f;
     private Vector2 graphPan = Vector2.zero;
 
-    private const float MinimumZoom = 1f;
-    private const float MaximumZoom = 20f;
+    private const float MinimumZoom = 0.5f;
+    private const float MaximumZoom = 100f;
+
+    private const float AxisLabelStep = 1f;// numeros de los ejes
 
     private void OnEnable()
     {
@@ -181,6 +184,15 @@ public sealed class ParameterRelationSOEditor : Editor
             out float minimumY,
             out float maximumY
         );
+        
+        MatchAxisScale(
+            graphRect,
+            ref minimumX,
+            ref maximumX,
+            ref minimumY,
+            ref maximumY
+        );
+
 
         HandleGraphNavigation(
             graphRect,
@@ -197,8 +209,26 @@ public sealed class ParameterRelationSOEditor : Editor
             ref maximumY
         );
 
-        DrawGrid(graphRect);
+        
+
+
+        DrawGrid(
+            graphRect,
+            minimumX,
+            maximumX,
+            minimumY,
+            maximumY
+        );
+
         DrawZeroAxes(
+            graphRect,
+            minimumX,
+            maximumX,
+            minimumY,
+            maximumY
+        );
+
+        DrawAxisValues(
             graphRect,
             minimumX,
             maximumX,
@@ -287,44 +317,184 @@ public sealed class ParameterRelationSOEditor : Editor
         }
     }
 
-    private void DrawGrid(Rect rect)
+    private void DrawGrid(
+        Rect rect,
+        float minimumX,
+        float maximumX,
+        float minimumY,
+        float maximumY
+    )
     {
+        float horizontalStep = CalculateGridStep(
+            maximumX - minimumX
+        );
+
+        float verticalStep = CalculateGridStep(
+            maximumY - minimumY
+        );
+
+        float firstVerticalLine =
+            Mathf.Ceil(minimumX / horizontalStep) *
+            horizontalStep;
+
+        float firstHorizontalLine =
+            Mathf.Ceil(minimumY / verticalStep) *
+            verticalStep;
+
         Handles.BeginGUI();
 
-        Handles.color =
-            new Color(1f, 1f, 1f, 0.10f);
+        Handles.color = new Color(
+            1f,
+            1f,
+            1f,
+            0.10f
+        );
 
-        const int divisions = 5;
-
-        for (int i = 0; i <= divisions; i++)
+        // Líneas verticales.
+        for (
+            float value = firstVerticalLine;
+            value <= maximumX;
+            value += horizontalStep
+        )
         {
-            float fraction = i / (float)divisions;
+            float normalizedX = Mathf.InverseLerp(
+                minimumX,
+                maximumX,
+                value
+            );
 
-            float x = Mathf.Lerp(
+            float screenX = Mathf.Lerp(
                 rect.xMin,
                 rect.xMax,
-                fraction
+                normalizedX
             );
 
-            float y = Mathf.Lerp(
-                rect.yMin,
+            Handles.DrawLine(
+                new Vector3(screenX, rect.yMin),
+                new Vector3(screenX, rect.yMax)
+            );
+        }
+
+        // Líneas horizontales.
+        for (
+            float value = firstHorizontalLine;
+            value <= maximumY;
+            value += verticalStep
+        )
+        {
+            float normalizedY = Mathf.InverseLerp(
+                minimumY,
+                maximumY,
+                value
+            );
+
+            float screenY = Mathf.Lerp(
                 rect.yMax,
-                fraction
+                rect.yMin,
+                normalizedY
             );
 
             Handles.DrawLine(
-                new Vector3(x, rect.yMin),
-                new Vector3(x, rect.yMax)
-            );
-
-            Handles.DrawLine(
-                new Vector3(rect.xMin, y),
-                new Vector3(rect.xMax, y)
+                new Vector3(rect.xMin, screenY),
+                new Vector3(rect.xMax, screenY)
             );
         }
 
         Handles.EndGUI();
     }
+
+    private float CalculateGridStep(float visibleRange)
+    {
+        if (visibleRange <= 0f)
+        {
+            return 1f;
+        }
+
+        const float targetDivisionCount = 6f;
+
+        float approximateStep =
+            visibleRange / targetDivisionCount;
+
+        float magnitude = Mathf.Pow(
+            10f,
+            Mathf.Floor(
+                Mathf.Log10(approximateStep)
+            )
+        );
+
+        float normalizedStep =
+            approximateStep / magnitude;
+
+        float selectedStep;
+
+        if (normalizedStep <= 1f)
+        {
+            selectedStep = 1f;
+        }
+        else if (normalizedStep <= 2f)
+        {
+            selectedStep = 2f;
+        }
+        else if (normalizedStep <= 5f)
+        {
+            selectedStep = 5f;
+        }
+        else
+        {
+            selectedStep = 10f;
+        }
+
+        return selectedStep * magnitude;
+    }
+    private void MatchAxisScale(
+        Rect graphRect,
+        ref float minimumX,
+        ref float maximumX,
+        ref float minimumY,
+        ref float maximumY
+    )
+    {
+        if (graphRect.width <= 0f || graphRect.height <= 0f)
+        {
+            return;
+        }
+
+        float xRange = maximumX - minimumX;
+        float yRange = maximumY - minimumY;
+
+        if (xRange <= 0f || yRange <= 0f)
+        {
+            return;
+        }
+
+        float centerX = (minimumX + maximumX) * 0.5f;
+        float centerY = (minimumY + maximumY) * 0.5f;
+
+        float xUnitsPerPixel = xRange / graphRect.width;
+        float yUnitsPerPixel = yRange / graphRect.height;
+
+        /*
+        * Utilizamos la escala menos ampliada para no recortar
+        * ninguna parte de la gráfica.
+        */
+        float unitsPerPixel = Mathf.Max(
+            xUnitsPerPixel,
+            yUnitsPerPixel
+        );
+
+        float correctedXRange =
+            unitsPerPixel * graphRect.width;
+
+        float correctedYRange =
+            unitsPerPixel * graphRect.height;
+
+        minimumX = centerX - correctedXRange * 0.5f;
+        maximumX = centerX + correctedXRange * 0.5f;
+
+        minimumY = centerY - correctedYRange * 0.5f;
+        maximumY = centerY + correctedYRange * 0.5f;
+    }
+
 
     private void DrawZeroAxes(
         Rect rect,
@@ -712,5 +882,125 @@ public sealed class ParameterRelationSOEditor : Editor
             currentEvent.Use();
             Repaint();
         }
+    }
+
+    private void DrawAxisValues(
+        Rect rect,
+        float minimumX,
+        float maximumX,
+        float minimumY,
+        float maximumY
+    )
+    {
+        GUIStyle labelStyle = new GUIStyle(EditorStyles.miniLabel)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = 9
+        };
+
+        labelStyle.normal.textColor = Color.white;
+
+        bool horizontalAxisVisible =
+            minimumY <= 0f && maximumY >= 0f;
+
+        bool verticalAxisVisible =
+            minimumX <= 0f && maximumX >= 0f;
+
+        float horizontalAxisY = horizontalAxisVisible
+            ? Mathf.Lerp(
+                rect.yMax,
+                rect.yMin,
+                Mathf.InverseLerp(minimumY, maximumY, 0f)
+            )
+            : rect.yMax;
+
+        float verticalAxisX = verticalAxisVisible
+            ? Mathf.Lerp(
+                rect.xMin,
+                rect.xMax,
+                Mathf.InverseLerp(minimumX, maximumX, 0f)
+            )
+            : rect.xMin;
+
+        Handles.BeginGUI();
+        Handles.color = Color.white;
+
+        // Valores del eje X.
+        float firstX =
+            Mathf.Ceil(minimumX / AxisLabelStep) *
+            AxisLabelStep;
+
+        for (
+            float value = firstX;
+            value <= maximumX;
+            value += AxisLabelStep
+        )
+        {
+            float screenX = Mathf.Lerp(
+                rect.xMin,
+                rect.xMax,
+                Mathf.InverseLerp(
+                    minimumX,
+                    maximumX,
+                    value
+                )
+            );
+
+            Handles.DrawLine(
+                new Vector3(screenX, horizontalAxisY - 3f),
+                new Vector3(screenX, horizontalAxisY + 3f)
+            );
+
+            GUI.Label(
+                new Rect(
+                    screenX - 25f,
+                    horizontalAxisY + 4f,
+                    50f,
+                    18f
+                ),
+                value.ToString("0"),
+                labelStyle
+            );
+        }
+
+        // Valores del eje Y.
+        float firstY =
+            Mathf.Ceil(minimumY / AxisLabelStep) *
+            AxisLabelStep;
+
+        for (
+            float value = firstY;
+            value <= maximumY;
+            value += AxisLabelStep
+        )
+        {
+            float screenY = Mathf.Lerp(
+                rect.yMax,
+                rect.yMin,
+                Mathf.InverseLerp(
+                    minimumY,
+                    maximumY,
+                    value
+                )
+            );
+
+            Handles.DrawLine(
+                new Vector3(verticalAxisX - 3f, screenY),
+                new Vector3(verticalAxisX + 3f, screenY)
+            );
+
+            GUI.Label(
+                new Rect(
+                    verticalAxisX - 43f,
+                    screenY - 9f,
+                    38f,
+                    18f
+                ),
+                value.ToString("0"),
+                labelStyle
+            );
+        }
+
+        Handles.EndGUI();
     }
 }

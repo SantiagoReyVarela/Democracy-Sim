@@ -10,25 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 363ad5f07e70f7844a9e50829be50676, type: 3}
-  m_Name: Relation_Inflation_Stability
+  m_Name: Inflation_Prosperity
   m_EditorClassIdentifier: Assembly-CSharp::ParameterRelationSO
-  relationId: inflation_stability
+  relationId: inflation_prosperity
   sourceParameter: 8
-  targetParameter: 4
-  interpolationMode: 2
+  targetParameter: 0
+  interpolationMode: 1
   points:
-  - sourceValue: -3
-    impactPerTurn: -1
+  - sourceValue: -1
+    impactPerTurn: 0.5
   - sourceValue: 0
     impactPerTurn: 0
   - sourceValue: 1
-    impactPerTurn: 0
-  - sourceValue: 3
     impactPerTurn: -0.5
-  - sourceValue: 15
-    impactPerTurn: -1
-  - sourceValue: 100
-    impactPerTurn: -3
   clampSplineToSegment: 1
   extrapolateBeyondRange: 1
   multiplier: 1

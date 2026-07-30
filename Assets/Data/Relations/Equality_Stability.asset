@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 363ad5f07e70f7844a9e50829be50676, type: 3}
+  m_Name: Equality_Stability
+  m_EditorClassIdentifier: Assembly-CSharp::ParameterRelationSO
+  relationId: equality_stability
+  sourceParameter: 1
+  targetParameter: 4
+  interpolationMode: 2
+  points:
+  - sourceValue: 0
+    impactPerTurn: -10
+  - sourceValue: 25
+    impactPerTurn: -2.5
+  - sourceValue: 50
+    impactPerTurn: -1
+  - sourceValue: 75
+    impactPerTurn: 0
+  - sourceValue: 100
+    impactPerTurn: 1
+  clampSplineToSegment: 1
+  extrapolateBeyondRange: 1
+  multiplier: 1
+  isEnabled: 1
