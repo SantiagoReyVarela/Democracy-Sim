@@ -321,6 +321,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 0
+  maximumPadding: 0.1
 --- !u!222 &70327435
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -394,6 +396,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 1
+  maximumPadding: 0.1
 --- !u!222 &74844512
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1292,6 +1296,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 1
+  maximumPadding: 0.1
 --- !u!222 &172692080
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2415,6 +2421,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 0
+  maximumPadding: 0.1
 --- !u!222 &414497088
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3496,6 +3504,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 0
+  maximumPadding: 0.1
 --- !u!222 &683134488
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5602,6 +5612,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 0
+  maximumPadding: 0.1
 --- !u!222 &1112277141
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6223,6 +6235,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 1
+  maximumPadding: 0.1
 --- !u!222 &1324817174
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6820,6 +6834,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 1
+  maximumPadding: 0.1
 --- !u!222 &1412720335
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8316,6 +8332,8 @@ MonoBehaviour:
   lineThickness: 4
   showPoints: 1
   pointSize: 8
+  autoExpandMaximum: 0
+  maximumPadding: 0.1
 --- !u!222 &1598293237
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10154,7 +10172,17 @@ MonoBehaviour:
   inflationPressureTurnsRemaining: 0
   inflationRecoveryTurnsRemaining: 0
   history: []
-  parameterRelations: []
+  parameterRelations:
+  - {fileID: 11400000, guid: 07ebc1617e6c30743bade3cf359c6734, type: 2}
+  - {fileID: 11400000, guid: 47dc92021f361ce449deef0ae4135706, type: 2}
+  - {fileID: 11400000, guid: b8f71cef247ea9b48b36d2fa50aca748, type: 2}
+  - {fileID: 11400000, guid: fa2d7a915502aca4d87484a7403444ea, type: 2}
+  - {fileID: 11400000, guid: c9c8e72e82130434a84e756917fa6c96, type: 2}
+  - {fileID: 11400000, guid: 1af217e737e79de449c1431dd9dda27d, type: 2}
+  - {fileID: 11400000, guid: 18f2b8a1637d25f4cbf4c8ff12060b2c, type: 2}
+  - {fileID: 11400000, guid: 594cfd1077fda7a448fdab7b44aa92bf, type: 2}
+  - {fileID: 11400000, guid: ef853828f8cda944da19e02b9d7096ae, type: 2}
+  - {fileID: 11400000, guid: a8e880c703e0cb4468f9adacba899093, type: 2}
   activePolicyEffects: []
 --- !u!4 &2008099408
 Transform:

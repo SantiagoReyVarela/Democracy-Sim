@@ -40,6 +40,13 @@ public class ParameterLineChart : MaskableGraphic
     [SerializeField, Min(1f)]
     private float pointSize = 8f;
 
+    [Header("Automatic vertical scale")]
+
+    [SerializeField]
+    private bool autoExpandMaximum = false;
+
+    [SerializeField, Range(0f, 0.5f)]
+    private float maximumPadding = 0.1f;
 
     protected override void Awake()
     {
@@ -110,6 +117,13 @@ public class ParameterLineChart : MaskableGraphic
             return;
         }
 
+        float effectiveMaximum = GetEffectiveMaximum();
+
+        if (effectiveMaximum <= minimumValue)
+        {
+            return;
+        }
+
         Rect chartRect = rectTransform.rect;
 
         float chartWidth = chartRect.width - padding * 2f;
@@ -148,9 +162,10 @@ public class ParameterLineChart : MaskableGraphic
 
             float verticalPosition = Mathf.InverseLerp(
                 minimumValue,
-                maximumValue,
+                effectiveMaximum,
                 parameterValue
             );
+            
 
             Vector2 currentPoint = new Vector2(
                 chartRect.xMin +
@@ -320,6 +335,86 @@ public class ParameterLineChart : MaskableGraphic
         rect.localScale = Vector3.one;
     }
 
+    private float GetEffectiveMaximum()
+    {
+        if (
+            !autoExpandMaximum ||
+            countryState == null ||
+            countryState.History == null ||
+            countryState.History.Count == 0
+        )
+        {
+            return maximumValue;
+        }
+
+        float highestValue = maximumValue;
+
+        foreach (CountrySnapshot snapshot in countryState.History)
+        {
+            float value = snapshot.GetParameter(parameter);
+
+            if (value > highestValue)
+            {
+                highestValue = value;
+            }
+        }
+
+        if (highestValue <= maximumValue)
+        {
+            return maximumValue;
+        }
+
+        float visibleRange = highestValue - minimumValue;
+
+        float paddedMaximum =
+            highestValue +
+            visibleRange * maximumPadding;
+
+        return RoundMaximumUp(paddedMaximum);
+    }
+
+    
+    private float RoundMaximumUp(float value)
+    {
+        if (value <= 0f)
+        {
+            return 1f;
+        }
+
+        float approximateStep =
+            (value - minimumValue) / 5f;
+
+        float magnitude = Mathf.Pow(
+            10f,
+            Mathf.Floor(Mathf.Log10(approximateStep))
+        );
+
+        float normalizedStep =
+            approximateStep / magnitude;
+
+        float niceStep;
+
+        if (normalizedStep <= 1f)
+        {
+            niceStep = 1f;
+        }
+        else if (normalizedStep <= 2f)
+        {
+            niceStep = 2f;
+        }
+        else if (normalizedStep <= 5f)
+        {
+            niceStep = 5f;
+        }
+        else
+        {
+            niceStep = 10f;
+        }
+
+        niceStep *= magnitude;
+
+        return Mathf.Ceil(value / niceStep) * niceStep;
+    }
 
 #if UNITY_EDITOR
 
