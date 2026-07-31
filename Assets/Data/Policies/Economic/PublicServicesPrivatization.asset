@@ -10,26 +10,38 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
-  m_Name: Policy_TaxIncrease
+  m_Name: PublicServicesPrivatization
   m_EditorClassIdentifier: Assembly-CSharp::PolicyDefinitionSO
-  policyId: policy_taxincrease
-  policyName: Subida de impuestos
-  description: El Estado sube impuestos.
+  policyId: policy_publicsercicesprivatization
+  policyName: "Privatizaci\xF3n de servicios p\xFAblicos"
+  description: "El gobierno privatiza servicios p\xFAblicos"
   politicalCost: 1
+  primaryAxis: 2
+  ideologicalProfile:
+  - axis: 2
+    position: 1
+    relevance: 1
+  - axis: 0
+    position: 1
+    relevance: 0.5
   effects:
   - parameter: 5
-    amount: 8
+    amount: 7
     delayInTurns: 0
     durationInTurns: 0
   - parameter: 0
-    amount: -2
+    amount: 3
     delayInTurns: 0
-    durationInTurns: 4
+    durationInTurns: 0
   - parameter: 1
-    amount: 2
+    amount: -5
     delayInTurns: 0
     durationInTurns: 0
   - parameter: 4
+    amount: -9
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 2
     amount: -1
     delayInTurns: 0
     durationInTurns: 0

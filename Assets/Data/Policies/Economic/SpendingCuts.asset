@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
+  m_Name: SpendingCuts
+  m_EditorClassIdentifier: Assembly-CSharp::PolicyDefinitionSO
+  policyId: Spending_cuts
+  policyName: Recorte de gasto publico
+  description: El gobierno recorta gastos
+  politicalCost: 0
+  primaryAxis: 2
+  ideologicalProfile:
+  - axis: 2
+    position: 2
+    relevance: 1
+  - axis: 4
+    position: 4
+    relevance: 0.4
+  effects:
+  - parameter: 5
+    amount: 10
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 1
+    amount: -5
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 4
+    amount: -4
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 2
+    amount: -1
+    delayInTurns: 0
+    durationInTurns: 0

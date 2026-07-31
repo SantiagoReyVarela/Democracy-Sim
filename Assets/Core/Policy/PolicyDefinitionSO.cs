@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Define un efecto individual provocado por una política.
-/// </summary>
 [Serializable]
 public class PolicyEffect
 {
@@ -20,27 +17,12 @@ public class PolicyEffect
     [SerializeField, Min(0)]
     private int durationInTurns;
 
-
     public CountryParameter Parameter => parameter;
-
     public float Amount => amount;
-
     public int DelayInTurns => delayInTurns;
-
     public int DurationInTurns => durationInTurns;
-
-    public bool IsImmediate => delayInTurns == 0;
-
-    public bool IsPermanent => durationInTurns == 0;
 }
 
-
-/// <summary>
-/// Contiene los datos permanentes de una política.
-///
-/// Al ser un ScriptableObject, permite crear políticas desde el menú
-/// de Assets sin escribir una clase nueva para cada una.
-/// </summary>
 [CreateAssetMenu(
     fileName = "NewPolicy",
     menuName = "Democracy Simulator/Policy Definition",
@@ -66,28 +48,61 @@ public class PolicyDefinitionSO : ScriptableObject
     private float politicalCost;
 
 
+    [Header("Ideological classification")]
+
+    [SerializeField]
+    private PoliticalAxis primaryAxis = PoliticalAxis.Economy;
+
+    [SerializeField]
+    private List<PolicyAxisPosition> ideologicalProfile =
+        new List<PolicyAxisPosition>();
+
+
     [Header("Effects")]
 
     [SerializeField]
-    private List<PolicyEffect> effects = new List<PolicyEffect>();
+    private List<PolicyEffect> effects =
+        new List<PolicyEffect>();
 
 
     public string PolicyId => policyId;
-
     public string PolicyName => policyName;
-
     public string Description => description;
-
     public float PoliticalCost => politicalCost;
+
+    public PoliticalAxis PrimaryAxis => primaryAxis;
+
+    public IReadOnlyList<PolicyAxisPosition> IdeologicalProfile =>
+        ideologicalProfile;
 
     public IReadOnlyList<PolicyEffect> Effects => effects;
 
 
-    /// <summary>
-    /// Busca el efecto de esta política sobre un parámetro concreto.
-    /// Devuelve cero si la política no afecta a dicho parámetro.
-    /// </summary>
-    public float GetTotalEffectOnParameter(CountryParameter parameter)
+    public bool TryGetAxisPosition(
+        PoliticalAxis axis,
+        out PolicyAxisPosition axisPosition
+    )
+    {
+        foreach (PolicyAxisPosition profileEntry in ideologicalProfile)
+        {
+            if (
+                profileEntry != null &&
+                profileEntry.Axis == axis
+            )
+            {
+                axisPosition = profileEntry;
+                return true;
+            }
+        }
+
+        axisPosition = null;
+        return false;
+    }
+
+
+    public float GetTotalEffectOnParameter(
+        CountryParameter parameter
+    )
     {
         float totalEffect = 0f;
 

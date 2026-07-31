@@ -10,26 +10,45 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
-  m_Name: Policy_SocialAid
+  m_Name: BorderClosure
   m_EditorClassIdentifier: Assembly-CSharp::PolicyDefinitionSO
-  policyId: policy_socialaid
-  policyName: Ayudas sociales
-  description: El gobierno crea ayudas sociales
+  policyId: policy_borderclosure
+  policyName: Cierre de fronteras
+  description: El gobierno cierra las fronteras
   politicalCost: 1
+  primaryAxis: 5
+  ideologicalProfile:
+  - axis: 5
+    position: 5
+    relevance: 1
+  - axis: 4
+    position: 5
+    relevance: 0.45
+  - axis: 0
+    position: 4
+    relevance: 0.3
   effects:
-  - parameter: 1
-    amount: 5
-    delayInTurns: 0
-    durationInTurns: 0
   - parameter: 4
     amount: 1
     delayInTurns: 0
     durationInTurns: 0
+  - parameter: 0
+    amount: -3
+    delayInTurns: 0
+    durationInTurns: 0
   - parameter: 2
-    amount: -2
+    amount: -1
     delayInTurns: 0
     durationInTurns: 0
   - parameter: 5
-    amount: -10
+    amount: -2
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 1
+    amount: -2
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 8
+    amount: 0.5
     delayInTurns: 0
     durationInTurns: 0

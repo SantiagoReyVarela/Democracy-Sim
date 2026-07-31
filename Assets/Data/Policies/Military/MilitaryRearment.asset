@@ -10,26 +10,41 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
-  m_Name: Policy_TaxReduction
+  m_Name: MilitaryRearment
   m_EditorClassIdentifier: Assembly-CSharp::PolicyDefinitionSO
-  policyId: policy_taxreduction
-  policyName: "Reducci\xF3n de impuestos"
-  description: El gobierno baja impuestos
+  policyId: policy_militaryrearment
+  policyName: Rearme militar
+  description: El gobierno se rearma fuertemente
   politicalCost: 1
+  primaryAxis: 6
+  ideologicalProfile:
+  - axis: 6
+    position: 5
+    relevance: 1
+  - axis: 0
+    position: 4
+    relevance: 0.35
+  - axis: 2
+    position: 4
+    relevance: 0.25
   effects:
-  - parameter: 0
-    amount: 5
-    delayInTurns: 0
-    durationInTurns: 4
-  - parameter: 1
-    amount: -1
+  - parameter: 5
+    amount: -10
     delayInTurns: 0
     durationInTurns: 0
+  - parameter: 2
+    amount: 2
+    delayInTurns: 0
+    durationInTurns: 4
   - parameter: 4
+    amount: 2
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 0
     amount: 1
     delayInTurns: 0
     durationInTurns: 0
-  - parameter: 5
-    amount: -8
+  - parameter: 8
+    amount: 0.5
     delayInTurns: 0
     durationInTurns: 0

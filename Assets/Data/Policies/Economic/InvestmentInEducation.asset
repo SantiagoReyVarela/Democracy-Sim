@@ -10,22 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
-  m_Name: Policy_InvestmentInEducation
+  m_Name: InvestmentInEducation
   m_EditorClassIdentifier: Assembly-CSharp::PolicyInvestmentInEducationSO
   policyId: policy_investmentineducation
   policyName: "Inversi\xF3n en educaci\xF3n"
   description: "El gobierno invierte en educaci\xF3n."
   politicalCost: 1
+  primaryAxis: 4
+  ideologicalProfile:
+  - axis: 4
+    position: 2
+    relevance: 0.8
+  - axis: 2
+    position: 4
+    relevance: 0.5
   effects:
   - parameter: 3
     amount: 5
     delayInTurns: 1
-    durationInTurns: 0
+    durationInTurns: 4
   - parameter: 2
     amount: 1
-    delayInTurns: 0
-    durationInTurns: 0
+    delayInTurns: 3
+    durationInTurns: 3
   - parameter: 0
     amount: -2
-    delayInTurns: 0
-    durationInTurns: 0
+    delayInTurns: 4
+    durationInTurns: 3
