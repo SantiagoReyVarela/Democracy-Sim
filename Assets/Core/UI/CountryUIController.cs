@@ -104,6 +104,7 @@ public class CountryUIController : MonoBehaviour
         if (countryState != null)
         {
             countryState.OnStateChanged += RefreshUI;
+            BindCountryState();
         }
     }
 
@@ -473,6 +474,30 @@ public class CountryUIController : MonoBehaviour
         {
             skipTurnButton.onClick.RemoveListener(SkipTurn);
         }
+    }
+
+    private void BindCountryState()
+    {
+        CountryState persistentState = CountryState.Instance;
+
+        if (persistentState == null)
+        {
+            Debug.LogError(
+                "CountryUIController: no existe CountryState.Instance."
+            );
+
+            return;
+        }
+
+        if (countryState != null)
+        {
+            countryState.OnStateChanged -= RefreshUI;
+        }
+
+        countryState = persistentState;
+
+        countryState.OnStateChanged -= RefreshUI;
+        countryState.OnStateChanged += RefreshUI;
     }
 
 }

@@ -62,14 +62,9 @@ public class ParameterLineChart : MaskableGraphic
     {
         base.OnEnable();
 
-        if (countryState != null)
-        {
-            countryState.OnStateChanged += HandleStateChanged;
-        }
-
+        BindCountryState();
         SetVerticesDirty();
     }
-
 
     protected override void OnDisable()
     {
@@ -80,7 +75,6 @@ public class ParameterLineChart : MaskableGraphic
 
         base.OnDisable();
     }
-
 
     private void HandleStateChanged()
     {
@@ -359,18 +353,11 @@ public class ParameterLineChart : MaskableGraphic
             }
         }
 
-        if (highestValue <= maximumValue)
-        {
-            return maximumValue;
-        }
-
-        float visibleRange = highestValue - minimumValue;
-
-        float paddedMaximum =
-            highestValue +
-            visibleRange * maximumPadding;
-
-        return RoundMaximumUp(paddedMaximum);
+        /*
+        * El máximo visible coincide exactamente con el máximo histórico.
+        * Por tanto, el dato más alto alcanza el límite superior.
+        */
+        return highestValue;
     }
 
     
@@ -414,6 +401,28 @@ public class ParameterLineChart : MaskableGraphic
         niceStep *= magnitude;
 
         return Mathf.Ceil(value / niceStep) * niceStep;
+    }
+
+    private void BindCountryState()
+    {
+        CountryState persistentState = CountryState.Instance;
+
+        if (persistentState == null)
+        {
+            return;
+        }
+
+        if (countryState != null)
+        {
+            countryState.OnStateChanged -= HandleStateChanged;
+        }
+
+        countryState = persistentState;
+
+        countryState.OnStateChanged -= HandleStateChanged;
+        countryState.OnStateChanged += HandleStateChanged;
+
+        SetVerticesDirty();
     }
 
 #if UNITY_EDITOR

@@ -10,9 +10,11 @@ public sealed class PolicyAxisPosition
     [SerializeField]
     private PoliticalAxis axis;
 
-    [Tooltip("Posición ideológica dentro del eje, entre 1 y 5.")]
-    [SerializeField, Range(1, 5)]
-    private int position = 3;
+    [Tooltip("Posición ideológica continua dentro del eje, entre 1 y 5.")]
+    [SerializeField, Range(1f, 5f)]
+    private float position = 3f;
+
+    public float Position => position;
 
     [Tooltip(
         "Indica cuánto representa esta política al eje. " +
@@ -22,8 +24,6 @@ public sealed class PolicyAxisPosition
     private float relevance = 1f;
 
     public PoliticalAxis Axis => axis;
-
-    public int Position => position;
 
     public float Relevance => relevance;
 }

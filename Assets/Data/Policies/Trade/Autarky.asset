@@ -12,32 +12,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
   m_Name: Autarky
   m_EditorClassIdentifier: Assembly-CSharp::PolicyDefinitionSO
-  policyId: policy_taxreduction
-  policyName: "Reducci\xF3n de impuestos"
-  description: El gobierno baja impuestos
+  policyId: policy_autarky
+  policyName: Autarquia
+  description: "El gobierno declara la autarqu\xEDa."
   politicalCost: 1
-  primaryAxis: 2
+  primaryAxis: 3
   ideologicalProfile:
-  - axis: 2
-    position: 2
+  - axis: 3
+    position: 4.5
     relevance: 1
-  - axis: 4
+  - axis: 0
     position: 4
-    relevance: 0.2
+    relevance: 0.4
   effects:
   - parameter: 0
-    amount: 5
-    delayInTurns: 0
-    durationInTurns: 4
-  - parameter: 1
-    amount: -1
+    amount: -5
     delayInTurns: 0
     durationInTurns: 0
-  - parameter: 4
-    amount: 1
+  - parameter: 2
+    amount: -2
     delayInTurns: 0
     durationInTurns: 0
   - parameter: 5
-    amount: -8
+    amount: -3
+    delayInTurns: 0
+    durationInTurns: 0
+  - parameter: 8
+    amount: 0.5
+    delayInTurns: 0
+    durationInTurns: 3
+  - parameter: 4
+    amount: 1
     delayInTurns: 0
     durationInTurns: 0

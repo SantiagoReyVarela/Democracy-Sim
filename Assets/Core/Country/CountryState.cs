@@ -122,6 +122,13 @@ public class CountryState : MonoBehaviour
     private List<CountrySnapshot> history = new List<CountrySnapshot>();
     public IReadOnlyList<CountrySnapshot> History => history;
 
+    [Header("Applied policy history")]
+
+    [SerializeField]
+    private List<AppliedPolicyRecord> appliedPolicyHistory = new List<AppliedPolicyRecord>();
+    
+        
+
     [Header("Parameter relations")]
 
     [SerializeField]
@@ -173,6 +180,8 @@ public class CountryState : MonoBehaviour
     public float DebtPaymentPercentage => debtPaymentPercentage;
 
     public DeficitFinancingMode DeficitFinancingMode => deficitFinancingMode;
+
+    public IReadOnlyList<AppliedPolicyRecord> AppliedPolicyHistory => appliedPolicyHistory;
 
     public float LastReservesUsed => lastReservesUsed;
 
@@ -368,6 +377,8 @@ public class CountryState : MonoBehaviour
                 activePolicyEffects.Add(delayedEffect);
             }
         }
+
+        RecordAppliedPolicy(policy);
 
         Debug.Log($"Policy applied: {policy.PolicyName}");
 
@@ -925,6 +936,7 @@ public class CountryState : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         activePolicyEffects.Clear();
+        appliedPolicyHistory.Clear();
 
         pendingInflation = 0f;
         inflationPressureTurnsRemaining = 0;
@@ -1023,6 +1035,21 @@ public class CountryState : MonoBehaviour
             );
         }
     }
+
+    private void RecordAppliedPolicy(
+        PolicyDefinitionSO policy
+    )
+    {
+        AppliedPolicyRecord record =
+            new AppliedPolicyRecord(
+                policy,
+                currentTurn
+            );
+
+        appliedPolicyHistory.Add(record);
+    }
+
+    
 
 
 #if UNITY_EDITOR

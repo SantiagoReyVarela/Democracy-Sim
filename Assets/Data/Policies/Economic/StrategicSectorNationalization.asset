@@ -19,7 +19,7 @@ MonoBehaviour:
   primaryAxis: 2
   ideologicalProfile:
   - axis: 2
-    position: 5
+    position: 4.5
     relevance: 1
   - axis: 0
     position: 4

@@ -22,7 +22,7 @@ MonoBehaviour:
     position: 1
     relevance: 1
   - axis: 0
-    position: 1
+    position: 1.5
     relevance: 0.5
   effects:
   - parameter: 5

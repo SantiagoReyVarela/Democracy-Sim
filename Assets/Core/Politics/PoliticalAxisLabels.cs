@@ -119,4 +119,25 @@ public static class PoliticalAxisLabels
 
         return PositionNames[axisIndex][positionIndex];
     }
+    
+    public static string GetPositionDescription(
+        PoliticalAxis axis,
+        float position
+    )
+    {
+        position = Mathf.Clamp(position, 1f, 5f);
+
+        int lowerPosition = Mathf.FloorToInt(position);
+        int upperPosition = Mathf.CeilToInt(position);
+
+        if (lowerPosition == upperPosition)
+        {
+            return GetPositionName(axis, lowerPosition);
+        }
+
+        string lowerName = GetPositionName(axis, lowerPosition);
+        string upperName = GetPositionName(axis, upperPosition);
+
+        return $"{position:0.#} — Entre {lowerName} y {upperName}";
+    }
 }
