@@ -249,6 +249,25 @@ MonoBehaviour:
   employment: 50
   education: 50
   stability: 50
+  policySlots:
+  - slotId: 0
+    activePolicy: {fileID: 0}
+  - slotId: 1
+    activePolicy: {fileID: 0}
+  - slotId: 2
+    activePolicy: {fileID: 0}
+  - slotId: 3
+    activePolicy: {fileID: 0}
+  - slotId: 4
+    activePolicy: {fileID: 0}
+  - slotId: 5
+    activePolicy: {fileID: 0}
+  - slotId: 6
+    activePolicy: {fileID: 0}
+  - slotId: 7
+    activePolicy: {fileID: 0}
+  - slotId: 8
+    activePolicy: {fileID: 0}
   fiscalResult: -10
   reserves: 20
   debt: 100
