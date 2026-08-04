@@ -250,27 +250,45 @@ MonoBehaviour:
   education: 50
   stability: 50
   policySlots:
-  - slotId: 0
+  - slotId: E1
+    displayName: "Econom\xEDa 1"
+    axis: 2
     activePolicy: {fileID: 0}
-  - slotId: 1
+  - slotId: E2
+    displayName: "Econom\xEDa 2"
+    axis: 2
     activePolicy: {fileID: 0}
-  - slotId: 2
+  - slotId: G1
+    displayName: Gobierno 1
+    axis: 0
     activePolicy: {fileID: 0}
-  - slotId: 3
+  - slotId: G2
+    displayName: Gobierno 2
+    axis: 0
     activePolicy: {fileID: 0}
-  - slotId: 4
+  - slotId: I1
+    displayName: "Inmigraci\xF3n"
+    axis: 5
     activePolicy: {fileID: 0}
-  - slotId: 5
+  - slotId: M1
+    displayName: Militar
+    axis: 6
     activePolicy: {fileID: 0}
-  - slotId: 6
+  - slotId: R1
+    displayName: "Religi\xF3n"
+    axis: 1
     activePolicy: {fileID: 0}
-  - slotId: 7
+  - slotId: S1
+    displayName: Sociedad
+    axis: 4
     activePolicy: {fileID: 0}
-  - slotId: 8
+  - slotId: T1
+    displayName: Comercio
+    axis: 3
     activePolicy: {fileID: 0}
-  fiscalResult: -10
+  fiscalResult: 10
   reserves: 20
-  debt: 100
+  debt: 0
   inflation: 2
   minimumInflation: -10
   disinflationPerReserveUnit: 0.03
@@ -291,8 +309,8 @@ MonoBehaviour:
   inflationRecoveryTurnsRemaining: 0
   history: []
   appliedPolicyHistory: []
+  policySlotChangeHistory: []
   parameterRelations: []
-  activePolicyEffects: []
 --- !u!4 &1402993959
 Transform:
   m_ObjectHideFlags: 0

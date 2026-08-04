@@ -4,9 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Representa visualmente un espacio de política permanente.
+/// Representa visualmente un espacio permanente de políticas.
+///
+/// Permite:
+/// - Seleccionar el espacio.
+/// - Ver la política activa.
+/// - Retirar la política directamente desde el espacio.
 /// </summary>
-[RequireComponent(typeof(Button))]
 public sealed class PolicySlotButtonUI : MonoBehaviour
 {
     [Header("Texts")]
@@ -18,15 +22,26 @@ public sealed class PolicySlotButtonUI : MonoBehaviour
     private TMP_Text activePolicyText;
 
 
-    [Header("Selection indicator")]
+    [Header("Buttons")]
+
+    [SerializeField]
+    private Button selectSlotButton;
+
+    [SerializeField]
+    private Button removePolicyButton;
+
+
+    [Header("Selection")]
 
     [SerializeField]
     private GameObject selectedIndicator;
 
 
-    private Button button;
     private PolicySlotState policySlot;
+
     private Action<PolicySlotState> selectionCallback;
+
+    private Action<PolicySlotState> removalCallback;
 
 
     public PolicySlotState PolicySlot => policySlot;
@@ -34,28 +49,45 @@ public sealed class PolicySlotButtonUI : MonoBehaviour
 
     private void Awake()
     {
-        button = GetComponent<Button>();
-        button.onClick.AddListener(HandleClicked);
+        if (selectSlotButton != null)
+        {
+            selectSlotButton.onClick.AddListener(
+                HandleSelectClicked
+            );
+        }
+
+        if (removePolicyButton != null)
+        {
+            removePolicyButton.onClick.AddListener(
+                HandleRemoveClicked
+            );
+        }
     }
 
 
     /// <summary>
-    /// Asigna a este botón uno de los espacios configurados
-    /// en CountryState.
+    /// Asigna a la fila uno de los espacios configurados
+    /// dentro de CountryState.
     /// </summary>
     public void Initialize(
         PolicySlotState slot,
-        Action<PolicySlotState> onSelected
+        Action<PolicySlotState> onSelected,
+        Action<PolicySlotState> onRemoved
     )
     {
         policySlot = slot;
+
         selectionCallback = onSelected;
+        removalCallback = onRemoved;
 
         Refresh();
         SetSelected(false);
     }
 
 
+    /// <summary>
+    /// Actualiza los textos y el estado de los botones.
+    /// </summary>
     public void Refresh()
     {
         if (policySlot == null)
@@ -70,9 +102,14 @@ public sealed class PolicySlotButtonUI : MonoBehaviour
                 string.Empty
             );
 
-            if (button != null)
+            if (selectSlotButton != null)
             {
-                button.interactable = false;
+                selectSlotButton.interactable = false;
+            }
+
+            if (removePolicyButton != null)
+            {
+                removePolicyButton.interactable = false;
             }
 
             return;
@@ -83,23 +120,32 @@ public sealed class PolicySlotButtonUI : MonoBehaviour
             policySlot.DisplayName
         );
 
-        string policyName =
+        string activePolicyName =
             policySlot.ActivePolicy != null
                 ? policySlot.ActivePolicy.PolicyName
                 : "Espacio vacío";
 
         SetText(
             activePolicyText,
-            policyName
+            activePolicyName
         );
 
-        if (button != null)
+        if (selectSlotButton != null)
         {
-            button.interactable = true;
+            selectSlotButton.interactable = true;
+        }
+
+        if (removePolicyButton != null)
+        {
+            removePolicyButton.interactable =
+                policySlot.ActivePolicy != null;
         }
     }
 
 
+    /// <summary>
+    /// Muestra u oculta el indicador visual de selección.
+    /// </summary>
     public void SetSelected(bool selected)
     {
         if (selectedIndicator != null)
@@ -109,7 +155,7 @@ public sealed class PolicySlotButtonUI : MonoBehaviour
     }
 
 
-    private void HandleClicked()
+    private void HandleSelectClicked()
     {
         if (policySlot == null)
         {
@@ -117,6 +163,20 @@ public sealed class PolicySlotButtonUI : MonoBehaviour
         }
 
         selectionCallback?.Invoke(policySlot);
+    }
+
+
+    private void HandleRemoveClicked()
+    {
+        if (
+            policySlot == null ||
+            policySlot.ActivePolicy == null
+        )
+        {
+            return;
+        }
+
+        removalCallback?.Invoke(policySlot);
     }
 
 
@@ -134,10 +194,17 @@ public sealed class PolicySlotButtonUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (button != null)
+        if (selectSlotButton != null)
         {
-            button.onClick.RemoveListener(
-                HandleClicked
+            selectSlotButton.onClick.RemoveListener(
+                HandleSelectClicked
+            );
+        }
+
+        if (removePolicyButton != null)
+        {
+            removePolicyButton.onClick.RemoveListener(
+                HandleRemoveClicked
             );
         }
     }
