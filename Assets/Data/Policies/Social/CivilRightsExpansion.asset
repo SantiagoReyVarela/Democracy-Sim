@@ -26,11 +26,11 @@ MonoBehaviour:
     relevance: 0.5
   firstImpactEffects:
   - parameter: 4
-    amount: -3
-  - parameter: 4
-    amount: 1
-  - parameter: 0
-    amount: 2
+    amount: -1
+  activeEffects:
   - parameter: 1
-    amount: 3
-  activeEffects: []
+    amount: 6
+  - parameter: 4
+    amount: 2
+  - parameter: 5
+    amount: -1

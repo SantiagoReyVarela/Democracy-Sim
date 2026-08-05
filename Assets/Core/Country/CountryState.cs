@@ -5,12 +5,10 @@ using UnityEngine;
 /// <summary>
 /// Almacena el estado actual del país durante una partida.
 ///
-/// Los campos numéricos representan los valores base del país.
-/// Los efectos permanentes de las políticas se calculan de forma dinámica:
-///
-/// valor efectivo = valor base + modificadores de políticas activas.
-///
-/// Los efectos de primer impacto sí modifican los valores base una sola vez.
+/// Funcionamiento de las políticas:
+/// - FirstImpactEffects: se aplican una sola vez al colocar la política.
+/// - ActiveEffects: se aplican una vez en cada turno mientras la política
+///   continúe ocupando un slot.
 /// </summary>
 public class CountryState : MonoBehaviour
 {
@@ -53,7 +51,9 @@ public class CountryState : MonoBehaviour
         }
     }
 
+
     public static CountryState Instance { get; private set; }
+
 
     [Header("Country information")]
 
@@ -67,7 +67,7 @@ public class CountryState : MonoBehaviour
     private int maximumTurns = 48;
 
 
-    [Header("Country parameters - Base values")]
+    [Header("Country parameters")]
 
     [SerializeField, Range(0f, 100f)]
     private float prosperity = 50f;
@@ -92,7 +92,7 @@ public class CountryState : MonoBehaviour
         new List<PolicySlotState>();
 
 
-    [Header("Fiscal economy - Base values")]
+    [Header("Fiscal economy")]
 
     [SerializeField, Range(-100f, 100f)]
     private float fiscalResult = -10f;
@@ -198,36 +198,16 @@ public class CountryState : MonoBehaviour
     public int MaximumTurns => maximumTurns;
     public bool HasReachedFinalTurn => currentTurn >= maximumTurns;
 
-    /*
-     * Las propiedades públicas devuelven valores efectivos para que
-     * la interfaz siempre muestre los modificadores de políticas.
-     */
-    public float Prosperity =>
-        GetEffectiveParameterValue(CountryParameter.Prosperity);
+    public float Prosperity => prosperity;
+    public float Equality => equality;
+    public float Employment => employment;
+    public float Education => education;
+    public float Stability => stability;
 
-    public float Equality =>
-        GetEffectiveParameterValue(CountryParameter.Equality);
-
-    public float Employment =>
-        GetEffectiveParameterValue(CountryParameter.Employment);
-
-    public float Education =>
-        GetEffectiveParameterValue(CountryParameter.Education);
-
-    public float Stability =>
-        GetEffectiveParameterValue(CountryParameter.Stability);
-
-    public float FiscalResult =>
-        GetEffectiveParameterValue(CountryParameter.FiscalResult);
-
-    public float Reserves =>
-        GetEffectiveParameterValue(CountryParameter.Reserves);
-
-    public float Debt =>
-        GetEffectiveParameterValue(CountryParameter.Debt);
-
-    public float Inflation =>
-        GetEffectiveParameterValue(CountryParameter.Inflation);
+    public float FiscalResult => fiscalResult;
+    public float Reserves => reserves;
+    public float Debt => debt;
+    public float Inflation => inflation;
 
     public float DebtPaymentPercentage => debtPaymentPercentage;
 
@@ -251,7 +231,8 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Devuelve el valor base, sin modificadores de políticas.
+    /// Devuelve el valor actual almacenado del parámetro.
+    /// Los efectos activos ya se incorporan al valor cuando avanza el turno.
     /// </summary>
     public float GetBaseParameterValue(
         CountryParameter parameter
@@ -296,44 +277,31 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Devuelve el valor efectivo utilizado por la interfaz,
-    /// las relaciones y las gráficas.
+    /// Método conservado por compatibilidad con la interfaz existente.
+    /// Ya no añade modificadores temporales: devuelve el valor almacenado.
     /// </summary>
     public float GetEffectiveParameterValue(
         CountryParameter parameter
     )
     {
-        float effectiveValue =
-            GetBaseParameterValue(parameter) +
-            GetActivePolicyModifier(parameter);
-
-        return ClampEffectiveParameterValue(
-            parameter,
-            effectiveValue
-        );
+        return GetBaseParameterValue(parameter);
     }
 
 
-    /// <summary>
-    /// Método de compatibilidad. Ahora devuelve el valor efectivo.
-    /// </summary>
     public float GetParameter(
         CountryParameter parameter
     )
     {
-        return GetEffectiveParameterValue(parameter);
+        return GetBaseParameterValue(parameter);
     }
 
 
-    /// <summary>
-    /// Sustituye el valor base de un parámetro.
-    /// </summary>
     public void SetParameter(
         CountryParameter parameter,
         float newValue
     )
     {
-        SetBaseParameterWithoutNotification(
+        SetParameterWithoutNotification(
             parameter,
             newValue
         );
@@ -342,10 +310,6 @@ public class CountryState : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// Modifica el valor base, no el valor efectivo.
-    /// Esto evita que retirar una política altere permanentemente el país.
-    /// </summary>
     public void ModifyParameter(
         CountryParameter parameter,
         float amount
@@ -361,19 +325,18 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Método temporal de compatibilidad con la interfaz antigua.
-    ///
-    /// Asigna la política al primer espacio compatible vacío.
-    /// Si no hay ninguno vacío, sustituye la política del primer
-    /// espacio compatible.
-    ///
-    /// La interfaz definitiva debe utilizar AssignPolicyToSlot.
+    /// Método de compatibilidad con interfaces antiguas.
+    /// Asigna la política al primer slot compatible vacío.
     /// </summary>
-    public void ApplyPolicy(PolicyDefinitionSO policy)
+    public void ApplyPolicy(
+        PolicyDefinitionSO policy
+    )
     {
         if (policy == null)
         {
-            Debug.LogError("Cannot apply a null policy.");
+            Debug.LogError(
+                "Cannot apply a null policy."
+            );
             return;
         }
 
@@ -389,7 +352,6 @@ public class CountryState : MonoBehaviour
                 $"No existe ningún espacio compatible con " +
                 $"{policy.PolicyName} ({policy.PrimaryAxis})."
             );
-
             return;
         }
 
@@ -401,7 +363,14 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Avanza un turno sin seleccionar automáticamente una política.
+    /// Avanza un turno.
+    ///
+    /// Orden:
+    /// 1. Se aplican una vez los ActiveEffects de cada política activa.
+    /// 2. Se procesa el presupuesto con el resultado fiscal actualizado.
+    /// 3. Se procesa la inflación.
+    /// 4. Se aplican las relaciones configuradas.
+    /// 5. Se guarda el historial del turno.
     /// </summary>
     public bool AdvanceTurn()
     {
@@ -410,12 +379,12 @@ public class CountryState : MonoBehaviour
             Debug.LogWarning(
                 "The simulation has already reached its final turn."
             );
-
             return false;
         }
 
         currentTurn++;
 
+        ProcessActivePoliciesPerTurn();
         ProcessFiscalEconomy();
         ProcessInflation();
         ApplyConfiguredRelations();
@@ -428,9 +397,56 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Procesa el presupuesto usando el resultado fiscal efectivo.
-    /// De este modo, los modificadores permanentes de las políticas
-    /// afectan a cada turno sin acumularse sobre fiscalResult.
+    /// Aplica una vez por turno los ActiveEffects de todas las
+    /// políticas que continúan dentro de un slot.
+    /// </summary>
+    private void ProcessActivePoliciesPerTurn()
+    {
+        if (policySlots == null)
+        {
+            return;
+        }
+
+        foreach (PolicySlotState slot in policySlots)
+        {
+            if (
+                slot == null ||
+                slot.ActivePolicy == null ||
+                slot.ActivePolicy.ActiveEffects == null
+            )
+            {
+                continue;
+            }
+
+            foreach (
+                PolicyEffect effect
+                in slot.ActivePolicy.ActiveEffects
+            )
+            {
+                if (effect == null)
+                {
+                    continue;
+                }
+
+                ModifyParameterWithoutNotification(
+                    effect.Parameter,
+                    effect.Amount
+                );
+
+                Debug.Log(
+                    $"Active policy effect | " +
+                    $"Policy: {slot.ActivePolicy.PolicyName} | " +
+                    $"Parameter: {effect.Parameter} | " +
+                    $"Amount: {effect.Amount:+0.##;-0.##;0}"
+                );
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Procesa el presupuesto público del turno utilizando el
+    /// resultado fiscal que ya incluye los efectos activos aplicados.
     /// </summary>
     private void ProcessFiscalEconomy()
     {
@@ -439,14 +455,9 @@ public class CountryState : MonoBehaviour
         lastDebtIssued = 0f;
         lastMoneyPrinted = 0f;
 
-        float effectiveFiscalResult =
-            GetEffectiveParameterValue(
-                CountryParameter.FiscalResult
-            );
-
-        if (effectiveFiscalResult >= 0f)
+        if (fiscalResult >= 0f)
         {
-            float surplus = effectiveFiscalResult;
+            float surplus = fiscalResult;
 
             lastDebtPayment = Mathf.Min(
                 debt,
@@ -465,7 +476,7 @@ public class CountryState : MonoBehaviour
         }
         else
         {
-            float deficit = -effectiveFiscalResult;
+            float deficit = -fiscalResult;
 
             lastReservesUsed = Mathf.Min(
                 reserves,
@@ -498,14 +509,14 @@ public class CountryState : MonoBehaviour
         }
 
         Debug.Log(
-            $"Fiscal result: {effectiveFiscalResult:0.##} | " +
+            $"Fiscal result: {fiscalResult:0.##} | " +
             $"Reserves used: {lastReservesUsed:0.##} | " +
             $"Debt payment: {lastDebtPayment:0.##} | " +
             $"Debt issued: {lastDebtIssued:0.##} | " +
             $"Money printed: {lastMoneyPrinted:0.##} | " +
-            $"Reserves: {Reserves:0.##} | " +
-            $"Debt: {Debt:0.##} | " +
-            $"Inflation: {Inflation:0.##}%"
+            $"Reserves: {reserves:0.##} | " +
+            $"Debt: {debt:0.##} | " +
+            $"Inflation: {inflation:0.##}%"
         );
     }
 
@@ -562,30 +573,20 @@ public class CountryState : MonoBehaviour
             inflationRecoveryTurnsRemaining--;
         }
 
-        float effectiveFiscalResult =
-            GetEffectiveParameterValue(
-                CountryParameter.FiscalResult
-            );
-
         float reservesAddedThisTurn = 0f;
 
-        if (effectiveFiscalResult > 0f)
+        if (fiscalResult > 0f)
         {
             reservesAddedThisTurn = Mathf.Max(
                 0f,
-                effectiveFiscalResult - lastDebtPayment
+                fiscalResult - lastDebtPayment
             );
         }
 
         if (reservesAddedThisTurn > 0f)
         {
-            float effectiveInflation =
-                GetEffectiveParameterValue(
-                    CountryParameter.Inflation
-                );
-
             float multiplier =
-                effectiveInflation >= highInflationThreshold
+                inflation >= highInflationThreshold
                     ? highInflationMultiplier
                     : 1f;
 
@@ -605,25 +606,22 @@ public class CountryState : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// Modifica el valor base sin notificar a la interfaz.
-    /// </summary>
     private void ModifyParameterWithoutNotification(
         CountryParameter parameter,
         float amount
     )
     {
-        float baseValue =
+        float currentValue =
             GetBaseParameterValue(parameter);
 
-        SetBaseParameterWithoutNotification(
+        SetParameterWithoutNotification(
             parameter,
-            baseValue + amount
+            currentValue + amount
         );
     }
 
 
-    private void SetBaseParameterWithoutNotification(
+    private void SetParameterWithoutNotification(
         CountryParameter parameter,
         float newValue
     )
@@ -659,11 +657,17 @@ public class CountryState : MonoBehaviour
                 break;
 
             case CountryParameter.Reserves:
-                reserves = Mathf.Max(0f, newValue);
+                reserves = Mathf.Max(
+                    0f,
+                    newValue
+                );
                 break;
 
             case CountryParameter.Debt:
-                debt = Mathf.Max(0f, newValue);
+                debt = Mathf.Max(
+                    0f,
+                    newValue
+                );
                 break;
 
             case CountryParameter.Inflation:
@@ -679,40 +683,6 @@ public class CountryState : MonoBehaviour
                     $"Unknown country parameter: {parameter}"
                 );
                 break;
-        }
-    }
-
-
-    private float ClampEffectiveParameterValue(
-        CountryParameter parameter,
-        float value
-    )
-    {
-        switch (parameter)
-        {
-            case CountryParameter.Prosperity:
-            case CountryParameter.Equality:
-            case CountryParameter.Employment:
-            case CountryParameter.Education:
-            case CountryParameter.Stability:
-                return Mathf.Clamp(value, 0f, 100f);
-
-            case CountryParameter.FiscalResult:
-                return Mathf.Clamp(value, -100f, 100f);
-
-            case CountryParameter.Reserves:
-            case CountryParameter.Debt:
-                return Mathf.Max(0f, value);
-
-            case CountryParameter.Inflation:
-                return Mathf.Clamp(
-                    value,
-                    minimumInflation,
-                    100f
-                );
-
-            default:
-                return value;
         }
     }
 
@@ -740,9 +710,6 @@ public class CountryState : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// Reinicia la simulación y vacía todas las políticas activas.
-    /// </summary>
     public void ResetState(
         float initialProsperity = 50f,
         float initialEquality = 50f,
@@ -769,8 +736,15 @@ public class CountryState : MonoBehaviour
             100f
         );
 
-        reserves = Mathf.Max(0f, initialReserves);
-        debt = Mathf.Max(0f, initialDebt);
+        reserves = Mathf.Max(
+            0f,
+            initialReserves
+        );
+
+        debt = Mathf.Max(
+            0f,
+            initialDebt
+        );
 
         inflation = Mathf.Clamp(
             initialInflation,
@@ -816,9 +790,15 @@ public class CountryState : MonoBehaviour
     }
 
 
-    private float ClampParameter(float value)
+    private float ClampParameter(
+        float value
+    )
     {
-        return Mathf.Clamp(value, 0f, 100f);
+        return Mathf.Clamp(
+            value,
+            0f,
+            100f
+        );
     }
 
 
@@ -863,40 +843,22 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Guarda los valores efectivos utilizados durante el turno.
+    /// Guarda los valores actuales después de procesar el turno.
     /// </summary>
     private void RecordSnapshot()
     {
         CountrySnapshot snapshot =
             new CountrySnapshot(
                 currentTurn,
-                GetEffectiveParameterValue(
-                    CountryParameter.Prosperity
-                ),
-                GetEffectiveParameterValue(
-                    CountryParameter.Equality
-                ),
-                GetEffectiveParameterValue(
-                    CountryParameter.Employment
-                ),
-                GetEffectiveParameterValue(
-                    CountryParameter.Education
-                ),
-                GetEffectiveParameterValue(
-                    CountryParameter.Stability
-                ),
-                GetEffectiveParameterValue(
-                    CountryParameter.FiscalResult
-                ),
-                GetEffectiveParameterValue(
-                    CountryParameter.Reserves
-                ),
-                GetEffectiveParameterValue(
-                    CountryParameter.Debt
-                ),
-                GetEffectiveParameterValue(
-                    CountryParameter.Inflation
-                )
+                prosperity,
+                equality,
+                employment,
+                education,
+                stability,
+                fiscalResult,
+                reserves,
+                debt,
+                inflation
             );
 
         if (
@@ -914,8 +876,8 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Las relaciones leen valores efectivos, pero sus impactos
-    /// modifican los valores base del país.
+    /// Las relaciones leen los valores actuales y modifican el estado
+    /// una vez por turno.
     /// </summary>
     private void ApplyConfiguredRelations()
     {
@@ -936,7 +898,7 @@ public class CountryState : MonoBehaviour
             {
                 sourceValues.Add(
                     source,
-                    GetEffectiveParameterValue(source)
+                    GetParameter(source)
                 );
             }
         }
@@ -1068,6 +1030,7 @@ public class CountryState : MonoBehaviour
 
     /// <summary>
     /// Coloca o sustituye una política sin avanzar el turno.
+    /// Solo aplica en ese momento sus FirstImpactEffects.
     /// </summary>
     public bool AssignPolicyToSlot(
         string slotId,
@@ -1131,7 +1094,6 @@ public class CountryState : MonoBehaviour
         targetSlot.SetPolicy(policy);
 
         ApplyFirstImpactEffects(policy);
-
         RecordAppliedPolicy(policy);
 
         RecordPolicySlotChange(
@@ -1154,8 +1116,8 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Retira una política. Sus efectos activos desaparecen
-    /// automáticamente porque se calculan dinámicamente.
+    /// Retira una política. Desde el siguiente turno sus ActiveEffects
+    /// dejan de ejecutarse.
     /// </summary>
     public bool RemovePolicyFromSlot(
         string slotId
@@ -1222,8 +1184,11 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
-    /// Suma todos los modificadores permanentes del parámetro.
-    /// Nunca modifica los valores base.
+    /// Devuelve la cantidad total que las políticas activas aplicarán
+    /// al parámetro en el siguiente turno.
+    ///
+    /// Se conserva el nombre por compatibilidad con código anterior.
+    /// Ya no es un modificador visual permanente.
     /// </summary>
     public float GetActivePolicyModifier(
         CountryParameter parameter
@@ -1234,7 +1199,7 @@ public class CountryState : MonoBehaviour
             return 0f;
         }
 
-        float totalModifier = 0f;
+        float totalPerTurnEffect = 0f;
 
         foreach (PolicySlotState slot in policySlots)
         {
@@ -1246,14 +1211,14 @@ public class CountryState : MonoBehaviour
                 continue;
             }
 
-            totalModifier +=
+            totalPerTurnEffect +=
                 slot.ActivePolicy
                     .GetTotalActiveEffectOnParameter(
                         parameter
                     );
         }
 
-        return totalModifier;
+        return totalPerTurnEffect;
     }
 
 
@@ -1299,50 +1264,47 @@ public class CountryState : MonoBehaviour
     }
 
 
-    [ContextMenu("Debug Active Policy Modifiers")]
-    private void DebugActivePolicyModifiers()
+    [ContextMenu("Debug Active Policy Effects Per Turn")]
+    private void DebugActivePolicyEffectsPerTurn()
     {
         foreach (
             CountryParameter parameter
             in Enum.GetValues(typeof(CountryParameter))
         )
         {
-            float modifier =
+            float perTurnEffect =
                 GetActivePolicyModifier(parameter);
 
-            if (!Mathf.Approximately(modifier, 0f))
+            if (!Mathf.Approximately(perTurnEffect, 0f))
             {
                 Debug.Log(
-                    $"{parameter}: modificador activo " +
-                    $"{modifier:+0.##;-0.##;0}"
+                    $"{parameter}: efecto activo por turno " +
+                    $"{perTurnEffect:+0.##;-0.##;0}"
                 );
             }
         }
     }
 
 
-    [ContextMenu("Debug Base And Effective Values")]
-    private void DebugBaseAndEffectiveValues()
+    [ContextMenu("Debug Current Values And Policy Effects")]
+    private void DebugCurrentValuesAndPolicyEffects()
     {
         foreach (
             CountryParameter parameter
             in Enum.GetValues(typeof(CountryParameter))
         )
         {
-            float baseValue =
-                GetBaseParameterValue(parameter);
+            float currentValue =
+                GetParameter(parameter);
 
-            float modifier =
+            float perTurnEffect =
                 GetActivePolicyModifier(parameter);
-
-            float effectiveValue =
-                GetEffectiveParameterValue(parameter);
 
             Debug.Log(
                 $"{parameter} | " +
-                $"Base: {baseValue:0.##} | " +
-                $"Policies: {modifier:+0.##;-0.##;0} | " +
-                $"Effective: {effectiveValue:0.##}"
+                $"Current: {currentValue:0.##} | " +
+                $"Active next turn: " +
+                $"{perTurnEffect:+0.##;-0.##;0}"
             );
         }
     }
@@ -1350,12 +1312,13 @@ public class CountryState : MonoBehaviour
 
 #if UNITY_EDITOR
 
-    /// <summary>
-    /// Mantiene válidos los valores modificados desde el Inspector.
-    /// </summary>
     private void OnValidate()
     {
-        maximumTurns = Mathf.Max(1, maximumTurns);
+        maximumTurns = Mathf.Max(
+            1,
+            maximumTurns
+        );
+
         currentTurn = Mathf.Clamp(
             currentTurn,
             1,
@@ -1374,8 +1337,15 @@ public class CountryState : MonoBehaviour
             100f
         );
 
-        reserves = Mathf.Max(0f, reserves);
-        debt = Mathf.Max(0f, debt);
+        reserves = Mathf.Max(
+            0f,
+            reserves
+        );
+
+        debt = Mathf.Max(
+            0f,
+            debt
+        );
 
         inflation = Mathf.Clamp(
             inflation,

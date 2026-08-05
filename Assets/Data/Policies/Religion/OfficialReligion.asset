@@ -27,20 +27,15 @@ MonoBehaviour:
   - axis: 0
     position: 4
     relevance: 0.3
-  effects:
+  firstImpactEffects:
+  - parameter: 4
+    amount: -1
+  activeEffects:
   - parameter: 4
     amount: 2
-    delayInTurns: 0
-    durationInTurns: 0
-  - parameter: 3
-    amount: -1
-    delayInTurns: 0
-    durationInTurns: 0
   - parameter: 1
     amount: -4
-    delayInTurns: 0
-    durationInTurns: 0
+  - parameter: 3
+    amount: -1
   - parameter: 5
     amount: -1
-    delayInTurns: 0
-    durationInTurns: 0
