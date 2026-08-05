@@ -26,7 +26,7 @@ MonoBehaviour:
     relevance: 0.2
   firstImpactEffects: []
   activeEffects:
-  - parameter: 5
+  - parameter: 6
     amount: -8
   - parameter: 2
     amount: 2

@@ -32,7 +32,7 @@ MonoBehaviour:
     amount: 3
   - parameter: 2
     amount: 2
-  - parameter: 5
+  - parameter: 6
     amount: 2
   - parameter: 1
     amount: -1

@@ -28,7 +28,7 @@ MonoBehaviour:
   - parameter: 6
     amount: -3
   activeEffects:
-  - parameter: 5
+  - parameter: 6
     amount: -10
   - parameter: 1
     amount: 7

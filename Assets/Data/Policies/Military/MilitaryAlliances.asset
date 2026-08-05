@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bbc2c309a171f942813194bf06d83a3, type: 3}
+  m_Name: MilitaryAlliances
+  m_EditorClassIdentifier: Assembly-CSharp::PolicyDefinitionSO
+  policyId: policy_militaryalliances
+  policyName: Alianzas militares
+  description: El gobierno firma alianzas militares.
+  politicalCost: 1
+  primaryAxis: 6
+  ideologicalProfile:
+  - axis: 6
+    position: 4
+    relevance: 1
+  - axis: 2
+    position: 2.5
+    relevance: 0.4
+  - axis: 0
+    position: 3
+    relevance: 0.3
+  firstImpactEffects:
+  - parameter: 4
+    amount: 1
+  - parameter: 6
+    amount: -2
+  activeEffects:
+  - parameter: 4
+    amount: 2
+  - parameter: 0
+    amount: 1
+  - parameter: 6
+    amount: -1

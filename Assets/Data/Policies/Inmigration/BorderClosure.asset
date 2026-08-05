@@ -33,7 +33,7 @@ MonoBehaviour:
   activeEffects:
   - parameter: 0
     amount: -1
-  - parameter: 5
+  - parameter: 6
     amount: -2
   - parameter: 2
     amount: -1
