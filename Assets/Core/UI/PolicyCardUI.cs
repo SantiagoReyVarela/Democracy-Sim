@@ -26,11 +26,15 @@ public sealed class PolicyCardUI : MonoBehaviour
     [SerializeField]
     private TMP_Text effectsText;
 
-
     [Header("Controls")]
 
     [SerializeField]
     private Button applyButton;
+
+    [Header("Policy color")]
+
+    [SerializeField]
+    private Image cardBackground;
 
 
     private PolicyDefinitionSO policy;
@@ -90,10 +94,16 @@ public sealed class PolicyCardUI : MonoBehaviour
     {
         if (policy == null)
         {
-            SetText(policyNameText, "Política no asignada");
+            SetText(
+                policyNameText,
+                "Política no asignada"
+            );
+
             SetInteractable(false);
             return;
         }
+
+        ApplyPolicyColor();
 
         SetText(
             policyNameText,
@@ -308,6 +318,19 @@ public sealed class PolicyCardUI : MonoBehaviour
         {
             textComponent.text = value;
         }
+    }
+
+    private void ApplyPolicyColor()
+    {
+        if (
+            policy == null ||
+            cardBackground == null
+        )
+        {
+            return;
+        }
+
+        cardBackground.color = PoliticalAxisColors.GetBackgroundColor(policy.PrimaryAxis);
     }
 
 

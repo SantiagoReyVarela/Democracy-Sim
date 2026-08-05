@@ -16,28 +16,24 @@ MonoBehaviour:
   policyName: Sistema migratorio por puntos
   description: El gobierno implmenta un sistema migratorio porpuntos
   politicalCost: 1
-  primaryAxis: 2
+  primaryAxis: 5
   ideologicalProfile:
-  - axis: 2
+  - axis: 5
     position: 3
     relevance: 1
   - axis: 4
-    position: 2
-    relevance: 0.4
-  effects:
+    position: 3
+    relevance: 0.5
+  - axis: 2
+    position: 2.5
+    relevance: 0.3
+  firstImpactEffects:
   - parameter: 0
     amount: 2
-    delayInTurns: 0
-    durationInTurns: 0
   - parameter: 2
     amount: 2
-    delayInTurns: 0
-    durationInTurns: 0
   - parameter: 4
     amount: 1
-    delayInTurns: 0
-    durationInTurns: 0
   - parameter: 5
     amount: 1
-    delayInTurns: 0
-    durationInTurns: 0
+  activeEffects: []

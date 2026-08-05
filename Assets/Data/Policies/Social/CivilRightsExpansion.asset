@@ -16,7 +16,7 @@ MonoBehaviour:
   policyName: "Expansi\xF3n de derechos civiles"
   description: El gobierno amplia los derechos civiles
   politicalCost: 1
-  primaryAxis: 2
+  primaryAxis: 4
   ideologicalProfile:
   - axis: 4
     position: 1.5
@@ -24,20 +24,13 @@ MonoBehaviour:
   - axis: 0
     position: 2
     relevance: 0.5
-  effects:
+  firstImpactEffects:
   - parameter: 4
     amount: -3
-    delayInTurns: 0
-    durationInTurns: 0
   - parameter: 4
     amount: 1
-    delayInTurns: 1
-    durationInTurns: 3
   - parameter: 0
     amount: 2
-    delayInTurns: 2
-    durationInTurns: 5
   - parameter: 1
     amount: 3
-    delayInTurns: 0
-    durationInTurns: 0
+  activeEffects: []
