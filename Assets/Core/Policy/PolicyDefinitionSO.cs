@@ -70,6 +70,15 @@ public class PolicyDefinitionSO : ScriptableObject
     [SerializeField, Min(0f)]
     private float politicalCost;
 
+    [Header("Political reaction")]
+
+    [Tooltip(
+        "Determina cuánto cambia la satisfacción de los partidos " +
+        "cuando se introduce esta política."
+    )]
+    [SerializeField, Range(0f, 20f)]
+    private float politicalRelevance = 10f;
+
 
     [Header("Ideological classification")]
 
@@ -109,6 +118,8 @@ public class PolicyDefinitionSO : ScriptableObject
     public string Description => description;
 
     public float PoliticalCost => politicalCost;
+
+    public float PoliticalRelevance => politicalRelevance;
 
     public PoliticalAxis PrimaryAxis => primaryAxis;
 

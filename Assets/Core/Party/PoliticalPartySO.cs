@@ -5,9 +5,10 @@ using UnityEngine;
 [CreateAssetMenu(
     fileName = "NewPoliticalParty",
     menuName = "Democracy Simulator/Political Party")]
+
 public class PoliticalPartySO : ScriptableObject
 {
-    [Header("Identity")]
+    [Header("Identidad")]
     public string partyId;
     public string partyName;
     public string acronym;
@@ -17,14 +18,42 @@ public class PoliticalPartySO : ScriptableObject
     [TextArea]
     public string description;
 
-    [Header("Ideology")]
-    public List<PartyIdeologicalPosition> ideologicalPositions;
+    [Header("Ideología")]
+    public List<PartyIdeologicalPosition> ideologicalPositions =
+        new List<PartyIdeologicalPosition>();
+
+    public float GetPosition(PoliticalAxis axis)
+    {
+        if (ideologicalPositions == null)
+        {
+            Debug.LogWarning(
+                $"El partido '{partyName}' no tiene posiciones ideológicas."
+            );
+
+            return 0f;
+        }
+
+        foreach (PartyIdeologicalPosition ideologicalPosition
+                 in ideologicalPositions)
+        {
+            if (ideologicalPosition.axis == axis)
+            {
+                return ideologicalPosition.position;
+            }
+        }
+
+        Debug.LogWarning(
+            $"El partido '{partyName}' no tiene definido el eje '{axis}'."
+        );
+
+        return 0f;
+    }
 }
 
 [Serializable]
 public class PartyIdeologicalPosition
 {
-    public IdeologicalAxis axis;
+    public PoliticalAxis  axis;
 
     [Range(-5f, 5f)]
     public float position;

@@ -119,6 +119,60 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &743243174
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 743243175}
+  - component: {fileID: 743243176}
+  m_Layer: 0
+  m_Name: PoliticalPartyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &743243175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743243174}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 161.51282, y: -42.59549, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1402993959}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &743243176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743243174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c29b9491fa5c2345a10c5d4efbf6217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartyManager
+  availableParties:
+  - {fileID: 11400000, guid: 29dfc0551243124448349776fa3d7d36, type: 2}
+  - {fileID: 11400000, guid: 1f20ba94eb5051046beeb106091531e2, type: 2}
+  - {fileID: 11400000, guid: 90bce1ed737f3dc4a84590ce144537d6, type: 2}
+  - {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
+  - {fileID: 11400000, guid: 4acc4cc062325a345b91eaa3f4c4b912, type: 2}
+  - {fileID: 11400000, guid: ea950ad112f65b1499ef07f53e5d023a, type: 2}
+  - {fileID: 11400000, guid: af1ee5225f2881a4caebf749681ef7ff, type: 2}
+  - {fileID: 11400000, guid: 94a04fb5b8907e44f95698b8235caa7c, type: 2}
+  - {fileID: 11400000, guid: ca12372d69a312840a6654d44b596f08, type: 2}
 --- !u!1 &760514556
 GameObject:
   m_ObjectHideFlags: 0
@@ -249,6 +303,7 @@ MonoBehaviour:
   employment: 50
   education: 50
   stability: 50
+  politicalPartyManager: {fileID: 0}
   policySlots:
   - slotId: E1
     displayName: "Econom\xEDa 1"
@@ -323,7 +378,8 @@ Transform:
   m_LocalPosition: {x: 855.0223, y: 548.65753, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 743243175}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1402993960

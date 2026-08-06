@@ -52,6 +52,8 @@ public class CountryState : MonoBehaviour
     }
 
 
+
+
     public static CountryState Instance { get; private set; }
 
 
@@ -83,6 +85,10 @@ public class CountryState : MonoBehaviour
 
     [SerializeField, Range(0f, 100f)]
     private float stability = 50f;
+
+    [Header("Managers")]
+    [SerializeField]
+    private PoliticalPartyManager politicalPartyManager;
 
 
     [Header("Permanent Policy Slots")]
@@ -1094,6 +1100,8 @@ public class CountryState : MonoBehaviour
         targetSlot.SetPolicy(policy);
 
         ApplyFirstImpactEffects(policy);
+        ApplyPoliticalPartyReaction(policy);
+
         RecordAppliedPolicy(policy);
 
         RecordPolicySlotChange(
@@ -1362,6 +1370,52 @@ public class CountryState : MonoBehaviour
         ValidatePolicySlots();
     }
 
+    private void ApplyPoliticalPartyReaction(
+        PolicyDefinitionSO policy
+    )
+    {
+        if (policy == null)
+        {
+            return;
+        }
+
+        if (politicalPartyManager == null)
+        {
+            Debug.LogWarning(
+                "CountryState: PoliticalPartyManager no está asignado.",
+                this
+            );
+
+            return;
+        }
+
+        if (
+            !policy.TryGetAxisPosition(
+                policy.PrimaryAxis,
+                out PolicyAxisPosition primaryAxisPosition
+            )
+        )
+        {
+            Debug.LogWarning(
+                $"La política '{policy.PolicyName}' no tiene una " +
+                $"posición definida para su eje principal " +
+                $"'{policy.PrimaryAxis}'.",
+                policy
+            );
+
+            return;
+        }
+
+        float effectiveRelevance =
+            policy.PoliticalRelevance *
+            primaryAxisPosition.Relevance;
+
+        politicalPartyManager.ApplyPolicyReaction(
+            policy.PrimaryAxis,
+            primaryAxisPosition.Position,
+            effectiveRelevance
+        );
+    }
 
     private void ValidatePolicySlots()
     {

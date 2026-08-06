@@ -124,4 +124,153 @@ public class PoliticalPartyManager : MonoBehaviour
 
         return partyState.satisfaction;
     }
+
+    [ContextMenu("Mostrar partidos inicializados")]
+    private void DebugPartyStates()
+    {
+        if (partyStates == null || partyStates.Count == 0)
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: todavía no hay partidos inicializados."
+            );
+
+            return;
+        }
+
+        Debug.Log($"PARTIDOS INICIALIZADOS: {partyStates.Count}");
+
+        foreach (PoliticalPartyState partyState in partyStates)
+        {
+            if (partyState == null || partyState.party == null)
+            {
+                Debug.LogWarning("Hay un estado de partido vacío.");
+                continue;
+            }
+
+            Debug.Log(
+                $"Partido: {partyState.party.partyName} | " +
+                $"ID: {partyState.party.partyId} | " +
+                $"Popularidad: {partyState.popularity:F2}% | " +
+                $"Satisfacción: {partyState.satisfaction:F2} | " +
+                $"Escaños: {partyState.seats}"
+            );
+        }
+    }
+
+    [ContextMenu("Probar reacción económica")]
+    private void DebugEconomicPolicyReaction()
+    {
+        if (partyStates == null || partyStates.Count == 0)
+        {
+            Debug.LogWarning(
+                "No hay partidos inicializados. Ejecuta primero la partida."
+            );
+
+            return;
+        }
+
+        PoliticalAxis testAxis = PoliticalAxis.Economy;
+        float testPolicyPosition = 4.5f;
+        float testRelevance = 20f;
+
+        Debug.Log(
+            "=== PRUEBA: POLÍTICA ECONÓMICA +4.5 ==="
+        );
+
+        foreach (PoliticalPartyState partyState in partyStates)
+        {
+            if (partyState == null || partyState.party == null)
+            {
+                continue;
+            }
+
+            float partyPosition =
+                partyState.party.GetPosition(testAxis);
+
+            float opinion =
+                PartyPolicyEvaluator.EvaluateOpinion(
+                    partyState.party,
+                    testAxis,
+                    testPolicyPosition
+                );
+
+            float impact =
+                PartyPolicyEvaluator.CalculateSatisfactionImpact(
+                    partyState.party,
+                    testAxis,
+                    testPolicyPosition,
+                    testRelevance
+                );
+
+            Debug.Log(
+                $"{partyState.party.partyName} | " +
+                $"Posición: {partyPosition:F1} | " +
+                $"Opinión: {opinion:F2} | " +
+                $"Impacto: {impact:+0.00;-0.00;0.00}"
+            );
+        }
+    }
+
+    public void ApplyPolicyReaction(
+        PoliticalAxis axis,
+        float policyPosition,
+        float policyRelevance)
+    {
+        if (partyStates == null || partyStates.Count == 0)
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: no hay partidos inicializados."
+            );
+
+            return;
+        }
+
+        Debug.Log(
+            $"=== REACCIÓN A POLÍTICA | " +
+            $"Eje: {axis} | " +
+            $"Posición: {policyPosition:F1} | " +
+            $"Relevancia: {policyRelevance:F1} ==="
+        );
+
+        foreach (PoliticalPartyState partyState in partyStates)
+        {
+            if (partyState == null || partyState.party == null)
+            {
+                continue;
+            }
+
+            float previousSatisfaction = partyState.satisfaction;
+
+            float impact =
+                PartyPolicyEvaluator.CalculateSatisfactionImpact(
+                    partyState.party,
+                    axis,
+                    policyPosition,
+                    policyRelevance
+                );
+
+            partyState.satisfaction = Mathf.Clamp(
+                partyState.satisfaction + impact,
+                0f,
+                100f
+            );
+
+            Debug.Log(
+                $"{partyState.party.partyName} | " +
+                $"Impacto: {impact:+0.00;-0.00;0.00} | " +
+                $"Satisfacción: {previousSatisfaction:F2} " +
+                $"→ {partyState.satisfaction:F2}"
+            );
+        }
+    }
+
+    [ContextMenu("Aplicar política económica de prueba")]
+    private void DebugApplyEconomicPolicy()
+    {
+        ApplyPolicyReaction(
+            PoliticalAxis.Economy,
+            4.5f,
+            20f
+        );
+    }
 }
