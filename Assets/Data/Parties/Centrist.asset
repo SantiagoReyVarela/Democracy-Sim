@@ -19,6 +19,7 @@ MonoBehaviour:
   partyColor: {r: 0.41960785, g: 0.44705883, b: 0.5019608, a: 1}
   description: "Partido moderado y pragm\xE1tico que busca acuerdos entre izquierda
     y derecha, evitando posiciones ideol\xF3gicas extremas."
+  ideologicalLine: "Centro pol\xEDtico"
   ideologicalPositions:
   - axis: 0
     position: 0.5

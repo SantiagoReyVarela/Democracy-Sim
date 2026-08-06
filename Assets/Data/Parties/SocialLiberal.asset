@@ -20,6 +20,7 @@ MonoBehaviour:
   description: "Partido de centroizquierda que combina las libertades individuales,
     los derechos civiles y la apertura social con una econom\xEDa de mercado regulada
     y un sistema p\xFAblico de protecci\xF3n social."
+  ideologicalLine: Centroizquierda social-liberal
   ideologicalPositions:
   - axis: 0
     position: -1

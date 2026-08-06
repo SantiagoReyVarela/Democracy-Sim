@@ -7,6 +7,7 @@ public class PoliticalPartyState
 
     public float popularity;
     public float satisfaction;
+    public float lastSatisfactionChange;
 
     public int seats;
     public bool isGovernment;

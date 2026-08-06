@@ -20,6 +20,7 @@ MonoBehaviour:
   description: "Partido tradicionalista que busca preservar las instituciones, el
     orden social, la autoridad, la propiedad y las costumbres, sin comprometerse
     completamente con una pol\xEDtica econ\xF3mica de izquierdas o de derechas."
+  ideologicalLine: Conservadurismo tradicional
   ideologicalPositions:
   - axis: 0
     position: 0

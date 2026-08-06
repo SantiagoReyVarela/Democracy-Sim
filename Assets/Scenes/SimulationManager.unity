@@ -173,6 +173,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: af1ee5225f2881a4caebf749681ef7ff, type: 2}
   - {fileID: 11400000, guid: 94a04fb5b8907e44f95698b8235caa7c, type: 2}
   - {fileID: 11400000, guid: ca12372d69a312840a6654d44b596f08, type: 2}
+  initialParliament:
+  - party: {fileID: 0}
+    seats: 0
+    isGovernment: 0
+  coalitionType: 3
 --- !u!1 &760514556
 GameObject:
   m_ObjectHideFlags: 0

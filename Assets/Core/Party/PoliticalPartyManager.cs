@@ -16,6 +16,37 @@ public class PoliticalPartyManager : MonoBehaviour
         get { return partyStates; }
     }
 
+    [Header("Parlamento inicial")]
+    [SerializeField]
+    private List<PartyParliamentSetup> initialParliament =
+        new List<PartyParliamentSetup>();
+
+    [Header("Gobierno")]
+    [SerializeField]
+    private GovernmentCoalitionType coalitionType =
+        GovernmentCoalitionType.MajorityCoalition;
+
+    public GovernmentCoalitionType CoalitionType =>
+      coalitionType;
+
+    public int TotalSeats
+    {
+        get
+        {
+            int totalSeats = 0;
+
+            foreach (PoliticalPartyState partyState in partyStates)
+            {
+                if (partyState != null)
+                {
+                    totalSeats += partyState.seats;
+                }
+            }
+
+            return totalSeats;
+        }
+    }
+
     private void Awake()
     {
         InitializeParties();
@@ -62,13 +93,31 @@ public class PoliticalPartyManager : MonoBehaviour
                 continue;
             }
 
+            PartyParliamentSetup parliamentSetup = null;
+
+            if (initialParliament != null)
+            {
+                parliamentSetup = initialParliament.Find(
+                    setup =>
+                        setup != null &&
+                        setup.Party == party
+                );
+            }
+
             PoliticalPartyState newState = new PoliticalPartyState
             {
                 party = party,
                 popularity = initialPopularity,
                 satisfaction = 50f,
-                seats = 0,
-                isGovernment = false
+                lastSatisfactionChange = 0f,
+
+                seats = parliamentSetup != null
+                    ? parliamentSetup.Seats
+                    : 0,
+
+                isGovernment =
+                    parliamentSetup != null &&
+                    parliamentSetup.IsGovernment
             };
 
             partyStates.Add(newState);
@@ -214,7 +263,8 @@ public class PoliticalPartyManager : MonoBehaviour
     public void ApplyPolicyReaction(
         PoliticalAxis axis,
         float policyPosition,
-        float policyRelevance)
+        float policyRelevance
+    )
     {
         if (partyStates == null || partyStates.Count == 0)
         {
@@ -239,7 +289,8 @@ public class PoliticalPartyManager : MonoBehaviour
                 continue;
             }
 
-            float previousSatisfaction = partyState.satisfaction;
+            float previousSatisfaction =
+                partyState.satisfaction;
 
             float impact =
                 PartyPolicyEvaluator.CalculateSatisfactionImpact(
@@ -249,17 +300,26 @@ public class PoliticalPartyManager : MonoBehaviour
                     policyRelevance
                 );
 
-            partyState.satisfaction = Mathf.Clamp(
-                partyState.satisfaction + impact,
+            float newSatisfaction = Mathf.Clamp(
+                previousSatisfaction + impact,
                 0f,
                 100f
             );
 
+            partyState.satisfaction =
+                newSatisfaction;
+
+            partyState.lastSatisfactionChange =
+                newSatisfaction - previousSatisfaction;
+
             Debug.Log(
                 $"{partyState.party.partyName} | " +
-                $"Impacto: {impact:+0.00;-0.00;0.00} | " +
+                $"Impacto calculado: " +
+                $"{impact:+0.00;-0.00;0.00} | " +
+                $"Cambio real: " +
+                $"{partyState.lastSatisfactionChange:+0.00;-0.00;0.00} | " +
                 $"Satisfacción: {previousSatisfaction:F2} " +
-                $"→ {partyState.satisfaction:F2}"
+                $"→ {newSatisfaction:F2}"
             );
         }
     }
@@ -272,5 +332,49 @@ public class PoliticalPartyManager : MonoBehaviour
             4.5f,
             20f
         );
+    }
+
+    [ContextMenu("Mostrar parlamento actual")]
+    private void DebugCurrentParliament()
+    {
+        if (partyStates == null || partyStates.Count == 0)
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: no hay partidos inicializados."
+            );
+
+            return;
+        }
+
+        int totalSeats = TotalSeats;
+
+        Debug.Log(
+            $"=== PARLAMENTO | TOTAL: {totalSeats} ASIENTOS | " +
+            $"GOBIERNO: {coalitionType} ==="
+        );
+
+        foreach (PoliticalPartyState partyState in partyStates)
+        {
+            if (partyState == null || partyState.party == null)
+            {
+                continue;
+            }
+
+            float percentage = totalSeats > 0
+                ? partyState.seats / (float)totalSeats * 100f
+                : 0f;
+
+            string governmentLabel =
+                partyState.isGovernment
+                    ? " | GOBIERNO"
+                    : string.Empty;
+
+            Debug.Log(
+                $"{partyState.party.partyName} | " +
+                $"Asientos: {partyState.seats} | " +
+                $"Porcentaje: {percentage:F2}%" +
+                governmentLabel
+            );
+        }
     }
 }

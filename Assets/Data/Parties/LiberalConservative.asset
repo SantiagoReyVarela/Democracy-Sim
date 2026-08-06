@@ -20,6 +20,7 @@ MonoBehaviour:
   description: "Partido de derecha moderada que combina la defensa del mercado, la
     propiedad privada y el constitucionalismo con el mantenimiento del orden, las
     instituciones tradicionales y la cohesi\xF3n nacional."
+  ideologicalLine: Derecha liberal-conservadora
   ideologicalPositions:
   - axis: 0
     position: 2.5

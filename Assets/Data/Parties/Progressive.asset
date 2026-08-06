@@ -19,6 +19,7 @@ MonoBehaviour:
   partyColor: {r: 0.5568628, g: 0.26666668, b: 0.6784314, a: 1}
   description: "Partido de izquierda cultural centrado en los derechos civiles, el
     secularismo, la apertura migratoria, el ecologismo y la transformaci\xF3n social."
+  ideologicalLine: Izquierda progresista
   ideologicalPositions:
   - axis: 0
     position: -1.5

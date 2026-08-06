@@ -16,10 +16,11 @@ MonoBehaviour:
   partyName: Partido Liberal
   acronym: PL
   logo: {fileID: 0}
-  partyColor: {r: 0.9490196, g: 0.7882353, b: 0.29803923, a: 1}
+  partyColor: {r: 1, g: 0.8963117, b: 0.5801887, a: 1}
   description: "Partido liberal cl\xE1sico que defiende el constitucionalismo, las
     libertades individuales, la secularizaci\xF3n, el gobierno limitado, la propiedad
     privada y la libertad comercial."
+  ideologicalLine: "Liberalismo cl\xE1sico"
   ideologicalPositions:
   - axis: 0
     position: 2

@@ -20,6 +20,7 @@ MonoBehaviour:
   description: "Partido de centroderecha econ\xF3mica que defiende la privatizaci\xF3n
     de empresas p\xFAblicas, la reducci\xF3n de impuestos y regulaciones, la disciplina
     fiscal, la competencia y la integraci\xF3n en los mercados internacionales."
+  ideologicalLine: "Derecha econ\xF3mica neolibreal"
   ideologicalPositions:
   - axis: 0
     position: 4.5

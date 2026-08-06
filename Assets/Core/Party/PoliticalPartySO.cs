@@ -14,13 +14,24 @@ public class PoliticalPartySO : ScriptableObject
     public string acronym;
     public Sprite logo;
     public Color partyColor;
-
     [TextArea]
     public string description;
 
+    [Header("Political identity")]
+
+    [SerializeField]
+    private string ideologicalLine;
+
+    public string IdeologicalLine => ideologicalLine;
+    
     [Header("Ideología")]
     public List<PartyIdeologicalPosition> ideologicalPositions =
         new List<PartyIdeologicalPosition>();
+
+
+
+
+
 
     public float GetPosition(PoliticalAxis axis)
     {
