@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
+  m_Name: Liberal
+  m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
+  partyId: liberal
+  partyName: Partido Liberal
+  acronym: PL
+  logo: {fileID: 0}
+  partyColor: {r: 0.9490196, g: 0.7882353, b: 0.29803923, a: 1}
+  description: "Partido liberal cl\xE1sico que defiende el constitucionalismo, las
+    libertades individuales, la secularizaci\xF3n, el gobierno limitado, la propiedad
+    privada y la libertad comercial."
+  ideologicalPositions:
+  - axis: 0
+    position: 2
+  - axis: 1
+    position: -3
+  - axis: 2
+    position: -1.5
+  - axis: 3
+    position: -1.5
+  - axis: 4
+    position: -4
+  - axis: 5
+    position: -3
+  - axis: 6
+    position: 4
