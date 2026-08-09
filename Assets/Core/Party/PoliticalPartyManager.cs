@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+using Random = UnityEngine.Random;
 
 public class PoliticalPartyManager : MonoBehaviour
 {
@@ -134,9 +137,12 @@ public class PoliticalPartyManager : MonoBehaviour
             partyStates.Add(newState);
         }
 
+        if (generateRandomParliament)
         {
             GenerateRandomSeats();
         }
+
+        FormAutomaticGovernment();
 
         Debug.Log(
             $"PoliticalPartyManager: " +
@@ -489,4 +495,264 @@ public class PoliticalPartyManager : MonoBehaviour
         );
     }
 
+    private void FormAutomaticGovernment()
+    {
+        if (partyStates == null || partyStates.Count == 0)
+        {
+            return;
+        }
+
+        foreach (PoliticalPartyState partyState in partyStates)
+        {
+            partyState.isGovernment = false;
+        }
+
+        int totalSeats = TotalSeats;
+
+        if (totalSeats <= 0)
+        {
+            coalitionType =
+                GovernmentCoalitionType.NoGovernment;
+
+            return;
+        }
+
+        int majorityThreshold =
+            totalSeats / 2 + 1;
+
+
+        // 1. Comprobar si existe mayoría absoluta
+        // de un único partido.
+
+        foreach (PoliticalPartyState partyState in partyStates)
+        {
+            if (partyState.seats >= majorityThreshold)
+            {
+                partyState.isGovernment = true;
+
+                coalitionType =
+                    GovernmentCoalitionType.SinglePartyMajority;
+
+                Debug.Log(
+                    $"Gobierno formado por " +
+                    $"{partyState.party.partyName} " +
+                    $"con {partyState.seats} asientos."
+                );
+
+                return;
+            }
+        }
+
+
+        // 2. Buscar la mejor coalición posible.
+
+        List<PoliticalPartyState> bestCoalition =
+            FindBestMajorityCoalition(
+                majorityThreshold
+            );
+
+        if (bestCoalition == null ||
+            bestCoalition.Count == 0)
+        {
+            coalitionType =
+                GovernmentCoalitionType.NoGovernment;
+
+            Debug.LogWarning(
+                "No ha sido posible formar gobierno."
+            );
+
+            return;
+        }
+
+
+        int governmentSeats = 0;
+
+        foreach (
+            PoliticalPartyState partyState
+            in bestCoalition
+        )
+        {
+            partyState.isGovernment = true;
+            governmentSeats += partyState.seats;
+        }
+
+        coalitionType =
+            GovernmentCoalitionType.MajorityCoalition;
+
+        Debug.Log(
+            $"Coalición formada con " +
+            $"{governmentSeats}/{totalSeats} asientos."
+        );
+
+        foreach (
+            PoliticalPartyState partyState
+            in bestCoalition
+        )
+        {
+            Debug.Log(
+                $"GOBIERNO | " +
+                $"{partyState.party.partyName} | " +
+                $"{partyState.seats} asientos"
+            );
+        }
+    }
+
+    private List<PoliticalPartyState> FindBestMajorityCoalition(int majorityThreshold)
+    {
+        List<PoliticalPartyState> bestCoalition =
+            null;
+
+        float bestScore =
+            float.MaxValue;
+
+        int partyCount =
+            partyStates.Count;
+
+        int combinationCount =
+            1 << partyCount;
+
+
+        for (
+            int mask = 1;
+            mask < combinationCount;
+            mask++
+        )
+        {
+            List<PoliticalPartyState> coalition =
+                new List<PoliticalPartyState>();
+
+            int coalitionSeats = 0;
+
+
+            for (
+                int i = 0;
+                i < partyCount;
+                i++
+            )
+            {
+                if ((mask & (1 << i)) != 0)
+                {
+                    PoliticalPartyState partyState =
+                        partyStates[i];
+
+                    coalition.Add(partyState);
+
+                    coalitionSeats +=
+                        partyState.seats;
+                }
+            }
+
+
+            // Ya hemos comprobado gobiernos
+            // de un solo partido.
+
+            if (coalition.Count < 2)
+            {
+                continue;
+            }
+
+
+            if (coalitionSeats < majorityThreshold)
+            {
+                continue;
+            }
+
+
+            float ideologicalDistance =
+                CalculateCoalitionIdeologicalDistance(
+                    coalition
+                );
+
+
+            // Penalizamos ligeramente:
+            // - tener demasiados partidos
+            // - tener muchos asientos innecesarios
+
+            int excessSeats =
+                coalitionSeats -
+                majorityThreshold;
+
+            float score =
+                ideologicalDistance +
+                (coalition.Count - 2) * 0.5f +
+                excessSeats * 0.03f;
+
+
+            if (score < bestScore)
+            {
+                bestScore = score;
+                bestCoalition = coalition;
+            }
+        }
+
+
+        return bestCoalition;
+    }
+    private float CalculateCoalitionIdeologicalDistance(
+        List<PoliticalPartyState> coalition
+    )
+    {
+        if (
+            coalition == null ||
+            coalition.Count <= 1
+        )
+        {
+            return 0f;
+        }
+
+        float totalDistance = 0f;
+        int comparisons = 0;
+
+
+        for (
+            int i = 0;
+            i < coalition.Count;
+            i++
+        )
+        {
+            for (
+                int j = i + 1;
+                j < coalition.Count;
+                j++
+            )
+            {
+                PoliticalPartySO partyA =
+                    coalition[i].party;
+
+                PoliticalPartySO partyB =
+                    coalition[j].party;
+
+
+                foreach (
+                    PoliticalAxis axis
+                    in Enum.GetValues(
+                        typeof(PoliticalAxis)
+                    )
+                )
+                {
+                    float positionA =
+                        partyA.GetPosition(axis);
+
+                    float positionB =
+                        partyB.GetPosition(axis);
+
+                    totalDistance +=
+                        Mathf.Abs(
+                            positionA - positionB
+                        );
+
+                    comparisons++;
+                }
+            }
+        }
+
+
+        if (comparisons == 0)
+        {
+            return 0f;
+        }
+
+        return totalDistance /
+            comparisons;
+    }
 }
