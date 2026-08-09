@@ -28,9 +28,24 @@ public class PoliticalPartySO : ScriptableObject
     public List<PartyIdeologicalPosition> ideologicalPositions =
         new List<PartyIdeologicalPosition>();
 
+    [Header("Parliament position")]
 
+    [SerializeField, Range(-5f, 5f)]
+    private float parliamentPosition;
 
+    public float ParliamentPosition => parliamentPosition;
 
+    [Header("Hemicycle")]
+
+    [SerializeField]
+    private HemicycleBloc hemicycleBloc;
+
+    [SerializeField, Range(-5f, 5f)]
+    private float hemicycleCenterPosition;
+
+    public HemicycleBloc HemicycleBloc => hemicycleBloc;
+
+    public float HemicycleCenterPosition => hemicycleCenterPosition;
 
 
     public float GetPosition(PoliticalAxis axis)
