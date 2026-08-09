@@ -8,6 +8,17 @@ public class PoliticalPartyManager : MonoBehaviour
     private List<PoliticalPartySO> availableParties =
         new List<PoliticalPartySO>();
 
+    [Header("Parlamento")]
+
+    [SerializeField, Min(1)]
+    private int parliamentSeatCount = 100;
+
+    [SerializeField]
+    private bool generateRandomParliament = true;
+
+    [SerializeField, Min(0)]
+    private int minimumSeatsPerParty = 1;
+
     private List<PoliticalPartyState> partyStates =
         new List<PoliticalPartyState>();
 
@@ -123,8 +134,13 @@ public class PoliticalPartyManager : MonoBehaviour
             partyStates.Add(newState);
         }
 
+        {
+            GenerateRandomSeats();
+        }
+
         Debug.Log(
-            $"PoliticalPartyManager: {partyStates.Count} partidos inicializados."
+            $"PoliticalPartyManager: " +
+            $"{partyStates.Count} partidos inicializados."
         );
     }
 
@@ -377,4 +393,100 @@ public class PoliticalPartyManager : MonoBehaviour
             );
         }
     }
+
+    private void GenerateRandomSeats()
+    {
+        if (partyStates == null || partyStates.Count == 0)
+        {
+            return;
+        }
+
+        int partyCount = partyStates.Count;
+
+        int minimumTotal =
+            minimumSeatsPerParty * partyCount;
+
+        if (minimumTotal > parliamentSeatCount)
+        {
+            Debug.LogError(
+                "El mínimo de asientos por partido supera " +
+                "el tamaño total del Parlamento."
+            );
+
+            return;
+        }
+
+        // Primero garantizamos el mínimo.
+        foreach (PoliticalPartyState partyState in partyStates)
+        {
+            partyState.seats =
+                minimumSeatsPerParty;
+        }
+
+        int remainingSeats =
+            parliamentSeatCount - minimumTotal;
+
+
+        // Creamos pesos aleatorios para cada partido.
+
+        float[] weights =
+            new float[partyCount];
+
+        float totalWeight = 0f;
+
+        for (int i = 0; i < partyCount; i++)
+        {
+            weights[i] =
+                Random.Range(0.25f, 1f);
+
+            totalWeight += weights[i];
+        }
+
+
+        // Primera distribución proporcional.
+
+        int distributedSeats = 0;
+
+        for (int i = 0; i < partyCount; i++)
+        {
+            int seatsToAdd =
+                Mathf.FloorToInt(
+                    remainingSeats *
+                    (weights[i] / totalWeight)
+                );
+
+            partyStates[i].seats +=
+                seatsToAdd;
+
+            distributedSeats +=
+                seatsToAdd;
+        }
+
+
+        // FloorToInt puede dejar algunos asientos sin repartir.
+        // Los distribuimos aleatoriamente.
+
+        int seatsLeft =
+            remainingSeats - distributedSeats;
+
+        while (seatsLeft > 0)
+        {
+            int randomParty =
+                Random.Range(
+                    0,
+                    partyStates.Count
+                );
+
+            partyStates[randomParty].seats++;
+
+            seatsLeft--;
+        }
+
+
+        Debug.Log(
+            $"Parlamento generado aleatoriamente: " +
+            $"{TotalSeats} asientos."
+        );
+    }
+
 }
