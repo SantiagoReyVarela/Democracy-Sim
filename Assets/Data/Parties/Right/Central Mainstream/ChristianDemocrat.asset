@@ -10,29 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
-  m_Name: Conservative
+  m_Name: ChristianDemocrat
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
-  partyId: conservative
-  partyName: Partido Conservador
-  acronym: PCon
+  enabled: 1
+  partyId: christian_democrat
+  partyName: "Partido Dem\xF3crata Cristiano"
+  acronym: PDC
   logo: {fileID: 0}
-  partyColor: {r: 0.20784314, g: 0.36862746, b: 0.23137255, a: 1}
-  description: "Partido tradicionalista que busca preservar las instituciones, el
-    orden social, la autoridad, la propiedad y las costumbres, sin comprometerse
-    completamente con una pol\xEDtica econ\xF3mica de izquierdas o de derechas."
-  ideologicalLine: Conservadurismo tradicional
+  partyColor: {r: 0.2784314, g: 0.4862745, b: 0.75686276, a: 1}
+  description: "Partido de centroderecha que combina la econom\xEDa social de mercado
+    con valores comunitarios, religiosos y familiares."
+  ideologicalLine: Centroderecha democristiana
   ideologicalPositions:
   - axis: 0
-    position: 0
+    position: 0.5
   - axis: 1
-    position: 2.5
-  - axis: 2
-    position: 1
-  - axis: 3
     position: 1.5
+  - axis: 2
+    position: 0.5
+  - axis: 3
+    position: 1
   - axis: 4
     position: 2.5
   - axis: 5
-    position: 3
+    position: 2
   - axis: 6
-    position: -0.5
+    position: 1
+  hemicycleBloc: 2
+  radicalizationLayer: 1

@@ -6,21 +6,52 @@ using Random = UnityEngine.Random;
 
 public class PoliticalPartyManager : MonoBehaviour
 {
+    // =========================================================
+    // PARTIDOS DISPONIBLES
+    // =========================================================
+
     [Header("Partidos disponibles")]
+
     [SerializeField]
     private List<PoliticalPartySO> availableParties =
         new List<PoliticalPartySO>();
 
+
+    // =========================================================
+    // PARLAMENTO
+    // =========================================================
+
     [Header("Parlamento")]
 
     [SerializeField, Min(1)]
-    private int parliamentSeatCount = 100;
+    private int parliamentSeatCount = 1000;
 
     [SerializeField]
     private bool generateRandomParliament = true;
 
     [SerializeField, Min(0)]
     private int minimumSeatsPerParty = 1;
+
+
+    // =========================================================
+    // DISTRIBUCIÓN IDEOLÓGICA DE ESCAÑOS
+    // =========================================================
+
+    [Header("Distribución ideológica de escaños")]
+
+    [SerializeField, Range(0f, 100f)]
+    private float centerMainstreamWeight = 50f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float hardlineWeight = 30f;
+
+    [SerializeField, Range(0f, 100f)]
+    private float radicalWeight = 20f;
+
+
+    // =========================================================
+    // ESTADO DE LOS PARTIDOS
+    // =========================================================
 
     private List<PoliticalPartyState> partyStates =
         new List<PoliticalPartyState>();
@@ -30,18 +61,35 @@ public class PoliticalPartyManager : MonoBehaviour
         get { return partyStates; }
     }
 
+
+    // =========================================================
+    // PARLAMENTO INICIAL
+    // =========================================================
+
     [Header("Parlamento inicial")]
+
     [SerializeField]
     private List<PartyParliamentSetup> initialParliament =
         new List<PartyParliamentSetup>();
 
+
+    // =========================================================
+    // GOBIERNO
+    // =========================================================
+
     [Header("Gobierno")]
+
     [SerializeField]
     private GovernmentCoalitionType coalitionType =
         GovernmentCoalitionType.MajorityCoalition;
 
     public GovernmentCoalitionType CoalitionType =>
-      coalitionType;
+        coalitionType;
+
+
+    // =========================================================
+    // TOTAL DE ESCAÑOS
+    // =========================================================
 
     public int TotalSeats
     {
@@ -49,11 +97,15 @@ public class PoliticalPartyManager : MonoBehaviour
         {
             int totalSeats = 0;
 
-            foreach (PoliticalPartyState partyState in partyStates)
+            foreach (
+                PoliticalPartyState partyState
+                in partyStates
+            )
             {
                 if (partyState != null)
                 {
-                    totalSeats += partyState.seats;
+                    totalSeats +=
+                        partyState.seats;
                 }
             }
 
@@ -61,16 +113,30 @@ public class PoliticalPartyManager : MonoBehaviour
         }
     }
 
+
+    // =========================================================
+    // AWAKE
+    // =========================================================
+
     private void Awake()
     {
         InitializeParties();
     }
 
+
+    // =========================================================
+    // INICIALIZAR PARTIDOS
+    // =========================================================
+
     public void InitializeParties()
     {
         partyStates.Clear();
 
-        if (availableParties == null || availableParties.Count == 0)
+
+        if (
+            availableParties == null ||
+            availableParties.Count == 0
+        )
         {
             Debug.LogWarning(
                 "PoliticalPartyManager: no hay partidos asignados."
@@ -79,70 +145,149 @@ public class PoliticalPartyManager : MonoBehaviour
             return;
         }
 
+
+        // -----------------------------------------------------
+        // CONTAR PARTIDOS HABILITADOS
+        // -----------------------------------------------------
+
         int validPartyCount = 0;
 
-        foreach (PoliticalPartySO party in availableParties)
+
+        foreach (
+            PoliticalPartySO party
+            in availableParties
+        )
         {
-            if (party != null)
+            if (party == null)
             {
-                validPartyCount++;
+                Debug.LogWarning(
+                    "PoliticalPartyManager: hay una referencia " +
+                    "de partido nula."
+                );
+
+                continue;
             }
+
+
+            if (!party.Enabled)
+            {
+                Debug.Log(
+                    $"{party.partyName} | Enabled: False"
+                );
+
+                continue;
+            }
+
+
+            validPartyCount++;
+
+
+            Debug.Log(
+                $"{party.partyName} | Enabled: True"
+            );
         }
+
 
         if (validPartyCount == 0)
         {
             Debug.LogWarning(
-                "PoliticalPartyManager: todos los partidos asignados son nulos."
+                "PoliticalPartyManager: no hay partidos habilitados."
             );
 
             return;
         }
 
-        float initialPopularity = 100f / validPartyCount;
 
-        foreach (PoliticalPartySO party in availableParties)
+        // -----------------------------------------------------
+        // POPULARIDAD INICIAL
+        // -----------------------------------------------------
+
+        float initialPopularity =
+            100f /
+            validPartyCount;
+
+
+        // -----------------------------------------------------
+        // CREAR ESTADOS SOLO PARA PARTIDOS HABILITADOS
+        // -----------------------------------------------------
+
+        foreach (
+            PoliticalPartySO party
+            in availableParties
+        )
         {
-            if (party == null)
+            if (
+                party == null ||
+                !party.Enabled
+            )
             {
                 continue;
             }
 
-            PartyParliamentSetup parliamentSetup = null;
+
+            PartyParliamentSetup parliamentSetup =
+                null;
+
 
             if (initialParliament != null)
             {
-                parliamentSetup = initialParliament.Find(
-                    setup =>
-                        setup != null &&
-                        setup.Party == party
-                );
+                parliamentSetup =
+                    initialParliament.Find(
+                        setup =>
+                            setup != null &&
+                            setup.Party == party
+                    );
             }
 
-            PoliticalPartyState newState = new PoliticalPartyState
-            {
-                party = party,
-                popularity = initialPopularity,
-                satisfaction = 50f,
-                lastSatisfactionChange = 0f,
 
-                seats = parliamentSetup != null
-                    ? parliamentSetup.Seats
-                    : 0,
+            PoliticalPartyState newState =
+                new PoliticalPartyState
+                {
+                    party =
+                        party,
 
-                isGovernment =
-                    parliamentSetup != null &&
-                    parliamentSetup.IsGovernment
-            };
+                    popularity =
+                        initialPopularity,
 
-            partyStates.Add(newState);
+                    satisfaction =
+                        50f,
+
+                    lastSatisfactionChange =
+                        0f,
+
+                    seats =
+                        parliamentSetup != null
+                            ? parliamentSetup.Seats
+                            : 0,
+
+                    isGovernment =
+                        parliamentSetup != null &&
+                        parliamentSetup.IsGovernment
+                };
+
+
+            partyStates.Add(
+                newState
+            );
         }
+
+
+        // -----------------------------------------------------
+        // GENERAR PARLAMENTO ALEATORIO
+        // -----------------------------------------------------
 
         if (generateRandomParliament)
         {
             GenerateRandomSeats();
         }
 
+
+        // -----------------------------------------------------
+        // FORMAR GOBIERNO
+        // -----------------------------------------------------
+
         FormAutomaticGovernment();
+
 
         Debug.Log(
             $"PoliticalPartyManager: " +
@@ -150,27 +295,49 @@ public class PoliticalPartyManager : MonoBehaviour
         );
     }
 
-    public PoliticalPartyState GetPartyState(string partyId)
+
+    // =========================================================
+    // BUSCAR ESTADO DE PARTIDO
+    // =========================================================
+
+    public PoliticalPartyState GetPartyState(
+        string partyId
+    )
     {
-        foreach (PoliticalPartyState partyState in partyStates)
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
         {
             if (partyState.party == null)
             {
                 continue;
             }
 
-            if (partyState.party.partyId == partyId)
+
+            if (
+                partyState.party.partyId ==
+                partyId
+            )
             {
                 return partyState;
             }
         }
 
+
         Debug.LogWarning(
-            $"PoliticalPartyManager: no existe el partido con ID '{partyId}'."
+            $"PoliticalPartyManager: no existe el partido " +
+            $"con ID '{partyId}'."
         );
+
 
         return null;
     }
+
+
+    // =========================================================
+    // SATISFACCIÓN
+    // =========================================================
 
     public float CalculatePartySatisfaction(
         PoliticalPartyState partyState
@@ -179,44 +346,69 @@ public class PoliticalPartyManager : MonoBehaviour
         if (partyState == null)
         {
             Debug.LogWarning(
-                "No se puede calcular la satisfacción de un partido nulo."
+                "No se puede calcular la satisfacción " +
+                "de un partido nulo."
             );
 
             return 0f;
         }
 
-        // Provisional. Más adelante se calculará comparando
-        // la ideología del partido con las políticas activas.
-        partyState.satisfaction = Mathf.Clamp(
-            partyState.satisfaction,
-            0f,
-            100f
-        );
+
+        partyState.satisfaction =
+            Mathf.Clamp(
+                partyState.satisfaction,
+                0f,
+                100f
+            );
+
 
         return partyState.satisfaction;
     }
 
+
+    // =========================================================
+    // DEBUG PARTIDOS
+    // =========================================================
+
     [ContextMenu("Mostrar partidos inicializados")]
     private void DebugPartyStates()
     {
-        if (partyStates == null || partyStates.Count == 0)
+        if (
+            partyStates == null ||
+            partyStates.Count == 0
+        )
         {
             Debug.LogWarning(
-                "PoliticalPartyManager: todavía no hay partidos inicializados."
+                "PoliticalPartyManager: todavía no hay " +
+                "partidos inicializados."
             );
 
             return;
         }
 
-        Debug.Log($"PARTIDOS INICIALIZADOS: {partyStates.Count}");
 
-        foreach (PoliticalPartyState partyState in partyStates)
+        Debug.Log(
+            $"PARTIDOS INICIALIZADOS: {partyStates.Count}"
+        );
+
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
         {
-            if (partyState == null || partyState.party == null)
+            if (
+                partyState == null ||
+                partyState.party == null
+            )
             {
-                Debug.LogWarning("Hay un estado de partido vacío.");
+                Debug.LogWarning(
+                    "Hay un estado de partido vacío."
+                );
+
                 continue;
             }
+
 
             Debug.Log(
                 $"Partido: {partyState.party.partyName} | " +
@@ -228,35 +420,62 @@ public class PoliticalPartyManager : MonoBehaviour
         }
     }
 
+
+    // =========================================================
+    // DEBUG REACCIÓN ECONÓMICA
+    // =========================================================
+
     [ContextMenu("Probar reacción económica")]
     private void DebugEconomicPolicyReaction()
     {
-        if (partyStates == null || partyStates.Count == 0)
+        if (
+            partyStates == null ||
+            partyStates.Count == 0
+        )
         {
             Debug.LogWarning(
-                "No hay partidos inicializados. Ejecuta primero la partida."
+                "No hay partidos inicializados. " +
+                "Ejecuta primero la partida."
             );
 
             return;
         }
 
-        PoliticalAxis testAxis = PoliticalAxis.Economy;
-        float testPolicyPosition = 4.5f;
-        float testRelevance = 20f;
+
+        PoliticalAxis testAxis =
+            PoliticalAxis.Economy;
+
+        float testPolicyPosition =
+            4.5f;
+
+        float testRelevance =
+            20f;
+
 
         Debug.Log(
             "=== PRUEBA: POLÍTICA ECONÓMICA +4.5 ==="
         );
 
-        foreach (PoliticalPartyState partyState in partyStates)
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
         {
-            if (partyState == null || partyState.party == null)
+            if (
+                partyState == null ||
+                partyState.party == null
+            )
             {
                 continue;
             }
 
+
             float partyPosition =
-                partyState.party.GetPosition(testAxis);
+                partyState.party.GetPosition(
+                    testAxis
+                );
+
 
             float opinion =
                 PartyPolicyEvaluator.EvaluateOpinion(
@@ -265,6 +484,7 @@ public class PoliticalPartyManager : MonoBehaviour
                     testPolicyPosition
                 );
 
+
             float impact =
                 PartyPolicyEvaluator.CalculateSatisfactionImpact(
                     partyState.party,
@@ -272,6 +492,7 @@ public class PoliticalPartyManager : MonoBehaviour
                     testPolicyPosition,
                     testRelevance
                 );
+
 
             Debug.Log(
                 $"{partyState.party.partyName} | " +
@@ -282,20 +503,30 @@ public class PoliticalPartyManager : MonoBehaviour
         }
     }
 
+
+    // =========================================================
+    // REACCIÓN A POLÍTICAS
+    // =========================================================
+
     public void ApplyPolicyReaction(
         PoliticalAxis axis,
         float policyPosition,
         float policyRelevance
     )
     {
-        if (partyStates == null || partyStates.Count == 0)
+        if (
+            partyStates == null ||
+            partyStates.Count == 0
+        )
         {
             Debug.LogWarning(
-                "PoliticalPartyManager: no hay partidos inicializados."
+                "PoliticalPartyManager: no hay " +
+                "partidos inicializados."
             );
 
             return;
         }
+
 
         Debug.Log(
             $"=== REACCIÓN A POLÍTICA | " +
@@ -304,15 +535,24 @@ public class PoliticalPartyManager : MonoBehaviour
             $"Relevancia: {policyRelevance:F1} ==="
         );
 
-        foreach (PoliticalPartyState partyState in partyStates)
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
         {
-            if (partyState == null || partyState.party == null)
+            if (
+                partyState == null ||
+                partyState.party == null
+            )
             {
                 continue;
             }
 
+
             float previousSatisfaction =
                 partyState.satisfaction;
+
 
             float impact =
                 PartyPolicyEvaluator.CalculateSatisfactionImpact(
@@ -322,17 +562,24 @@ public class PoliticalPartyManager : MonoBehaviour
                     policyRelevance
                 );
 
-            float newSatisfaction = Mathf.Clamp(
-                previousSatisfaction + impact,
-                0f,
-                100f
-            );
+
+            float newSatisfaction =
+                Mathf.Clamp(
+                    previousSatisfaction +
+                    impact,
+                    0f,
+                    100f
+                );
+
 
             partyState.satisfaction =
                 newSatisfaction;
 
+
             partyState.lastSatisfactionChange =
-                newSatisfaction - previousSatisfaction;
+                newSatisfaction -
+                previousSatisfaction;
+
 
             Debug.Log(
                 $"{partyState.party.partyName} | " +
@@ -346,6 +593,7 @@ public class PoliticalPartyManager : MonoBehaviour
         }
     }
 
+
     [ContextMenu("Aplicar política económica de prueba")]
     private void DebugApplyEconomicPolicy()
     {
@@ -356,40 +604,65 @@ public class PoliticalPartyManager : MonoBehaviour
         );
     }
 
+
+    // =========================================================
+    // DEBUG PARLAMENTO
+    // =========================================================
+
     [ContextMenu("Mostrar parlamento actual")]
     private void DebugCurrentParliament()
     {
-        if (partyStates == null || partyStates.Count == 0)
+        if (
+            partyStates == null ||
+            partyStates.Count == 0
+        )
         {
             Debug.LogWarning(
-                "PoliticalPartyManager: no hay partidos inicializados."
+                "PoliticalPartyManager: no hay " +
+                "partidos inicializados."
             );
 
             return;
         }
 
-        int totalSeats = TotalSeats;
+
+        int totalSeats =
+            TotalSeats;
+
 
         Debug.Log(
             $"=== PARLAMENTO | TOTAL: {totalSeats} ASIENTOS | " +
             $"GOBIERNO: {coalitionType} ==="
         );
 
-        foreach (PoliticalPartyState partyState in partyStates)
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
         {
-            if (partyState == null || partyState.party == null)
+            if (
+                partyState == null ||
+                partyState.party == null
+            )
             {
                 continue;
             }
 
-            float percentage = totalSeats > 0
-                ? partyState.seats / (float)totalSeats * 100f
-                : 0f;
+
+            float percentage =
+                totalSeats > 0
+                    ? partyState.seats /
+                      (float)totalSeats *
+                      100f
+                    : 0f;
+
 
             string governmentLabel =
                 partyState.isGovernment
                     ? " | GOBIERNO"
                     : string.Empty;
+
 
             Debug.Log(
                 $"{partyState.party.partyName} | " +
@@ -400,17 +673,30 @@ public class PoliticalPartyManager : MonoBehaviour
         }
     }
 
+
+    // =========================================================
+    // GENERAR ESCAÑOS
+    // =========================================================
+
     private void GenerateRandomSeats()
     {
-        if (partyStates == null || partyStates.Count == 0)
+        if (
+            partyStates == null ||
+            partyStates.Count == 0
+        )
         {
             return;
         }
 
-        int partyCount = partyStates.Count;
+
+        int partyCount =
+            partyStates.Count;
+
 
         int minimumTotal =
-            minimumSeatsPerParty * partyCount;
+            minimumSeatsPerParty *
+            partyCount;
+
 
         if (minimumTotal > parliamentSeatCount)
         {
@@ -422,92 +708,409 @@ public class PoliticalPartyManager : MonoBehaviour
             return;
         }
 
-        // Primero garantizamos el mínimo.
-        foreach (PoliticalPartyState partyState in partyStates)
+
+        // -----------------------------------------------------
+        // 1. GARANTIZAR MÍNIMO
+        // -----------------------------------------------------
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
         {
             partyState.seats =
                 minimumSeatsPerParty;
         }
 
+
         int remainingSeats =
-            parliamentSeatCount - minimumTotal;
+            parliamentSeatCount -
+            minimumTotal;
 
 
-        // Creamos pesos aleatorios para cada partido.
+        // -----------------------------------------------------
+        // 2. SEPARAR LOS PARTIDOS POR RADICALIZACIÓN
+        // -----------------------------------------------------
+
+        List<PoliticalPartyState> centerMainstreamParties =
+            new List<PoliticalPartyState>();
+
+
+        List<PoliticalPartyState> hardlineParties =
+            new List<PoliticalPartyState>();
+
+
+        List<PoliticalPartyState> radicalParties =
+            new List<PoliticalPartyState>();
+
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
+        {
+            if (
+                partyState == null ||
+                partyState.party == null
+            )
+            {
+                continue;
+            }
+
+
+            switch (
+                partyState.party.RadicalizationLayer
+            )
+            {
+                case PoliticalRadicalizationLayer.Center:
+
+                case PoliticalRadicalizationLayer.Mainstream:
+
+                    centerMainstreamParties.Add(
+                        partyState
+                    );
+
+                    break;
+
+
+                case PoliticalRadicalizationLayer.Hardline:
+
+                    hardlineParties.Add(
+                        partyState
+                    );
+
+                    break;
+
+
+                case PoliticalRadicalizationLayer.Radical:
+
+                    radicalParties.Add(
+                        partyState
+                    );
+
+                    break;
+            }
+        }
+
+
+        // -----------------------------------------------------
+        // 3. PESOS ACTIVOS
+        //
+        // Si una categoría no tiene ningún partido,
+        // su porcentaje se redistribuye automáticamente.
+        // -----------------------------------------------------
+
+        float activeCenterMainstreamWeight =
+            centerMainstreamParties.Count > 0
+                ? centerMainstreamWeight
+                : 0f;
+
+
+        float activeHardlineWeight =
+            hardlineParties.Count > 0
+                ? hardlineWeight
+                : 0f;
+
+
+        float activeRadicalWeight =
+            radicalParties.Count > 0
+                ? radicalWeight
+                : 0f;
+
+
+        float totalActiveWeight =
+            activeCenterMainstreamWeight +
+            activeHardlineWeight +
+            activeRadicalWeight;
+
+
+        if (totalActiveWeight <= 0f)
+        {
+            Debug.LogError(
+                "PoliticalPartyManager: no existen grupos " +
+                "ideológicos válidos para repartir escaños."
+            );
+
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // 4. REPARTIR LOS ESCAÑOS RESTANTES ENTRE CAPAS
+        // -----------------------------------------------------
+
+        int centerMainstreamSeats =
+            Mathf.FloorToInt(
+                remainingSeats *
+                activeCenterMainstreamWeight /
+                totalActiveWeight
+            );
+
+
+        int hardlineSeats =
+            Mathf.FloorToInt(
+                remainingSeats *
+                activeHardlineWeight /
+                totalActiveWeight
+            );
+
+
+        int radicalSeats =
+            Mathf.FloorToInt(
+                remainingSeats *
+                activeRadicalWeight /
+                totalActiveWeight
+            );
+
+
+        int assignedGroupSeats =
+            centerMainstreamSeats +
+            hardlineSeats +
+            radicalSeats;
+
+
+        int groupSeatsLeft =
+            remainingSeats -
+            assignedGroupSeats;
+
+
+        // -----------------------------------------------------
+        // REPARTIR RESTOS PRODUCIDOS POR FloorToInt
+        // -----------------------------------------------------
+
+        while (groupSeatsLeft > 0)
+        {
+            if (
+                centerMainstreamParties.Count > 0 &&
+                activeCenterMainstreamWeight >=
+                activeHardlineWeight &&
+                activeCenterMainstreamWeight >=
+                activeRadicalWeight
+            )
+            {
+                centerMainstreamSeats++;
+            }
+            else if (
+                hardlineParties.Count > 0 &&
+                activeHardlineWeight >=
+                activeRadicalWeight
+            )
+            {
+                hardlineSeats++;
+            }
+            else if (
+                radicalParties.Count > 0
+            )
+            {
+                radicalSeats++;
+            }
+
+
+            groupSeatsLeft--;
+        }
+
+
+        // -----------------------------------------------------
+        // 5. REPARTIR DENTRO DE CADA GRUPO
+        // -----------------------------------------------------
+
+        DistributeSeatsWithinGroup(
+            centerMainstreamParties,
+            centerMainstreamSeats
+        );
+
+
+        DistributeSeatsWithinGroup(
+            hardlineParties,
+            hardlineSeats
+        );
+
+
+        DistributeSeatsWithinGroup(
+            radicalParties,
+            radicalSeats
+        );
+
+
+        Debug.Log(
+            $"=== PARLAMENTO GENERADO: {TotalSeats} ASIENTOS ==="
+        );
+
+
+        Debug.Log(
+            $"Center/Mainstream: " +
+            $"{GetGroupSeats(centerMainstreamParties)} | " +
+            $"Hardline: " +
+            $"{GetGroupSeats(hardlineParties)} | " +
+            $"Radical: " +
+            $"{GetGroupSeats(radicalParties)}"
+        );
+    }
+
+
+    // =========================================================
+    // REPARTIR ESCAÑOS DENTRO DE UN GRUPO
+    // =========================================================
+
+    private void DistributeSeatsWithinGroup(
+        List<PoliticalPartyState> group,
+        int seatsToDistribute
+    )
+    {
+        if (
+            group == null ||
+            group.Count == 0 ||
+            seatsToDistribute <= 0
+        )
+        {
+            return;
+        }
+
 
         float[] weights =
-            new float[partyCount];
+            new float[group.Count];
 
-        float totalWeight = 0f;
 
-        for (int i = 0; i < partyCount; i++)
+        float totalWeight =
+            0f;
+
+
+        // Cada partido obtiene una fuerza aleatoria.
+        // Así no todos los partidos de una misma capa
+        // tienen exactamente el mismo resultado.
+
+        for (
+            int i = 0;
+            i < group.Count;
+            i++
+        )
         {
             weights[i] =
-                Random.Range(0.25f, 1f);
-
-            totalWeight += weights[i];
-        }
-
-
-        // Primera distribución proporcional.
-
-        int distributedSeats = 0;
-
-        for (int i = 0; i < partyCount; i++)
-        {
-            int seatsToAdd =
-                Mathf.FloorToInt(
-                    remainingSeats *
-                    (weights[i] / totalWeight)
+                Random.Range(
+                    0.25f,
+                    1f
                 );
 
-            partyStates[i].seats +=
-                seatsToAdd;
 
-            distributedSeats +=
-                seatsToAdd;
+            totalWeight +=
+                weights[i];
         }
 
 
-        // FloorToInt puede dejar algunos asientos sin repartir.
-        // Los distribuimos aleatoriamente.
+        int distributedSeats =
+            0;
+
+
+        for (
+            int i = 0;
+            i < group.Count;
+            i++
+        )
+        {
+            int seats =
+                Mathf.FloorToInt(
+                    seatsToDistribute *
+                    weights[i] /
+                    totalWeight
+                );
+
+
+            group[i].seats +=
+                seats;
+
+
+            distributedSeats +=
+                seats;
+        }
+
 
         int seatsLeft =
-            remainingSeats - distributedSeats;
+            seatsToDistribute -
+            distributedSeats;
+
+
+        // Repartimos cualquier resto.
 
         while (seatsLeft > 0)
         {
             int randomParty =
                 Random.Range(
                     0,
-                    partyStates.Count
+                    group.Count
                 );
 
-            partyStates[randomParty].seats++;
+
+            group[randomParty].seats++;
+
 
             seatsLeft--;
         }
-
-
-        Debug.Log(
-            $"Parlamento generado aleatoriamente: " +
-            $"{TotalSeats} asientos."
-        );
     }
+
+
+    // =========================================================
+    // OBTENER TOTAL DE ESCAÑOS DE UN GRUPO
+    // =========================================================
+
+    private int GetGroupSeats(
+        List<PoliticalPartyState> group
+    )
+    {
+        if (group == null)
+        {
+            return 0;
+        }
+
+
+        int total =
+            0;
+
+
+        foreach (
+            PoliticalPartyState partyState
+            in group
+        )
+        {
+            if (partyState != null)
+            {
+                total +=
+                    partyState.seats;
+            }
+        }
+
+
+        return total;
+    }
+
+
+    // =========================================================
+    // FORMAR GOBIERNO
+    // =========================================================
 
     private void FormAutomaticGovernment()
     {
-        if (partyStates == null || partyStates.Count == 0)
+        if (
+            partyStates == null ||
+            partyStates.Count == 0
+        )
         {
             return;
         }
 
-        foreach (PoliticalPartyState partyState in partyStates)
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
         {
-            partyState.isGovernment = false;
+            partyState.isGovernment =
+                false;
         }
 
-        int totalSeats = TotalSeats;
+
+        int totalSeats =
+            TotalSeats;
+
 
         if (totalSeats <= 0)
         {
@@ -517,21 +1120,32 @@ public class PoliticalPartyManager : MonoBehaviour
             return;
         }
 
+
         int majorityThreshold =
             totalSeats / 2 + 1;
 
 
-        // 1. Comprobar si existe mayoría absoluta
-        // de un único partido.
+        // -----------------------------------------------------
+        // 1. MAYORÍA ABSOLUTA DE UN PARTIDO
+        // -----------------------------------------------------
 
-        foreach (PoliticalPartyState partyState in partyStates)
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
         {
-            if (partyState.seats >= majorityThreshold)
+            if (
+                partyState.seats >=
+                majorityThreshold
+            )
             {
-                partyState.isGovernment = true;
+                partyState.isGovernment =
+                    true;
+
 
                 coalitionType =
                     GovernmentCoalitionType.SinglePartyMajority;
+
 
                 Debug.Log(
                     $"Gobierno formado por " +
@@ -539,50 +1153,67 @@ public class PoliticalPartyManager : MonoBehaviour
                     $"con {partyState.seats} asientos."
                 );
 
+
                 return;
             }
         }
 
 
-        // 2. Buscar la mejor coalición posible.
+        // -----------------------------------------------------
+        // 2. BUSCAR COALICIÓN
+        // -----------------------------------------------------
 
         List<PoliticalPartyState> bestCoalition =
             FindBestMajorityCoalition(
                 majorityThreshold
             );
 
-        if (bestCoalition == null ||
-            bestCoalition.Count == 0)
+
+        if (
+            bestCoalition == null ||
+            bestCoalition.Count == 0
+        )
         {
             coalitionType =
                 GovernmentCoalitionType.NoGovernment;
+
 
             Debug.LogWarning(
                 "No ha sido posible formar gobierno."
             );
 
+
             return;
         }
 
 
-        int governmentSeats = 0;
+        int governmentSeats =
+            0;
+
 
         foreach (
             PoliticalPartyState partyState
             in bestCoalition
         )
         {
-            partyState.isGovernment = true;
-            governmentSeats += partyState.seats;
+            partyState.isGovernment =
+                true;
+
+
+            governmentSeats +=
+                partyState.seats;
         }
+
 
         coalitionType =
             GovernmentCoalitionType.MajorityCoalition;
+
 
         Debug.Log(
             $"Coalición formada con " +
             $"{governmentSeats}/{totalSeats} asientos."
         );
+
 
         foreach (
             PoliticalPartyState partyState
@@ -597,66 +1228,181 @@ public class PoliticalPartyManager : MonoBehaviour
         }
     }
 
-    private List<PoliticalPartyState> FindBestMajorityCoalition(int majorityThreshold)
+
+    // =========================================================
+    // BUSCAR MEJOR COALICIÓN
+    //
+    // NUEVO ALGORITMO ESCALABLE.
+    //
+    // Ya NO comprueba 2^N combinaciones.
+    //
+    // Cada partido se prueba como líder.
+    // Sus socios se ordenan por cercanía ideológica.
+    // Se añaden hasta alcanzar la mayoría.
+    // =========================================================
+
+    private List<PoliticalPartyState> FindBestMajorityCoalition(
+        int majorityThreshold
+    )
     {
         List<PoliticalPartyState> bestCoalition =
             null;
 
+
         float bestScore =
             float.MaxValue;
 
-        int partyCount =
-            partyStates.Count;
 
-        int combinationCount =
-            1 << partyCount;
-
-
-        for (
-            int mask = 1;
-            mask < combinationCount;
-            mask++
+        foreach (
+            PoliticalPartyState leader
+            in partyStates
         )
         {
+            if (
+                leader == null ||
+                leader.party == null ||
+                leader.seats <= 0
+            )
+            {
+                continue;
+            }
+
+
+            List<PoliticalPartyState> possiblePartners =
+                new List<PoliticalPartyState>();
+
+
+            foreach (
+                PoliticalPartyState candidate
+                in partyStates
+            )
+            {
+                if (
+                    candidate == null ||
+                    candidate.party == null ||
+                    candidate == leader ||
+                    candidate.seats <= 0
+                )
+                {
+                    continue;
+                }
+
+                // Un partido no puede liderar una coalición
+                // que contenga otro partido con más escaños.
+                if (candidate.seats > leader.seats)
+                {
+                    continue;
+                }
+
+                possiblePartners.Add(
+                    candidate
+                );
+            }
+
+
+            // -------------------------------------------------
+            // ORDENAR SOCIOS POR COMPATIBILIDAD
+            // -------------------------------------------------
+
+            possiblePartners.Sort(
+                (a, b) =>
+                {
+                    float distanceA =
+                        CalculatePartyIdeologicalDistance(
+                            leader.party,
+                            a.party
+                        );
+
+
+                    float distanceB =
+                        CalculatePartyIdeologicalDistance(
+                            leader.party,
+                            b.party
+                        );
+
+
+                    int comparison =
+                        distanceA.CompareTo(
+                            distanceB
+                        );
+
+
+                    if (comparison != 0)
+                    {
+                        return comparison;
+                    }
+
+
+                    // Si la distancia es idéntica,
+                    // preferimos al partido con más escaños.
+
+                    return b.seats.CompareTo(
+                        a.seats
+                    );
+                }
+            );
+
+
+            // -------------------------------------------------
+            // CREAR COALICIÓN DEL LÍDER
+            // -------------------------------------------------
+
             List<PoliticalPartyState> coalition =
                 new List<PoliticalPartyState>();
 
-            int coalitionSeats = 0;
+
+            coalition.Add(
+                leader
+            );
 
 
-            for (
-                int i = 0;
-                i < partyCount;
-                i++
+            int coalitionSeats =
+                leader.seats;
+
+
+            // -------------------------------------------------
+            // AÑADIR SOCIOS HASTA CONSEGUIR MAYORÍA
+            // -------------------------------------------------
+
+            foreach (
+                PoliticalPartyState partner
+                in possiblePartners
             )
             {
-                if ((mask & (1 << i)) != 0)
+                if (
+                    coalitionSeats >=
+                    majorityThreshold
+                )
                 {
-                    PoliticalPartyState partyState =
-                        partyStates[i];
-
-                    coalition.Add(partyState);
-
-                    coalitionSeats +=
-                        partyState.seats;
+                    break;
                 }
+
+
+                coalition.Add(
+                    partner
+                );
+
+
+                coalitionSeats +=
+                    partner.seats;
             }
 
 
-            // Ya hemos comprobado gobiernos
-            // de un solo partido.
+            // Si ni siquiera usando socios
+            // conseguimos mayoría, descartamos.
 
-            if (coalition.Count < 2)
+            if (
+                coalitionSeats <
+                majorityThreshold
+            )
             {
                 continue;
             }
 
 
-            if (coalitionSeats < majorityThreshold)
-            {
-                continue;
-            }
-
+            // -------------------------------------------------
+            // PUNTUAR COALICIÓN
+            // -------------------------------------------------
 
             float ideologicalDistance =
                 CalculateCoalitionIdeologicalDistance(
@@ -664,30 +1410,127 @@ public class PoliticalPartyManager : MonoBehaviour
                 );
 
 
-            // Penalizamos ligeramente:
-            // - tener demasiados partidos
-            // - tener muchos asientos innecesarios
-
             int excessSeats =
                 coalitionSeats -
                 majorityThreshold;
 
+
+            // El coste por asiento sobrante se escala
+            // automáticamente al tamaño del Parlamento.
+            //
+            // 100 escaños  -> 0.03
+            // 1000 escaños -> 0.003
+
+            float excessSeatPenalty =
+                3f /
+                Mathf.Max(
+                    1,
+                    TotalSeats
+                );
+
+
             float score =
                 ideologicalDistance +
-                (coalition.Count - 2) * 0.5f +
-                excessSeats * 0.03f;
+
+                // Penalizar coaliciones excesivamente grandes.
+                (coalition.Count - 2) *
+                0.5f +
+
+                // Penalizar mayoría innecesariamente sobrada.
+                excessSeats *
+                excessSeatPenalty;
 
 
             if (score < bestScore)
             {
-                bestScore = score;
-                bestCoalition = coalition;
+                bestScore =
+                    score;
+
+
+                bestCoalition =
+                    new List<PoliticalPartyState>(
+                        coalition
+                    );
             }
         }
 
 
         return bestCoalition;
     }
+
+
+    // =========================================================
+    // DISTANCIA ENTRE DOS PARTIDOS
+    // =========================================================
+
+    private float CalculatePartyIdeologicalDistance(
+        PoliticalPartySO partyA,
+        PoliticalPartySO partyB
+    )
+    {
+        if (
+            partyA == null ||
+            partyB == null
+        )
+        {
+            return float.MaxValue;
+        }
+
+
+        float totalDistance =
+            0f;
+
+
+        int axisCount =
+            0;
+
+
+        foreach (
+            PoliticalAxis axis
+            in Enum.GetValues(
+                typeof(PoliticalAxis)
+            )
+        )
+        {
+            float positionA =
+                partyA.GetPosition(
+                    axis
+                );
+
+
+            float positionB =
+                partyB.GetPosition(
+                    axis
+                );
+
+
+            totalDistance +=
+                Mathf.Abs(
+                    positionA -
+                    positionB
+                );
+
+
+            axisCount++;
+        }
+
+
+        if (axisCount == 0)
+        {
+            return 0f;
+        }
+
+
+        return
+            totalDistance /
+            axisCount;
+    }
+
+
+    // =========================================================
+    // DISTANCIA IDEOLÓGICA DE UNA COALICIÓN
+    // =========================================================
+
     private float CalculateCoalitionIdeologicalDistance(
         List<PoliticalPartyState> coalition
     )
@@ -700,8 +1543,13 @@ public class PoliticalPartyManager : MonoBehaviour
             return 0f;
         }
 
-        float totalDistance = 0f;
-        int comparisons = 0;
+
+        float totalDistance =
+            0f;
+
+
+        int comparisons =
+            0;
 
 
         for (
@@ -719,6 +1567,7 @@ public class PoliticalPartyManager : MonoBehaviour
                 PoliticalPartySO partyA =
                     coalition[i].party;
 
+
                 PoliticalPartySO partyB =
                     coalition[j].party;
 
@@ -731,15 +1580,23 @@ public class PoliticalPartyManager : MonoBehaviour
                 )
                 {
                     float positionA =
-                        partyA.GetPosition(axis);
+                        partyA.GetPosition(
+                            axis
+                        );
+
 
                     float positionB =
-                        partyB.GetPosition(axis);
+                        partyB.GetPosition(
+                            axis
+                        );
+
 
                     totalDistance +=
                         Mathf.Abs(
-                            positionA - positionB
+                            positionA -
+                            positionB
                         );
+
 
                     comparisons++;
                 }
@@ -752,7 +1609,9 @@ public class PoliticalPartyManager : MonoBehaviour
             return 0f;
         }
 
-        return totalDistance /
+
+        return
+            totalDistance /
             comparisons;
     }
 }

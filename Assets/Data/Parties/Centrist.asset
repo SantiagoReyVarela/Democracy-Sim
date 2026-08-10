@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
   m_Name: Centrist
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
+  enabled: 1
   partyId: centrist
   partyName: Partido Centrista
   acronym: PC
   logo: {fileID: 0}
-  partyColor: {r: 0.41960785, g: 0.44705883, b: 0.5019608, a: 1}
+  partyColor: {r: 0.65882355, g: 0.65882355, b: 0.65882355, a: 1}
   description: "Partido moderado y pragm\xE1tico que busca acuerdos entre izquierda
     y derecha, evitando posiciones ideol\xF3gicas extremas."
   ideologicalLine: "Centro pol\xEDtico"
@@ -35,3 +36,5 @@ MonoBehaviour:
     position: -0.5
   - axis: 6
     position: 1
+  hemicycleBloc: 1
+  radicalizationLayer: 0

@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
   m_Name: Neoliberal
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
+  enabled: 1
   partyId: neoliberal
   partyName: Partido Neoliberal
   acronym: PNL
   logo: {fileID: 0}
-  partyColor: {r: 0.9019608, g: 0.72156864, b: 0, a: 1}
+  partyColor: {r: 0.9019608, g: 0.6039216, b: 0.1764706, a: 1}
   description: "Partido de centroderecha econ\xF3mica que defiende la privatizaci\xF3n
     de empresas p\xFAblicas, la reducci\xF3n de impuestos y regulaciones, la disciplina
     fiscal, la competencia y la integraci\xF3n en los mercados internacionales."
@@ -36,3 +37,5 @@ MonoBehaviour:
     position: -1
   - axis: 6
     position: 5
+  hemicycleBloc: 2
+  radicalizationLayer: 1

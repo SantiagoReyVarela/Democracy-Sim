@@ -10,29 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
-  m_Name: Liberal
+  m_Name: Fascist
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
-  partyId: liberal
-  partyName: Partido Liberal
-  acronym: PL
+  enabled: 1
+  partyId: fascist
+  partyName: Partido Fascista
+  acronym: PFas
   logo: {fileID: 0}
-  partyColor: {r: 1, g: 0.8963117, b: 0.5801887, a: 1}
-  description: "Partido liberal cl\xE1sico que defiende el constitucionalismo, las
-    libertades individuales, la secularizaci\xF3n, el gobierno limitado, la propiedad
-    privada y la libertad comercial."
-  ideologicalLine: "Liberalismo cl\xE1sico"
+  partyColor: {r: 0.23529412, g: 0.23529412, b: 0.23529412, a: 1}
+  description: "Partido moderado y pragm\xE1tico que busca acuerdos entre izquierda
+    y derecha, evitando posiciones ideol\xF3gicas extremas."
+  ideologicalLine: Fascismo
   ideologicalPositions:
   - axis: 0
-    position: 2
+    position: 0.5
   - axis: 1
-    position: -3
+    position: 0.5
   - axis: 2
-    position: -1.5
+    position: 0
   - axis: 3
-    position: -1.5
+    position: 0
   - axis: 4
-    position: -4
+    position: -0.5
   - axis: 5
-    position: -3
+    position: -0.5
   - axis: 6
-    position: 4
+    position: 1
+  hemicycleBloc: 2
+  radicalizationLayer: 3

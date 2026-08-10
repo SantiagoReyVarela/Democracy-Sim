@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
+  m_Name: Commulnalist
+  m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
+  enabled: 1
+  partyId: communalist
+  partyName: Partido Comunalista
+  acronym: PSynd
+  logo: {fileID: 0}
+  partyColor: {r: 0.15816452, g: 0.509434, b: 0.06968674, a: 1}
+  description: "Partido moderado y pragm\xE1tico que busca acuerdos entre izquierda
+    y derecha, evitando posiciones ideol\xF3gicas extremas."
+  ideologicalLine: Sindicalismo
+  ideologicalPositions:
+  - axis: 0
+    position: 0.5
+  - axis: 1
+    position: 0.5
+  - axis: 2
+    position: 0
+  - axis: 3
+    position: 0
+  - axis: 4
+    position: -0.5
+  - axis: 5
+    position: -0.5
+  - axis: 6
+    position: 1
+  hemicycleBloc: 0
+  radicalizationLayer: 2

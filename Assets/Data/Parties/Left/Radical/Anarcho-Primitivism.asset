@@ -10,28 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
-  m_Name: ChristianDemocrat
+  m_Name: Anarcho-Primitivism
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
-  partyId: christian_democrat
-  partyName: "Partido Dem\xF3crata Cristiano"
-  acronym: PDC
+  enabled: 1
+  partyId: anarcho-primitivism
+  partyName: Partido Anarco-Primitivista
+  acronym: PAnPrim
   logo: {fileID: 0}
-  partyColor: {r: 0.1764706, g: 0.3529412, b: 0.654902, a: 1}
-  description: "Partido de centroderecha que combina la econom\xEDa social de mercado
-    con valores comunitarios, religiosos y familiares."
-  ideologicalLine: Centroderecha democristiana
+  partyColor: {r: 0.24705882, g: 0.40784314, b: 0.16078432, a: 1}
+  description: "Partido moderado y pragm\xE1tico que busca acuerdos entre izquierda
+    y derecha, evitando posiciones ideol\xF3gicas extremas."
+  ideologicalLine: Anarquismo primitivista
   ideologicalPositions:
   - axis: 0
     position: 0.5
   - axis: 1
-    position: 1.5
-  - axis: 2
     position: 0.5
+  - axis: 2
+    position: 0
   - axis: 3
-    position: 1
+    position: 0
   - axis: 4
-    position: 2.5
+    position: -0.5
   - axis: 5
-    position: 2
+    position: -0.5
   - axis: 6
     position: 1
+  hemicycleBloc: 0
+  radicalizationLayer: 3

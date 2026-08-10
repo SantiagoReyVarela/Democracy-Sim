@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
+  m_Name: SocialDemocrat
+  m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
+  enabled: 1
+  partyId: social_democrat
+  partyName: "Partido Socialdem\xF3crata"
+  acronym: PSD
+  logo: {fileID: 0}
+  partyColor: {r: 0.8509804, g: 0.40392157, b: 0.5019608, a: 1}
+  description: "Partido de centroizquierda que defiende una econom\xEDa regulada,
+    servicios p\xFAblicos amplios, derechos sociales y cooperaci\xF3n internacional."
+  ideologicalLine: "Centroizquierda socialdem\xF3crata"
+  ideologicalPositions:
+  - axis: 0
+    position: -2.5
+  - axis: 1
+    position: 2
+  - axis: 2
+    position: -1
+  - axis: 3
+    position: -1
+  - axis: 4
+    position: -2
+  - axis: 5
+    position: 0.2
+  - axis: 6
+    position: 0.5
+  hemicycleBloc: 0
+  radicalizationLayer: 1

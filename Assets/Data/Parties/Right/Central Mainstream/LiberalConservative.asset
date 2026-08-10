@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
   m_Name: LiberalConservative
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
+  enabled: 1
   partyId: liberal_conservative
   partyName: Partido Liberal-Conservador
   acronym: PLC
   logo: {fileID: 0}
-  partyColor: {r: 0.14117648, g: 0.23137255, b: 0.41960785, a: 1}
+  partyColor: {r: 0.3372549, g: 0.5411765, b: 0.5764706, a: 1}
   description: "Partido de derecha moderada que combina la defensa del mercado, la
     propiedad privada y el constitucionalismo con el mantenimiento del orden, las
     instituciones tradicionales y la cohesi\xF3n nacional."
@@ -36,3 +37,5 @@ MonoBehaviour:
     position: 1.5
   - axis: 6
     position: 3
+  hemicycleBloc: 2
+  radicalizationLayer: 1

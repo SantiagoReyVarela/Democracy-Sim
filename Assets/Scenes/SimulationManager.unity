@@ -173,10 +173,49 @@ MonoBehaviour:
   - {fileID: 11400000, guid: af1ee5225f2881a4caebf749681ef7ff, type: 2}
   - {fileID: 11400000, guid: 94a04fb5b8907e44f95698b8235caa7c, type: 2}
   - {fileID: 11400000, guid: ca12372d69a312840a6654d44b596f08, type: 2}
-  initialParliament:
-  - party: {fileID: 0}
-    seats: 0
-    isGovernment: 0
+  - {fileID: 11400000, guid: c5683fb9926a89d46b0ef770ece28255, type: 2}
+  - {fileID: 11400000, guid: d5e1d9cff4076b14eb0f21a1f3af9076, type: 2}
+  - {fileID: 11400000, guid: 1106857318edf8746aba38c5977b511f, type: 2}
+  - {fileID: 11400000, guid: 877c96c00168ad34bab7f08fa1f6eb33, type: 2}
+  - {fileID: 11400000, guid: b2099c1df35185c44ac79039dc07c85f, type: 2}
+  - {fileID: 11400000, guid: 0e49796c6c702c84d8827f6a06decaf0, type: 2}
+  - {fileID: 11400000, guid: 8d940aa0fe6e8d84a873e1bd08fea56e, type: 2}
+  - {fileID: 11400000, guid: 30ed27831bb277140a7c039af655ef79, type: 2}
+  - {fileID: 11400000, guid: 38abb9cce966a4340a4b19e31c389137, type: 2}
+  - {fileID: 11400000, guid: 52462a4be9f9424438d40c28c75f734d, type: 2}
+  - {fileID: 11400000, guid: ea39883ee1556324585099c4b85d1f18, type: 2}
+  - {fileID: 11400000, guid: edc730c97eabbfc449ed19546d3fc182, type: 2}
+  - {fileID: 11400000, guid: 703c5ea08df632b4eb208a560c882683, type: 2}
+  - {fileID: 11400000, guid: dac54166bb54abc47b741d0d86e2fa39, type: 2}
+  - {fileID: 11400000, guid: 29e2ba02a9ce56d468a6b2509024c620, type: 2}
+  - {fileID: 11400000, guid: 339f94d30cda04f4dabe308b841036f1, type: 2}
+  - {fileID: 11400000, guid: 85ae06df811b0b946bfe9a1a0cbf46f5, type: 2}
+  - {fileID: 11400000, guid: 71e3dc3b45fbc2445a3550155fa5560a, type: 2}
+  - {fileID: 11400000, guid: f067d4d28a6a7544fac0949a37bbf67b, type: 2}
+  - {fileID: 11400000, guid: 3b30271f5185f7042ac70e056baba15f, type: 2}
+  - {fileID: 11400000, guid: 2ee338b0bcc1eb349b87592fef1c2b4c, type: 2}
+  - {fileID: 11400000, guid: 793d83e32a4e9b04181193437c4c74e6, type: 2}
+  - {fileID: 11400000, guid: bbe3cfbc29dcd2144afd7ca00e7e34fb, type: 2}
+  - {fileID: 11400000, guid: c4958db4c322b9f47880fb464a5e7bc4, type: 2}
+  - {fileID: 11400000, guid: c2ea816556c2afc458af0626ca7b9e68, type: 2}
+  - {fileID: 11400000, guid: d0878dd845e1ee64fa0187d3f2db8395, type: 2}
+  - {fileID: 11400000, guid: c9117b18fb91561489b8876173c8443e, type: 2}
+  - {fileID: 11400000, guid: c3998894263b2144ea1df35bf30dc4b9, type: 2}
+  - {fileID: 11400000, guid: 65db3d3cb3def1a4bbcdef6dca31d4a9, type: 2}
+  - {fileID: 11400000, guid: abefc065a55df4b4db806455fe7fdc94, type: 2}
+  - {fileID: 11400000, guid: 24d7215c7b2dff740a814fc833392694, type: 2}
+  - {fileID: 11400000, guid: 45b85a99d6362444e86d6947fbf40c65, type: 2}
+  - {fileID: 11400000, guid: 4939442c6ecbe0a4082e552466231cf6, type: 2}
+  - {fileID: 11400000, guid: 816f5f7a55dccc84a9c5ae8b359da0b3, type: 2}
+  - {fileID: 11400000, guid: 192cc1f4b9127834b828e24b80cc90ee, type: 2}
+  - {fileID: 11400000, guid: 7cbdf71cac85e8b4a946be2596805483, type: 2}
+  parliamentSeatCount: 1000
+  generateRandomParliament: 1
+  minimumSeatsPerParty: 1
+  centerMainstreamWeight: 70
+  hardlineWeight: 20
+  radicalWeight: 10
+  initialParliament: []
   coalitionType: 3
 --- !u!1 &760514556
 GameObject:
@@ -399,7 +438,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5c7462de015e7042a36eee95cff4520, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BootstrapLoader
-  initialScene: Economy
+  initialScene: Parties
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
