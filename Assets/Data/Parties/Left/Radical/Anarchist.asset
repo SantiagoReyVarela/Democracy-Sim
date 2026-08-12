@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Anarchist
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
   enabled: 1
-  partyId: trotskyist
-  partyName: Partido Trotskysta
-  acronym: PTrostk
+  partyId: anarchist
+  partyName: Partido Anarquista
+  acronym: PAnarchy
   logo: {fileID: 0}
-  partyColor: {r: 0.84705883, g: 0.29411766, b: 0.34901962, a: 1}
+  partyColor: {r: 0.13333334, g: 0.13333334, b: 0.13333334, a: 1}
   description: "Partido moderado y pragm\xE1tico que busca acuerdos entre izquierda
     y derecha, evitando posiciones ideol\xF3gicas extremas."
-  ideologicalLine: Trotskysmo
+  ideologicalLine: Anarquismo
   ideologicalPositions:
   - axis: 0
     position: 0.5

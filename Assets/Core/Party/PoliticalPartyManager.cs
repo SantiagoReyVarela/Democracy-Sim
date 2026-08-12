@@ -87,6 +87,16 @@ public class PoliticalPartyManager : MonoBehaviour
         coalitionType;
 
 
+    // Partido que lidera el gobierno.
+    // Siempre será el partido gubernamental
+    // con mayor número de escaños.
+
+    private PoliticalPartyState governmentLeader;
+
+    public PoliticalPartyState GovernmentLeader =>
+        governmentLeader;
+
+
     // =========================================================
     // TOTAL DE ESCAÑOS
     // =========================================================
@@ -131,6 +141,8 @@ public class PoliticalPartyManager : MonoBehaviour
     public void InitializeParties()
     {
         partyStates.Clear();
+
+        governmentLeader = null;
 
 
         if (
@@ -636,6 +648,19 @@ public class PoliticalPartyManager : MonoBehaviour
         );
 
 
+        if (
+            governmentLeader != null &&
+            governmentLeader.party != null
+        )
+        {
+            Debug.Log(
+                $"LÍDER DEL GOBIERNO | " +
+                $"{governmentLeader.party.partyName} | " +
+                $"{governmentLeader.seats} asientos"
+            );
+        }
+
+
         foreach (
             PoliticalPartyState partyState
             in partyStates
@@ -664,11 +689,18 @@ public class PoliticalPartyManager : MonoBehaviour
                     : string.Empty;
 
 
+            string leaderLabel =
+                partyState == governmentLeader
+                    ? " | LÍDER"
+                    : string.Empty;
+
+
             Debug.Log(
                 $"{partyState.party.partyName} | " +
                 $"Asientos: {partyState.seats} | " +
                 $"Porcentaje: {percentage:F2}%" +
-                governmentLabel
+                governmentLabel +
+                leaderLabel
             );
         }
     }
@@ -795,9 +827,6 @@ public class PoliticalPartyManager : MonoBehaviour
 
         // -----------------------------------------------------
         // 3. PESOS ACTIVOS
-        //
-        // Si una categoría no tiene ningún partido,
-        // su porcentaje se redistribuye automáticamente.
         // -----------------------------------------------------
 
         float activeCenterMainstreamWeight =
@@ -836,7 +865,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // 4. REPARTIR LOS ESCAÑOS RESTANTES ENTRE CAPAS
+        // 4. REPARTIR ESCAÑOS ENTRE CAPAS
         // -----------------------------------------------------
 
         int centerMainstreamSeats =
@@ -875,7 +904,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // REPARTIR RESTOS PRODUCIDOS POR FloorToInt
+        // REPARTIR RESTOS
         // -----------------------------------------------------
 
         while (groupSeatsLeft > 0)
@@ -975,10 +1004,6 @@ public class PoliticalPartyManager : MonoBehaviour
             0f;
 
 
-        // Cada partido obtiene una fuerza aleatoria.
-        // Así no todos los partidos de una misma capa
-        // tienen exactamente el mismo resultado.
-
         for (
             int i = 0;
             i < group.Count;
@@ -1028,8 +1053,6 @@ public class PoliticalPartyManager : MonoBehaviour
             seatsToDistribute -
             distributedSeats;
 
-
-        // Repartimos cualquier resto.
 
         while (seatsLeft > 0)
         {
@@ -1089,11 +1112,21 @@ public class PoliticalPartyManager : MonoBehaviour
 
     private void FormAutomaticGovernment()
     {
+        // El líder se vuelve a calcular
+        // cada vez que se forma un gobierno.
+
+        governmentLeader =
+            null;
+
+
         if (
             partyStates == null ||
             partyStates.Count == 0
         )
         {
+            coalitionType =
+                GovernmentCoalitionType.NoGovernment;
+
             return;
         }
 
@@ -1126,7 +1159,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // 1. MAYORÍA ABSOLUTA DE UN PARTIDO
+        // 1. MAYORÍA ABSOLUTA DE UN SOLO PARTIDO
         // -----------------------------------------------------
 
         foreach (
@@ -1143,6 +1176,10 @@ public class PoliticalPartyManager : MonoBehaviour
                     true;
 
 
+                governmentLeader =
+                    partyState;
+
+
                 coalitionType =
                     GovernmentCoalitionType.SinglePartyMajority;
 
@@ -1151,6 +1188,12 @@ public class PoliticalPartyManager : MonoBehaviour
                     $"Gobierno formado por " +
                     $"{partyState.party.partyName} " +
                     $"con {partyState.seats} asientos."
+                );
+
+
+                Debug.Log(
+                    $"LÍDER DEL GOBIERNO | " +
+                    $"{governmentLeader.party.partyName}"
                 );
 
 
@@ -1191,6 +1234,11 @@ public class PoliticalPartyManager : MonoBehaviour
             0;
 
 
+        // -----------------------------------------------------
+        // MARCAR PARTIDOS DEL GOBIERNO
+        // Y ENCONTRAR EL PARTIDO MÁS GRANDE
+        // -----------------------------------------------------
+
         foreach (
             PoliticalPartyState partyState
             in bestCoalition
@@ -1202,6 +1250,17 @@ public class PoliticalPartyManager : MonoBehaviour
 
             governmentSeats +=
                 partyState.seats;
+
+
+            if (
+                governmentLeader == null ||
+                partyState.seats >
+                governmentLeader.seats
+            )
+            {
+                governmentLeader =
+                    partyState;
+            }
         }
 
 
@@ -1215,15 +1274,35 @@ public class PoliticalPartyManager : MonoBehaviour
         );
 
 
+        if (
+            governmentLeader != null &&
+            governmentLeader.party != null
+        )
+        {
+            Debug.Log(
+                $"LÍDER DEL GOBIERNO | " +
+                $"{governmentLeader.party.partyName} | " +
+                $"{governmentLeader.seats} asientos"
+            );
+        }
+
+
         foreach (
             PoliticalPartyState partyState
             in bestCoalition
         )
         {
+            string leaderLabel =
+                partyState == governmentLeader
+                    ? " | LÍDER"
+                    : string.Empty;
+
+
             Debug.Log(
                 $"GOBIERNO | " +
                 $"{partyState.party.partyName} | " +
-                $"{partyState.seats} asientos"
+                $"{partyState.seats} asientos" +
+                leaderLabel
             );
         }
     }
@@ -1231,14 +1310,6 @@ public class PoliticalPartyManager : MonoBehaviour
 
     // =========================================================
     // BUSCAR MEJOR COALICIÓN
-    //
-    // NUEVO ALGORITMO ESCALABLE.
-    //
-    // Ya NO comprueba 2^N combinaciones.
-    //
-    // Cada partido se prueba como líder.
-    // Sus socios se ordenan por cercanía ideológica.
-    // Se añaden hasta alcanzar la mayoría.
     // =========================================================
 
     private List<PoliticalPartyState> FindBestMajorityCoalition(
@@ -1287,12 +1358,22 @@ public class PoliticalPartyManager : MonoBehaviour
                     continue;
                 }
 
-                // Un partido no puede liderar una coalición
-                // que contenga otro partido con más escaños.
-                if (candidate.seats > leader.seats)
+
+                // =================================================
+                // REGLA DE LIDERAZGO
+                //
+                // Un partido NO puede liderar una coalición
+                // que incluya otro partido con más escaños.
+                // =================================================
+
+                if (
+                    candidate.seats >
+                    leader.seats
+                )
                 {
                     continue;
                 }
+
 
                 possiblePartners.Add(
                     candidate
@@ -1333,8 +1414,9 @@ public class PoliticalPartyManager : MonoBehaviour
                     }
 
 
-                    // Si la distancia es idéntica,
-                    // preferimos al partido con más escaños.
+                    // Si tienen exactamente la misma
+                    // compatibilidad, preferimos al
+                    // partido con más escaños.
 
                     return b.seats.CompareTo(
                         a.seats
@@ -1344,7 +1426,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
             // -------------------------------------------------
-            // CREAR COALICIÓN DEL LÍDER
+            // CREAR COALICIÓN
             // -------------------------------------------------
 
             List<PoliticalPartyState> coalition =
@@ -1361,7 +1443,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
             // -------------------------------------------------
-            // AÑADIR SOCIOS HASTA CONSEGUIR MAYORÍA
+            // AÑADIR SOCIOS HASTA MAYORÍA
             // -------------------------------------------------
 
             foreach (
@@ -1388,9 +1470,6 @@ public class PoliticalPartyManager : MonoBehaviour
             }
 
 
-            // Si ni siquiera usando socios
-            // conseguimos mayoría, descartamos.
-
             if (
                 coalitionSeats <
                 majorityThreshold
@@ -1415,12 +1494,6 @@ public class PoliticalPartyManager : MonoBehaviour
                 majorityThreshold;
 
 
-            // El coste por asiento sobrante se escala
-            // automáticamente al tamaño del Parlamento.
-            //
-            // 100 escaños  -> 0.03
-            // 1000 escaños -> 0.003
-
             float excessSeatPenalty =
                 3f /
                 Mathf.Max(
@@ -1432,11 +1505,9 @@ public class PoliticalPartyManager : MonoBehaviour
             float score =
                 ideologicalDistance +
 
-                // Penalizar coaliciones excesivamente grandes.
                 (coalition.Count - 2) *
                 0.5f +
 
-                // Penalizar mayoría innecesariamente sobrada.
                 excessSeats *
                 excessSeatPenalty;
 

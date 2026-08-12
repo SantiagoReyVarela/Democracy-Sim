@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -48,6 +49,35 @@ public class PartiesScreenController : MonoBehaviour
     [SerializeField]
     private TMP_Text coalitionTypeText;
 
+    [SerializeField]
+    private TMP_Text governmentLeaderText;
+
+
+    // =========================================================
+    // ESTADO DEL GOBIERNO
+    // =========================================================
+
+    [Header("Government Status")]
+
+    [SerializeField]
+    private TMP_Text satisfactionText;
+
+    [SerializeField]
+    private TMP_Text trendText;
+
+
+    // =========================================================
+    // PERFIL IDEOLÓGICO DEL GOBIERNO
+    // =========================================================
+
+    [Header("Government Ideology")]
+
+    [SerializeField]
+    private Transform ideologyRowsContainer;
+
+    [SerializeField]
+    private GovIdeologyRowUI ideologyRowPrefab;
+
 
     // =========================================================
     // MANAGER
@@ -65,6 +95,9 @@ public class PartiesScreenController : MonoBehaviour
 
     private readonly List<GovPartyRowUI> createdGovernmentRows =
         new List<GovPartyRowUI>();
+
+    private readonly List<GovIdeologyRowUI> createdIdeologyRows =
+        new List<GovIdeologyRowUI>();
 
 
     // =========================================================
@@ -141,7 +174,9 @@ public class PartiesScreenController : MonoBehaviour
             }
         }
 
+
         ClearParliamentRows();
+
 
         int totalSeats =
             politicalPartyManager.TotalSeats;
@@ -164,6 +199,7 @@ public class PartiesScreenController : MonoBehaviour
 
         List<PoliticalPartyState> orderedParties =
             new List<PoliticalPartyState>();
+
 
         foreach (
             PoliticalPartyState partyState
@@ -188,7 +224,9 @@ public class PartiesScreenController : MonoBehaviour
 
         orderedParties.Sort(
             (a, b) =>
-                b.seats.CompareTo(a.seats)
+                b.seats.CompareTo(
+                    a.seats
+                )
         );
 
 
@@ -212,10 +250,12 @@ public class PartiesScreenController : MonoBehaviour
                         partyListContent
                     );
 
+
                 newRow.Configure(
                     partyState,
                     totalSeats
                 );
+
 
                 createdRows.Add(
                     newRow
@@ -235,16 +275,8 @@ public class PartiesScreenController : MonoBehaviour
         // HEMICICLO
         // -----------------------------------------------------
 
-        Debug.Log(
-            "PartiesScreenController: intentando refrescar el hemiciclo."
-        );
-
         if (parliamentHemicycle != null)
         {
-            Debug.Log(
-                "PartiesScreenController: Parliament Hemicycle encontrado."
-            );
-
             parliamentHemicycle.Refresh(
                 politicalPartyManager
             );
@@ -255,12 +287,6 @@ public class PartiesScreenController : MonoBehaviour
                 "PartiesScreenController: Parliament Hemicycle es NULL."
             );
         }
-
-
-        Debug.Log(
-            $"PartiesScreenController: " +
-            $"{createdRows.Count} partidos mostrados."
-        );
     }
 
 
@@ -280,12 +306,20 @@ public class PartiesScreenController : MonoBehaviour
             }
         }
 
+
         ClearGovernmentRows();
+
+
+        // -----------------------------------------------------
+        // OBTENER PARTIDOS DEL GOBIERNO
+        // -----------------------------------------------------
 
         List<PoliticalPartyState> governmentParties =
             new List<PoliticalPartyState>();
 
-        int governmentSeats = 0;
+
+        int governmentSeats =
+            0;
 
 
         foreach (
@@ -302,24 +336,32 @@ public class PartiesScreenController : MonoBehaviour
                 continue;
             }
 
+
             governmentParties.Add(
                 partyState
             );
+
 
             governmentSeats +=
                 partyState.seats;
         }
 
 
-        // Ordenar partidos gubernamentales por asientos.
+        // -----------------------------------------------------
+        // ORDENAR PARTIDOS DEL GOBIERNO
+        // -----------------------------------------------------
 
         governmentParties.Sort(
             (a, b) =>
-                b.seats.CompareTo(a.seats)
+                b.seats.CompareTo(
+                    a.seats
+                )
         );
 
 
-        // Crear sus filas.
+        // -----------------------------------------------------
+        // CREAR FILAS DEL GOBIERNO
+        // -----------------------------------------------------
 
         if (
             governmentPartyRowPrefab != null &&
@@ -337,9 +379,11 @@ public class PartiesScreenController : MonoBehaviour
                         governmentPartiesContainer
                     );
 
+
                 newRow.Configure(
                     partyState
                 );
+
 
                 createdGovernmentRows.Add(
                     newRow
@@ -355,7 +399,9 @@ public class PartiesScreenController : MonoBehaviour
         }
 
 
-        // Asientos gubernamentales.
+        // -----------------------------------------------------
+        // ASIENTOS DEL GOBIERNO
+        // -----------------------------------------------------
 
         if (governmentSeatsText != null)
         {
@@ -365,7 +411,9 @@ public class PartiesScreenController : MonoBehaviour
         }
 
 
-        // Tipo de coalición.
+        // -----------------------------------------------------
+        // TIPO DE COALICIÓN
+        // -----------------------------------------------------
 
         if (coalitionTypeText != null)
         {
@@ -374,11 +422,402 @@ public class PartiesScreenController : MonoBehaviour
                     politicalPartyManager.CoalitionType
                 );
         }
+
+
+        // -----------------------------------------------------
+        // PARTIDO LÍDER
+        // -----------------------------------------------------
+
+        if (governmentLeaderText != null)
+        {
+            PoliticalPartyState leader =
+                politicalPartyManager.GovernmentLeader;
+
+
+            if (
+                leader != null &&
+                leader.party != null
+            )
+            {
+                governmentLeaderText.text =
+                    $"Leading Party: " +
+                    $"{leader.party.partyName}";
+            }
+            else
+            {
+                governmentLeaderText.text =
+                    "Leading Party: -";
+            }
+        }
+
+
+        // -----------------------------------------------------
+        // SATISFACCIÓN DEL GOBIERNO
+        // -----------------------------------------------------
+
+        float governmentSatisfaction =
+            CalculateGovernmentSatisfaction(
+                governmentParties
+            );
+
+
+        if (satisfactionText != null)
+        {
+            if (governmentParties.Count > 0)
+            {
+                satisfactionText.text =
+                    $"Satisfaction: " +
+                    $"{governmentSatisfaction:F1}%";
+            }
+            else
+            {
+                satisfactionText.text =
+                    "Satisfaction: -";
+            }
+        }
+
+
+        // -----------------------------------------------------
+        // TENDENCIA DEL GOBIERNO
+        // -----------------------------------------------------
+
+        float governmentTrend =
+            CalculateGovernmentTrend(
+                governmentParties
+            );
+
+
+        if (trendText != null)
+        {
+            trendText.text =
+                GetGovernmentTrendDisplay(
+                    governmentTrend,
+                    governmentParties.Count > 0
+                );
+        }
+
+
+        // -----------------------------------------------------
+        // PERFIL IDEOLÓGICO DEL GOBIERNO
+        // -----------------------------------------------------
+
+        RefreshGovernmentIdeology(
+            governmentParties
+        );
     }
 
 
     // =========================================================
-    // BORRAR FILAS PARLAMENTO
+    // PERFIL IDEOLÓGICO DEL GOBIERNO
+    // =========================================================
+
+    private void RefreshGovernmentIdeology(
+        List<PoliticalPartyState> governmentParties
+    )
+    {
+        ClearIdeologyRows();
+
+
+        if (
+            governmentParties == null ||
+            governmentParties.Count == 0
+        )
+        {
+            return;
+        }
+
+
+        if (
+            ideologyRowsContainer == null ||
+            ideologyRowPrefab == null
+        )
+        {
+            Debug.LogWarning(
+                "PartiesScreenController: Ideology Rows Container " +
+                "o Ideology Row Prefab no están asignados."
+            );
+
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // CREAR UNA FILA POR CADA EJE POLÍTICO
+        // -----------------------------------------------------
+
+        foreach (
+            PoliticalAxis axis
+            in Enum.GetValues(
+                typeof(PoliticalAxis)
+            )
+        )
+        {
+            float averagePosition =
+                CalculateGovernmentAxisPosition(
+                    governmentParties,
+                    axis
+                );
+
+
+            GovIdeologyRowUI newRow =
+                Instantiate(
+                    ideologyRowPrefab,
+                    ideologyRowsContainer
+                );
+
+
+            newRow.Configure(
+                axis,
+                averagePosition
+            );
+
+
+            createdIdeologyRows.Add(
+                newRow
+            );
+        }
+    }
+
+
+    // =========================================================
+    // POSICIÓN MEDIA DEL GOBIERNO EN UN EJE
+    //
+    // MEDIA PONDERADA POR ASIENTOS
+    // =========================================================
+
+    private float CalculateGovernmentAxisPosition(
+        List<PoliticalPartyState> governmentParties,
+        PoliticalAxis axis
+    )
+    {
+        if (
+            governmentParties == null ||
+            governmentParties.Count == 0
+        )
+        {
+            return 0f;
+        }
+
+
+        float weightedPosition =
+            0f;
+
+
+        int totalGovernmentSeats =
+            0;
+
+
+        foreach (
+            PoliticalPartyState partyState
+            in governmentParties
+        )
+        {
+            if (
+                partyState == null ||
+                partyState.party == null ||
+                partyState.seats <= 0
+            )
+            {
+                continue;
+            }
+
+
+            float partyPosition =
+                partyState.party.GetPosition(
+                    axis
+                );
+
+
+            weightedPosition +=
+                partyPosition *
+                partyState.seats;
+
+
+            totalGovernmentSeats +=
+                partyState.seats;
+        }
+
+
+        if (totalGovernmentSeats <= 0)
+        {
+            return 0f;
+        }
+
+
+        return
+            weightedPosition /
+            totalGovernmentSeats;
+    }
+
+
+    // =========================================================
+    // CALCULAR SATISFACCIÓN DEL GOBIERNO
+    //
+    // MEDIA PONDERADA POR ASIENTOS
+    // =========================================================
+
+    private float CalculateGovernmentSatisfaction(
+        List<PoliticalPartyState> governmentParties
+    )
+    {
+        if (
+            governmentParties == null ||
+            governmentParties.Count == 0
+        )
+        {
+            return 0f;
+        }
+
+
+        float weightedSatisfaction =
+            0f;
+
+
+        int totalGovernmentSeats =
+            0;
+
+
+        foreach (
+            PoliticalPartyState partyState
+            in governmentParties
+        )
+        {
+            if (
+                partyState == null ||
+                partyState.party == null ||
+                partyState.seats <= 0
+            )
+            {
+                continue;
+            }
+
+
+            weightedSatisfaction +=
+                partyState.satisfaction *
+                partyState.seats;
+
+
+            totalGovernmentSeats +=
+                partyState.seats;
+        }
+
+
+        if (totalGovernmentSeats <= 0)
+        {
+            return 0f;
+        }
+
+
+        return
+            weightedSatisfaction /
+            totalGovernmentSeats;
+    }
+
+
+    // =========================================================
+    // CALCULAR TENDENCIA DEL GOBIERNO
+    //
+    // MEDIA PONDERADA POR ASIENTOS
+    // =========================================================
+
+    private float CalculateGovernmentTrend(
+        List<PoliticalPartyState> governmentParties
+    )
+    {
+        if (
+            governmentParties == null ||
+            governmentParties.Count == 0
+        )
+        {
+            return 0f;
+        }
+
+
+        float weightedTrend =
+            0f;
+
+
+        int totalGovernmentSeats =
+            0;
+
+
+        foreach (
+            PoliticalPartyState partyState
+            in governmentParties
+        )
+        {
+            if (
+                partyState == null ||
+                partyState.party == null ||
+                partyState.seats <= 0
+            )
+            {
+                continue;
+            }
+
+
+            weightedTrend +=
+                partyState.lastSatisfactionChange *
+                partyState.seats;
+
+
+            totalGovernmentSeats +=
+                partyState.seats;
+        }
+
+
+        if (totalGovernmentSeats <= 0)
+        {
+            return 0f;
+        }
+
+
+        return
+            weightedTrend /
+            totalGovernmentSeats;
+    }
+
+
+    // =========================================================
+    // TEXTO DE TENDENCIA
+    // =========================================================
+
+    private string GetGovernmentTrendDisplay(
+        float trend,
+        bool hasGovernment
+    )
+    {
+        if (!hasGovernment)
+        {
+            return "Trend: -";
+        }
+
+
+        const float stableThreshold =
+            0.05f;
+
+
+        if (trend > stableThreshold)
+        {
+            return
+                $"Trend: ▲ +{trend:F2}";
+        }
+
+
+        if (trend < -stableThreshold)
+        {
+            return
+                $"Trend: ▼ {trend:F2}";
+        }
+
+
+        return
+            "Trend: — Stable";
+    }
+
+
+    // =========================================================
+    // BORRAR FILAS DEL PARLAMENTO
     // =========================================================
 
     private void ClearParliamentRows()
@@ -396,12 +835,13 @@ public class PartiesScreenController : MonoBehaviour
             }
         }
 
+
         createdRows.Clear();
     }
 
 
     // =========================================================
-    // BORRAR FILAS GOBIERNO
+    // BORRAR FILAS DEL GOBIERNO
     // =========================================================
 
     private void ClearGovernmentRows()
@@ -419,7 +859,32 @@ public class PartiesScreenController : MonoBehaviour
             }
         }
 
+
         createdGovernmentRows.Clear();
+    }
+
+
+    // =========================================================
+    // BORRAR FILAS IDEOLÓGICAS
+    // =========================================================
+
+    private void ClearIdeologyRows()
+    {
+        foreach (
+            GovIdeologyRowUI row
+            in createdIdeologyRows
+        )
+        {
+            if (row != null)
+            {
+                Destroy(
+                    row.gameObject
+                );
+            }
+        }
+
+
+        createdIdeologyRows.Clear();
     }
 
 

@@ -212,8 +212,8 @@ MonoBehaviour:
   parliamentSeatCount: 1000
   generateRandomParliament: 1
   minimumSeatsPerParty: 1
-  centerMainstreamWeight: 70
-  hardlineWeight: 20
+  centerMainstreamWeight: 60
+  hardlineWeight: 30
   radicalWeight: 10
   initialParliament: []
   coalitionType: 3
