@@ -23,6 +23,31 @@ public class ElectionPollManager : MonoBehaviour
     private int trackedPartyCount = 5;
 
 
+    [Header("Voting Intention")]
+
+    [Tooltip(
+        "Cuánto reaccionan las encuestas a las preocupaciones " +
+        "de la población en cada turno."
+    )]
+    [SerializeField, Range(0f, 1f)]
+    private float concernResponsiveness = 0.35f;
+
+
+    [Tooltip(
+        "Máximo cambio permitido para un partido en un solo turno, " +
+        "medido en puntos porcentuales."
+    )]
+    [SerializeField, Range(0.1f, 10f)]
+    private float maxChangePerTurn = 2f;
+
+
+    [Tooltip(
+        "Apoyo mínimo que conserva cualquier partido."
+    )]
+    [SerializeField, Range(0.01f, 5f)]
+    private float minimumPolling = 0.10f;
+
+
     // =========================================================
     // ESTADO
     // =========================================================
@@ -35,6 +60,13 @@ public class ElectionPollManager : MonoBehaviour
     [SerializeField]
     private List<PollPartyData> partyPollingData =
         new List<PollPartyData>();
+
+
+    // =========================================================
+    // EVENTOS
+    // =========================================================
+
+    public event Action OnPollUpdated;
 
 
     // =========================================================
@@ -77,10 +109,7 @@ public class ElectionPollManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        // Esperamos un frame para dar tiempo a que
-        // PoliticalPartyManager inicialice el parlamento.
         yield return null;
-
 
         InitializeFromCurrentParliament();
     }
@@ -99,8 +128,7 @@ public class ElectionPollManager : MonoBehaviour
         if (politicalPartyManager == null)
         {
             Debug.LogError(
-                "ElectionPollManager: no se encontró " +
-                "PoliticalPartyManager."
+                "ElectionPollManager: no se encontró PoliticalPartyManager."
             );
 
             return;
@@ -120,6 +148,8 @@ public class ElectionPollManager : MonoBehaviour
             return;
         }
 
+
+        currentTurn = 0;
 
         partyPollingData.Clear();
 
@@ -171,7 +201,12 @@ public class ElectionPollManager : MonoBehaviour
         }
 
 
+        // Los cinco partidos visibles se eligen aquí.
+        // NO se vuelven a elegir en cada turno.
         SelectTopTrackedParties();
+
+
+        OnPollUpdated?.Invoke();
 
 
         Debug.Log(
@@ -182,7 +217,505 @@ public class ElectionPollManager : MonoBehaviour
 
 
     // =========================================================
-    // ELEGIR LOS 5 PARTIDOS VISIBLES
+    // REGISTRAR NUEVO TURNO
+    // =========================================================
+
+    public void RegisterTurn()
+    {
+        currentTurn++;
+
+
+        // -----------------------------------------------------
+        // 1. ACTUALIZAR PREOCUPACIONES
+        // -----------------------------------------------------
+
+        if (PublicConcernManager.Instance != null)
+        {
+            PublicConcernManager.Instance.RefreshConcerns();
+        }
+
+
+        // -----------------------------------------------------
+        // 2. CAMBIAR INTENCIÓN DE VOTO
+        // -----------------------------------------------------
+
+        UpdateVotingIntentions();
+
+
+        // -----------------------------------------------------
+        // 3. GUARDAR HISTORIAL
+        // -----------------------------------------------------
+
+        foreach (
+            PollPartyData data
+            in partyPollingData
+        )
+        {
+            if (data == null)
+            {
+                continue;
+            }
+
+
+            data.history.Add(
+                data.currentPolling
+            );
+        }
+
+
+        // -----------------------------------------------------
+        // 4. AVISAR AL GRÁFICO
+        // -----------------------------------------------------
+
+        OnPollUpdated?.Invoke();
+    }
+
+
+    // =========================================================
+    // ACTUALIZAR INTENCIÓN DE VOTO
+    // =========================================================
+
+    private void UpdateVotingIntentions()
+    {
+        if (
+            partyPollingData == null ||
+            partyPollingData.Count == 0
+        )
+        {
+            return;
+        }
+
+
+        if (
+            PublicConcernManager.Instance == null ||
+            PublicConcernManager.Instance.TopConcerns == null ||
+            PublicConcernManager.Instance.TopConcerns.Count == 0
+        )
+        {
+            return;
+        }
+
+
+        Dictionary<PollPartyData, float> partyScores =
+            new Dictionary<PollPartyData, float>();
+
+
+        // -----------------------------------------------------
+        // CALCULAR PUNTUACIÓN DE CADA PARTIDO
+        // -----------------------------------------------------
+
+        foreach (
+            PollPartyData data
+            in partyPollingData
+        )
+        {
+            if (
+                data == null ||
+                data.party == null
+            )
+            {
+                continue;
+            }
+
+
+            float score =
+                CalculatePartyConcernScore(
+                    data.party
+                );
+
+
+            partyScores[data] =
+                score;
+        }
+
+
+        if (partyScores.Count == 0)
+        {
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // PUNTUACIÓN MEDIA DEL SISTEMA
+        //
+        // PONDERADA POR LA INTENCIÓN DE VOTO ACTUAL.
+        // -----------------------------------------------------
+
+        float weightedAverageScore =
+            0f;
+
+        float totalCurrentPolling =
+            0f;
+
+
+        foreach (
+            KeyValuePair<PollPartyData, float> pair
+            in partyScores
+        )
+        {
+            weightedAverageScore +=
+                pair.Value *
+                pair.Key.currentPolling;
+
+
+            totalCurrentPolling +=
+                pair.Key.currentPolling;
+        }
+
+
+        if (totalCurrentPolling > 0f)
+        {
+            weightedAverageScore /=
+                totalCurrentPolling;
+        }
+
+
+        // -----------------------------------------------------
+        // CALCULAR NUEVOS PORCENTAJES PROVISIONALES
+        // -----------------------------------------------------
+
+        Dictionary<PollPartyData, float> newValues =
+            new Dictionary<PollPartyData, float>();
+
+
+        foreach (
+            KeyValuePair<PollPartyData, float> pair
+            in partyScores
+        )
+        {
+            PollPartyData data =
+                pair.Key;
+
+
+            float score =
+                pair.Value;
+
+
+            // > 0 = responde mejor que la media
+            // < 0 = responde peor que la media
+            float relativeScore =
+                score -
+                weightedAverageScore;
+
+
+            // Convertimos esa diferencia en presión electoral.
+            float proportionalChange =
+                relativeScore *
+                concernResponsiveness;
+
+
+            float targetPolling =
+                data.currentPolling *
+                (
+                    1f +
+                    proportionalChange
+                );
+
+
+            float delta =
+                targetPolling -
+                data.currentPolling;
+
+
+            delta =
+                Mathf.Clamp(
+                    delta,
+                    -maxChangePerTurn,
+                    maxChangePerTurn
+                );
+
+
+            float newPolling =
+                Mathf.Max(
+                    minimumPolling,
+                    data.currentPolling +
+                    delta
+                );
+
+
+            newValues[data] =
+                newPolling;
+        }
+
+
+        // -----------------------------------------------------
+        // NORMALIZAR PARA QUE TODOS LOS PARTIDOS SUMEN 100%
+        // -----------------------------------------------------
+
+        float totalNewPolling =
+            newValues.Values.Sum();
+
+
+        if (totalNewPolling <= 0f)
+        {
+            return;
+        }
+
+
+        foreach (
+            KeyValuePair<PollPartyData, float> pair
+            in newValues
+        )
+        {
+            pair.Key.currentPolling =
+                pair.Value /
+                totalNewPolling *
+                100f;
+        }
+    }
+
+
+    // =========================================================
+    // PUNTUACIÓN POLÍTICA SEGÚN PREOCUPACIONES
+    // =========================================================
+
+    private float CalculatePartyConcernScore(
+        PoliticalPartySO party
+    )
+    {
+        if (
+            party == null ||
+            PublicConcernManager.Instance == null
+        )
+        {
+            return 0f;
+        }
+
+
+        float totalScore =
+            0f;
+
+
+        foreach (
+            PublicConcernData concern
+            in PublicConcernManager.Instance.TopConcerns
+        )
+        {
+            if (concern == null)
+            {
+                continue;
+            }
+
+
+            PoliticalAxis axis;
+
+            float desiredPosition;
+
+
+            GetPoliticalDemandForConcern(
+                concern.type,
+                out axis,
+                out desiredPosition
+            );
+
+
+            float partyPosition =
+                party.GetPosition(
+                    axis
+                );
+
+
+            float distance =
+                Mathf.Abs(
+                    partyPosition -
+                    desiredPosition
+                );
+
+
+            // Rango completo -5 ... +5
+            // Distancia máxima = 10.
+            float affinity =
+                1f -
+                Mathf.Clamp01(
+                    distance / 10f
+                );
+
+
+            float concernWeight =
+                concern.importance /
+                100f;
+
+
+            totalScore +=
+                affinity *
+                concernWeight;
+        }
+
+
+        return totalScore;
+    }
+
+
+    // =========================================================
+    // QUÉ RESPUESTA POLÍTICA DEMANDA CADA PROBLEMA
+    //
+    // ESTOS VALORES SON DE BALANCE Y PODREMOS AJUSTARLOS.
+    // =========================================================
+
+    private void GetPoliticalDemandForConcern(
+        PublicConcernType concern,
+        out PoliticalAxis axis,
+        out float desiredPosition
+    )
+    {
+        switch (concern)
+        {
+            // -------------------------------------------------
+            // ECONOMÍA GENERAL
+            //
+            // No favorece un extremo concreto.
+            // -------------------------------------------------
+
+            case PublicConcernType.Economy:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    0f;
+
+                break;
+
+
+            // -------------------------------------------------
+            // EDUCACIÓN
+            //
+            // Mayor intervención/inversión pública.
+            // -------------------------------------------------
+
+            case PublicConcernType.Education:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    -2f;
+
+                break;
+
+
+            // -------------------------------------------------
+            // DESEMPLEO
+            // -------------------------------------------------
+
+            case PublicConcernType.Unemployment:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    -2.5f;
+
+                break;
+
+
+            // -------------------------------------------------
+            // DESIGUALDAD
+            // -------------------------------------------------
+
+            case PublicConcernType.Inequality:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    -3.5f;
+
+                break;
+
+
+            // -------------------------------------------------
+            // INFLACIÓN
+            //
+            // Favorece posiciones de mayor disciplina económica.
+            // -------------------------------------------------
+
+            case PublicConcernType.Inflation:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    3f;
+
+                break;
+
+
+            // -------------------------------------------------
+            // INESTABILIDAD
+            // -------------------------------------------------
+
+            case PublicConcernType.Stability:
+
+                axis =
+                    PoliticalAxis.Government;
+
+                desiredPosition =
+                    2.5f;
+
+                break;
+
+
+            // -------------------------------------------------
+            // DEUDA
+            // -------------------------------------------------
+
+            case PublicConcernType.Debt:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    3f;
+
+                break;
+
+
+            // -------------------------------------------------
+            // DÉFICIT
+            // -------------------------------------------------
+
+            case PublicConcernType.FiscalDeficit:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    3.5f;
+
+                break;
+
+
+            // -------------------------------------------------
+            // FALTA DE RESERVAS
+            // -------------------------------------------------
+
+            case PublicConcernType.Reserves:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    2f;
+
+                break;
+
+
+            default:
+
+                axis =
+                    PoliticalAxis.Economy;
+
+                desiredPosition =
+                    0f;
+
+                break;
+        }
+    }
+
+
+    // =========================================================
+    // ELEGIR PARTIDOS VISIBLES
     // =========================================================
 
     public void SelectTopTrackedParties()
@@ -200,7 +733,8 @@ public class ElectionPollManager : MonoBehaviour
         List<PollPartyData> ordered =
             partyPollingData
             .OrderByDescending(
-                data => data.currentPolling
+                data =>
+                    data.currentPolling
             )
             .Take(
                 trackedPartyCount
@@ -220,7 +754,7 @@ public class ElectionPollManager : MonoBehaviour
 
 
     // =========================================================
-    // OBTENER LOS 5 PARTIDOS DEL GRÁFICO
+    // OBTENER LOS PARTIDOS DEL GRÁFICO
     // =========================================================
 
     public List<PollPartyData> GetTrackedParties()
@@ -228,17 +762,19 @@ public class ElectionPollManager : MonoBehaviour
         return
             partyPollingData
             .Where(
-                data => data.isTracked
+                data =>
+                    data.isTracked
             )
             .OrderByDescending(
-                data => data.currentPolling
+                data =>
+                    data.currentPolling
             )
             .ToList();
     }
 
 
     // =========================================================
-    // OBTENER UN PARTIDO CONCRETO
+    // OBTENER DATOS DE UN PARTIDO
     // =========================================================
 
     public PollPartyData GetPartyData(
@@ -268,25 +804,14 @@ public class ElectionPollManager : MonoBehaviour
 
 
     // =========================================================
-    // REGISTRAR UN NUEVO TURNO
-    //
-    // POR AHORA NO CAMBIA LOS PORCENTAJES.
-    // SOLO GUARDA EL HISTORIAL.
+    // DESTROY
     // =========================================================
 
-    public void RegisterTurn()
+    private void OnDestroy()
     {
-        currentTurn++;
-
-
-        foreach (
-            PollPartyData data
-            in partyPollingData
-        )
+        if (Instance == this)
         {
-            data.history.Add(
-                data.currentPolling
-            );
+            Instance = null;
         }
     }
 }
@@ -301,10 +826,13 @@ public class PollPartyData
 {
     public PoliticalPartySO party;
 
+
     [Range(0f, 100f)]
     public float currentPolling;
 
+
     public bool isTracked;
+
 
     public List<float> history =
         new List<float>();

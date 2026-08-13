@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ElectionPollGraphGraphic : MaskableGraphic
+public class ElectionPollGraphic : MaskableGraphic
 {
     [Header("Graph")]
     [SerializeField]
@@ -16,7 +16,7 @@ public class ElectionPollGraphGraphic : MaskableGraphic
 
 
     // =========================================================
-    // ACTUALIZACIÓN
+    // REFRESCAR
     // =========================================================
 
     public void Refresh()
@@ -26,7 +26,19 @@ public class ElectionPollGraphGraphic : MaskableGraphic
 
 
     // =========================================================
-    // DIBUJAR GRÁFICO
+    // AL ACTIVARSE
+    // =========================================================
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+
+        Refresh();
+    }
+
+
+    // =========================================================
+    // DIBUJAR
     // =========================================================
 
     protected override void OnPopulateMesh(
@@ -36,14 +48,18 @@ public class ElectionPollGraphGraphic : MaskableGraphic
         vh.Clear();
 
 
-        if (ElectionPollManager.Instance == null)
+        ElectionPollManager pollManager =
+            ElectionPollManager.Instance;
+
+
+        if (pollManager == null)
         {
             return;
         }
 
 
         List<PollPartyData> trackedParties =
-            ElectionPollManager.Instance.GetTrackedParties();
+            pollManager.GetTrackedParties();
 
 
         if (
@@ -121,8 +137,10 @@ public class ElectionPollGraphGraphic : MaskableGraphic
             partyData.party.partyColor;
 
 
-        // Si solo tenemos un dato inicial,
-        // dibujamos un pequeño punto.
+        // -----------------------------------------------------
+        // SOLO EXISTE EL DATO INICIAL
+        // -----------------------------------------------------
+
         if (history.Count == 1)
         {
             float y =
@@ -148,6 +166,10 @@ public class ElectionPollGraphGraphic : MaskableGraphic
             return;
         }
 
+
+        // -----------------------------------------------------
+        // HISTORIAL CON VARIOS TURNOS
+        // -----------------------------------------------------
 
         for (
             int i = 0;
@@ -222,8 +244,24 @@ public class ElectionPollGraphGraphic : MaskableGraphic
         Color color
     )
     {
+        Vector2 difference =
+            end - start;
+
+
+        if (difference.sqrMagnitude <= 0.0001f)
+        {
+            DrawPoint(
+                vh,
+                start,
+                color
+            );
+
+            return;
+        }
+
+
         Vector2 direction =
-            (end - start).normalized;
+            difference.normalized;
 
 
         Vector2 perpendicular =
@@ -252,10 +290,29 @@ public class ElectionPollGraphGraphic : MaskableGraphic
             vh.currentVertCount;
 
 
-        vh.AddVert(v0, color, Vector2.zero);
-        vh.AddVert(v1, color, Vector2.zero);
-        vh.AddVert(v2, color, Vector2.zero);
-        vh.AddVert(v3, color, Vector2.zero);
+        vh.AddVert(
+            v0,
+            color,
+            Vector2.zero
+        );
+
+        vh.AddVert(
+            v1,
+            color,
+            Vector2.zero
+        );
+
+        vh.AddVert(
+            v2,
+            color,
+            Vector2.zero
+        );
+
+        vh.AddVert(
+            v3,
+            color,
+            Vector2.zero
+        );
 
 
         vh.AddTriangle(
@@ -323,10 +380,29 @@ public class ElectionPollGraphGraphic : MaskableGraphic
             vh.currentVertCount;
 
 
-        vh.AddVert(v0, color, Vector2.zero);
-        vh.AddVert(v1, color, Vector2.zero);
-        vh.AddVert(v2, color, Vector2.zero);
-        vh.AddVert(v3, color, Vector2.zero);
+        vh.AddVert(
+            v0,
+            color,
+            Vector2.zero
+        );
+
+        vh.AddVert(
+            v1,
+            color,
+            Vector2.zero
+        );
+
+        vh.AddVert(
+            v2,
+            color,
+            Vector2.zero
+        );
+
+        vh.AddVert(
+            v3,
+            color,
+            Vector2.zero
+        );
 
 
         vh.AddTriangle(

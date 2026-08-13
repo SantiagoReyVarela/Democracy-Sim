@@ -385,22 +385,47 @@ public class CountryState : MonoBehaviour
             Debug.LogWarning(
                 "The simulation has already reached its final turn."
             );
+
             return false;
         }
 
+
         currentTurn++;
 
+
+        // 1. Políticas activas
         ProcessActivePoliciesPerTurn();
+
+
+        // 2. Economía fiscal
         ProcessFiscalEconomy();
+
+
+        // 3. Inflación
         ProcessInflation();
+
+
+        // 4. Relaciones entre parámetros
         ApplyConfiguredRelations();
 
+
+        // 5. Guardar estado del país
         RecordSnapshot();
+
+
+        // 6. Registrar encuesta electoral del turno
+        if (ElectionPollManager.Instance != null)
+        {
+            ElectionPollManager.Instance.RegisterTurn();
+        }
+
+
+        // 7. Avisar a la interfaz
         NotifyStateChanged();
+
 
         return true;
     }
-
 
     /// <summary>
     /// Aplica una vez por turno los ActiveEffects de todas las
