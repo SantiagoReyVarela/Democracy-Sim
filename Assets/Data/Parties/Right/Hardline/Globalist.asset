@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
   m_Name: Globalist
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
-  enabled: 1
+  enabled: 0
   partyId: globalist
   partyName: Partido Globalista
   acronym: PC
