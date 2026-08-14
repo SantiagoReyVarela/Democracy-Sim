@@ -46,7 +46,7 @@ public class PublicConcernData
             switch (type)
             {
                 case PublicConcernType.Economy:
-                    return "Economía";
+                    return "Prosperidad";
 
                 case PublicConcernType.Education:
                     return "Educación";
