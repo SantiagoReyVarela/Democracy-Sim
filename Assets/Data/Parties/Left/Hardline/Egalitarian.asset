@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
   m_Name: Egalitarian
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
-  enabled: 1
+  enabled: 0
   partyId: egalitarian
   partyName: Partido Igualista
   acronym: PEgal
@@ -23,18 +23,18 @@ MonoBehaviour:
   ideologicalLine: Izquierda igualitarista
   ideologicalPositions:
   - axis: 0
-    position: 0.5
+    position: 0
   - axis: 1
-    position: 0.5
+    position: -4
   - axis: 2
-    position: 0
+    position: -4
   - axis: 3
-    position: 0
-  - axis: 4
-    position: -0.5
-  - axis: 5
-    position: -0.5
-  - axis: 6
     position: 1
+  - axis: 4
+    position: -5
+  - axis: 5
+    position: -4
+  - axis: 6
+    position: -3
   hemicycleBloc: 0
   radicalizationLayer: 2

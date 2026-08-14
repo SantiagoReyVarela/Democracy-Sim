@@ -23,18 +23,18 @@ MonoBehaviour:
   ideologicalLine: Cooperativismo
   ideologicalPositions:
   - axis: 0
-    position: 0.5
+    position: -2
   - axis: 1
-    position: 0.5
+    position: -3
   - axis: 2
-    position: 0
+    position: -4
   - axis: 3
-    position: 0
-  - axis: 4
-    position: -0.5
-  - axis: 5
-    position: -0.5
-  - axis: 6
     position: 1
+  - axis: 4
+    position: -3
+  - axis: 5
+    position: -2
+  - axis: 6
+    position: -2
   hemicycleBloc: 0
   radicalizationLayer: 3

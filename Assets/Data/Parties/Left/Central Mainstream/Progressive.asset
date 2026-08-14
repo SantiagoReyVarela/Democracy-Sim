@@ -12,29 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
   m_Name: Progressive
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
-  enabled: 0
+  enabled: 1
   partyId: progressive
   partyName: Partido Progresista
   acronym: PProg
   logo: {fileID: 0}
-  partyColor: {r: 0.49803922, g: 0.68235296, b: 0.33333334, a: 1}
+  partyColor: {r: 0.6226415, g: 0.15566038, b: 0.8352941, a: 1}
   description: "Partido de izquierda cultural centrado en los derechos civiles, el
     secularismo, la apertura migratoria, el ecologismo y la transformaci\xF3n social."
   ideologicalLine: Izquierda progresista
   ideologicalPositions:
   - axis: 0
-    position: -1.5
+    position: -2
   - axis: 1
-    position: 1
+    position: -4
   - axis: 2
-    position: -3.5
+    position: -1
   - axis: 3
-    position: -3
+    position: 4
   - axis: 4
     position: -4
   - axis: 5
-    position: -5
+    position: -4
   - axis: 6
-    position: 1
+    position: -4
   hemicycleBloc: 0
   radicalizationLayer: 1

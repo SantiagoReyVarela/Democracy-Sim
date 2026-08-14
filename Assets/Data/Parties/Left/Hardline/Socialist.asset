@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337dcb72da2304247bb9a517f9736833, type: 3}
   m_Name: Socialist
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalPartySO
-  enabled: 1
+  enabled: 0
   partyId: socialist
   partyName: Partido Socialist
   acronym: PSoc
@@ -23,17 +23,17 @@ MonoBehaviour:
   ideologicalLine: Socialismo
   ideologicalPositions:
   - axis: 0
-    position: 0.5
+    position: 3
   - axis: 1
-    position: 0.5
+    position: -4
   - axis: 2
-    position: 0
+    position: -4
   - axis: 3
-    position: 0
+    position: -2
   - axis: 4
-    position: -0.5
+    position: -3
   - axis: 5
-    position: -0.5
+    position: -2
   - axis: 6
     position: 1
   hemicycleBloc: 0

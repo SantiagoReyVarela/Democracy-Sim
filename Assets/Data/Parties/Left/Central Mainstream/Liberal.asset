@@ -24,18 +24,18 @@ MonoBehaviour:
   ideologicalLine: "Liberalismo cl\xE1sico"
   ideologicalPositions:
   - axis: 0
-    position: 2
+    position: -2
   - axis: 1
     position: -3
   - axis: 2
-    position: -1.5
+    position: 2
   - axis: 3
-    position: -1.5
+    position: 4
   - axis: 4
-    position: -4
+    position: -3
   - axis: 5
     position: -3
   - axis: 6
-    position: 4
+    position: -2
   hemicycleBloc: 0
   radicalizationLayer: 1
