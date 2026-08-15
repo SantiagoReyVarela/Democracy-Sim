@@ -86,9 +86,23 @@ public class CountryState : MonoBehaviour
     [SerializeField, Range(0f, 100f)]
     private float stability = 50f;
 
+    [Header("Political System")]
+
+    [SerializeField]
+    private StateType stateType =
+        StateType.DemocraticRepublic;
+
+    [SerializeField]
+    private GovernmentSystem governmentSystem = GovernmentSystem.Presidential;
+
     [Header("Managers")]
     [SerializeField]
     private PoliticalPartyManager politicalPartyManager;
+
+    [SerializeField]
+    private PoliticalLeaderSO governmentLeader;
+
+    public PoliticalLeaderSO GovernmentLeader => governmentLeader;
 
 
     [Header("Permanent Policy Slots")]
@@ -219,6 +233,11 @@ public class CountryState : MonoBehaviour
 
     public DeficitFinancingMode DeficitFinancingMode =>
         deficitFinancingMode;
+
+    public StateType StateType => stateType;
+    public GovernmentSystem GovernmentSystem => governmentSystem;
+
+    
 
     public float LastReservesUsed => lastReservesUsed;
     public float LastDebtPayment => lastDebtPayment;
@@ -848,7 +867,6 @@ public class CountryState : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         ClearActivePolicies();
 

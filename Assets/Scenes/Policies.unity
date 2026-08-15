@@ -2671,6 +2671,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6674518463244474322, guid: fa0967a797efce64aafba9884aa6bde9, type: 3}
+      propertyPath: countryButton
+      value: 
+      objectReference: {fileID: 2108877370}
     - target: {fileID: 7160823914703317570, guid: fa0967a797efce64aafba9884aa6bde9, type: 3}
       propertyPath: m_Name
       value: NavigationBar
@@ -2709,6 +2713,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5096265169461121519, guid: fa0967a797efce64aafba9884aa6bde9, type: 3}
   m_PrefabInstance: {fileID: 2108877368}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2108877370 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5709773984181595698, guid: fa0967a797efce64aafba9884aa6bde9, type: 3}
+  m_PrefabInstance: {fileID: 2108877368}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -356,6 +356,121 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &850057719
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 850057720}
+  - component: {fileID: 850057721}
+  m_Layer: 0
+  m_Name: CountryStateManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &850057720
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850057719}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 109.21918, y: -27.620361, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1402993959}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &850057721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850057719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327cdc3d1583021429e74c63dd2d4679, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CountryState
+  countryName: "Espa\xF1a"
+  currentTurn: 1
+  maximumTurns: 100
+  prosperity: 50
+  equality: 50
+  employment: 50
+  education: 50
+  stability: 50
+  politicalPartyManager: {fileID: 743243176}
+  policySlots:
+  - slotId: E1
+    displayName: "Econom\xEDa 1"
+    axis: 2
+    activePolicy: {fileID: 0}
+  - slotId: E2
+    displayName: "Econom\xEDa 2"
+    axis: 2
+    activePolicy: {fileID: 0}
+  - slotId: G1
+    displayName: Gobierno 1
+    axis: 0
+    activePolicy: {fileID: 0}
+  - slotId: G2
+    displayName: Gobierno 2
+    axis: 0
+    activePolicy: {fileID: 0}
+  - slotId: I1
+    displayName: "Inmigraci\xF3n"
+    axis: 5
+    activePolicy: {fileID: 0}
+  - slotId: M1
+    displayName: Militar
+    axis: 6
+    activePolicy: {fileID: 0}
+  - slotId: R1
+    displayName: "Religi\xF3n"
+    axis: 1
+    activePolicy: {fileID: 0}
+  - slotId: S1
+    displayName: Sociedad
+    axis: 4
+    activePolicy: {fileID: 0}
+  - slotId: T1
+    displayName: Comercio
+    axis: 3
+    activePolicy: {fileID: 0}
+  fiscalResult: -5
+  reserves: 20
+  debt: 0
+  inflation: 2
+  minimumInflation: -10
+  disinflationPerReserveUnit: 0.03
+  highInflationMultiplier: 2
+  highInflationThreshold: 5
+  debtPaymentPercentage: 50
+  deficitFinancingMode: 0
+  inflationPerPrintedUnit: 0.1
+  lastReservesUsed: 0
+  lastDebtPayment: 0
+  lastDebtIssued: 0
+  lastMoneyPrinted: 0
+  inflationEffectDuration: 10
+  inflationRecoveryDuration: 10
+  normalInflation: 2
+  pendingInflation: 0
+  inflationPressureTurnsRemaining: 0
+  inflationRecoveryTurnsRemaining: 0
+  history: []
+  appliedPolicyHistory: []
+  policySlotChangeHistory: []
+  parameterRelations: []
 --- !u!1 &1132362388
 GameObject:
   m_ObjectHideFlags: 0
@@ -401,6 +516,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElectionPollManager
   trackedPartyCount: 5
+  concernResponsiveness: 0.35
+  maxChangePerTurn: 2
+  minimumPolling: 0.1
   currentTurn: 0
   partyPollingData: []
 --- !u!1 &1402993957
@@ -412,7 +530,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1402993959}
-  - component: {fileID: 1402993958}
   - component: {fileID: 1402993960}
   m_Layer: 0
   m_Name: SimulationManager
@@ -421,89 +538,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1402993958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1402993957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 327cdc3d1583021429e74c63dd2d4679, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CountryState
-  countryName: New Country
-  currentTurn: 1
-  maximumTurns: 48
-  prosperity: 50
-  equality: 50
-  employment: 50
-  education: 50
-  stability: 50
-  politicalPartyManager: {fileID: 0}
-  policySlots:
-  - slotId: E1
-    displayName: "Econom\xEDa 1"
-    axis: 2
-    activePolicy: {fileID: 0}
-  - slotId: E2
-    displayName: "Econom\xEDa 2"
-    axis: 2
-    activePolicy: {fileID: 0}
-  - slotId: G1
-    displayName: Gobierno 1
-    axis: 0
-    activePolicy: {fileID: 0}
-  - slotId: G2
-    displayName: Gobierno 2
-    axis: 0
-    activePolicy: {fileID: 0}
-  - slotId: I1
-    displayName: "Inmigraci\xF3n"
-    axis: 5
-    activePolicy: {fileID: 0}
-  - slotId: M1
-    displayName: Militar
-    axis: 6
-    activePolicy: {fileID: 0}
-  - slotId: R1
-    displayName: "Religi\xF3n"
-    axis: 1
-    activePolicy: {fileID: 0}
-  - slotId: S1
-    displayName: Sociedad
-    axis: 4
-    activePolicy: {fileID: 0}
-  - slotId: T1
-    displayName: Comercio
-    axis: 3
-    activePolicy: {fileID: 0}
-  fiscalResult: 10
-  reserves: 20
-  debt: 0
-  inflation: 2
-  minimumInflation: -10
-  disinflationPerReserveUnit: 0.03
-  highInflationMultiplier: 2
-  highInflationThreshold: 5
-  debtPaymentPercentage: 50
-  deficitFinancingMode: 0
-  inflationPerPrintedUnit: 0.1
-  lastReservesUsed: 0
-  lastDebtPayment: 0
-  lastDebtIssued: 0
-  lastMoneyPrinted: 0
-  inflationEffectDuration: 10
-  inflationRecoveryDuration: 10
-  normalInflation: 2
-  pendingInflation: 0
-  inflationPressureTurnsRemaining: 0
-  inflationRecoveryTurnsRemaining: 0
-  history: []
-  appliedPolicyHistory: []
-  policySlotChangeHistory: []
-  parameterRelations: []
 --- !u!4 &1402993959
 Transform:
   m_ObjectHideFlags: 0
@@ -517,6 +551,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 850057720}
   - {fileID: 743243175}
   - {fileID: 1132362389}
   - {fileID: 136173267}

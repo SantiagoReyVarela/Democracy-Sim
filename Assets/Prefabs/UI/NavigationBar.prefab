@@ -816,7 +816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09e2d9f13bf7d6d44884548da696c1fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneNavigationUI
-  countryDataButton: {fileID: 5709773984181595698}
+  countryButton: {fileID: 5709773984181595698}
   economyButton: {fileID: 2633249860985450070}
   policiesButton: {fileID: 8751213519333062068}
   partiesButton: {fileID: 4038275208654820583}
@@ -1439,7 +1439,7 @@ GameObject:
   - component: {fileID: 5709773984181595698}
   - component: {fileID: 4158728752611721322}
   m_Layer: 5
-  m_Name: CountryDataButton
+  m_Name: CountryButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

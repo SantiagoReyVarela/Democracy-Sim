@@ -11,7 +11,7 @@ public class SceneNavigationUI : MonoBehaviour
     [Header("Navigation buttons")]
 
     [SerializeField]
-    private Button countryDataButton;
+    private Button countryButton;
 
     [SerializeField]
     private Button economyButton;
@@ -28,10 +28,10 @@ public class SceneNavigationUI : MonoBehaviour
 
     private void Awake()
     {
-        if (countryDataButton != null)
+        if (countryButton != null)
         {
-            countryDataButton.onClick.AddListener(
-                OpenCountryData
+            countryButton.onClick.AddListener(
+                OpenCountry
             );
         }
 
@@ -65,9 +65,9 @@ public class SceneNavigationUI : MonoBehaviour
     }
 
 
-    public void OpenCountryData()
+    public void OpenCountry()
     {
-        LoadScene("CountryData");
+        LoadScene("Country");
     }
 
 
@@ -107,10 +107,10 @@ public class SceneNavigationUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (countryDataButton != null)
+        if (countryButton != null)
         {
-            countryDataButton.onClick.RemoveListener(
-                OpenCountryData
+            countryButton.onClick.RemoveListener(
+                OpenCountry
             );
         }
 
