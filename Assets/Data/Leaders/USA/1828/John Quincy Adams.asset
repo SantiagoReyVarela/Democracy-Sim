@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abc42c0756ea5814996b1b2d33169376, type: 3}
+  m_Name: John Quincy Adams
+  m_EditorClassIdentifier: Assembly-CSharp::PoliticalLeaderSO
+  leaderName: John Quincy Adams
+  portrait: {fileID: 0}
+  party: {fileID: 11400000, guid: 4acc4cc062325a345b91eaa3f4c4b912, type: 2}
