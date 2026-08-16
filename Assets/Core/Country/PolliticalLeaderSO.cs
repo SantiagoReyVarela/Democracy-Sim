@@ -6,11 +6,33 @@ using UnityEngine;
 )]
 public class PoliticalLeaderSO : ScriptableObject
 {
-    [Header("Identity")]
-    public string leaderName;
+    // =========================================================
+    // IDENTIDAD
+    // =========================================================
 
-    public Sprite portrait;
+    [Header("Identity")]
+
+    [SerializeField]
+    private string leaderName;
+
+
+    // =========================================================
+    // PARTIDO
+    // =========================================================
 
     [Header("Party")]
-    public PoliticalPartySO party;
+
+    [SerializeField]
+    private PoliticalPartySO party;
+
+
+    // =========================================================
+    // ACCESO PÚBLICO
+    // =========================================================
+
+    public string LeaderName =>
+        leaderName;
+
+    public PoliticalPartySO Party =>
+        party;
 }

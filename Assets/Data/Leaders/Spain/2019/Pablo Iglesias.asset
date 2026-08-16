@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc42c0756ea5814996b1b2d33169376, type: 3}
   m_Name: Pablo Iglesias
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalLeaderSO
-  leaderName: Julio Anguita
+  leaderName: Pablo Iglesias
   portrait: {fileID: 0}
-  party: {fileID: 11400000, guid: ea39883ee1556324585099c4b85d1f18, type: 2}
+  party: {fileID: 11400000, guid: b2099c1df35185c44ac79039dc07c85f, type: 2}

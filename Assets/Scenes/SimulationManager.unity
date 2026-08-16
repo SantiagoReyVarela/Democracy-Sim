@@ -408,7 +408,10 @@ MonoBehaviour:
   employment: 50
   education: 50
   stability: 50
+  stateType: 0
+  governmentSystem: 0
   politicalPartyManager: {fileID: 743243176}
+  governmentLeader: {fileID: 11400000, guid: 47e5c8b387f6eb94ebfe0068e3c60474, type: 2}
   policySlots:
   - slotId: E1
     displayName: "Econom\xEDa 1"

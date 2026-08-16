@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc42c0756ea5814996b1b2d33169376, type: 3}
   m_Name: "Pedro S\xE1nchez"
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalLeaderSO
-  leaderName: "Felipe Gonz\xE1lez"
+  leaderName: "Pedro S\xE1nchez"
   portrait: {fileID: 0}
   party: {fileID: 11400000, guid: 94a04fb5b8907e44f95698b8235caa7c, type: 2}

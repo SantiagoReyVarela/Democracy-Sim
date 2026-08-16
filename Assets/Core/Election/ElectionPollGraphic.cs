@@ -114,8 +114,12 @@ public class ElectionPollGraphic : MaskableGraphic
     {
         base.OnEnable();
 
-        SubscribeToPollManager();
+        if (!Application.isPlaying)
+        {
+            return;
+        }
 
+        SubscribeToPollManager();
         Refresh();
     }
 
@@ -127,6 +131,9 @@ public class ElectionPollGraphic : MaskableGraphic
     protected override void OnDisable()
     {
         UnsubscribeFromPollManager();
+
+        ClearYAxisLabels();
+        ClearXAxisLabels();
 
         base.OnDisable();
     }
@@ -505,19 +512,27 @@ public class ElectionPollGraphic : MaskableGraphic
 
     private void ClearYAxisLabels()
     {
-        foreach (
-            TMP_Text label
-            in createdYAxisLabels
-        )
+        if (yAxisLabelsContainer != null)
         {
-            if (label != null)
+            for (
+                int i = yAxisLabelsContainer.childCount - 1;
+                i >= 0;
+                i--
+            )
             {
-                Destroy(
-                    label.gameObject
-                );
+                GameObject child =
+                    yAxisLabelsContainer.GetChild(i).gameObject;
+
+                if (Application.isPlaying)
+                {
+                    Destroy(child);
+                }
+                else
+                {
+                    DestroyImmediate(child);
+                }
             }
         }
-
 
         createdYAxisLabels.Clear();
     }
@@ -748,19 +763,27 @@ public class ElectionPollGraphic : MaskableGraphic
 
     private void ClearXAxisLabels()
     {
-        foreach (
-            TMP_Text label
-            in createdXAxisLabels
-        )
+        if (xAxisLabelsContainer != null)
         {
-            if (label != null)
+            for (
+                int i = xAxisLabelsContainer.childCount - 1;
+                i >= 0;
+                i--
+            )
             {
-                Destroy(
-                    label.gameObject
-                );
+                GameObject child =
+                    xAxisLabelsContainer.GetChild(i).gameObject;
+
+                if (Application.isPlaying)
+                {
+                    Destroy(child);
+                }
+                else
+                {
+                    DestroyImmediate(child);
+                }
             }
         }
-
 
         createdXAxisLabels.Clear();
     }

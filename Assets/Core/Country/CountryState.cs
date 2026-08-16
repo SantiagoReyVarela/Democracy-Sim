@@ -30,6 +30,8 @@ public class CountryState : MonoBehaviour
         [SerializeField]
         private PolicyDefinitionSO newPolicy;
 
+        
+
         public int Turn => turn;
         public string SlotId => slotId;
         public string SlotDisplayName => slotDisplayName;

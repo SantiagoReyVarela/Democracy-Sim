@@ -14,6 +14,12 @@ public class CountryHeaderUI : MonoBehaviour
 
     private CountryState countryState;
 
+    [SerializeField]
+    private TMP_Text leaderNameText;
+
+    [SerializeField]
+    private TMP_Text leaderPartyText;
+
 
     private void OnEnable()
     {
@@ -74,6 +80,27 @@ public class CountryHeaderUI : MonoBehaviour
         if (countryState == null)
         {
             return;
+        }
+
+        if (countryState.GovernmentLeader != null)
+        {
+            if (leaderNameText != null)
+            {
+                leaderNameText.text =
+                    countryState.GovernmentLeader.LeaderName;
+            }
+
+            if (
+                leaderPartyText != null &&
+                countryState.GovernmentLeader.Party != null
+            )
+            {
+                leaderPartyText.text =
+                    countryState.GovernmentLeader.Party.partyName;
+
+                leaderPartyText.color =
+                    countryState.GovernmentLeader.Party.partyColor;
+            }
         }
 
 
