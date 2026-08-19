@@ -18,7 +18,7 @@ MonoBehaviour:
   interpolationMode: 2
   points:
   - sourceValue: -5
-    impactPerTurn: 0
+    impactPerTurn: 0.5
   - sourceValue: 0
     impactPerTurn: 1
   - sourceValue: 2

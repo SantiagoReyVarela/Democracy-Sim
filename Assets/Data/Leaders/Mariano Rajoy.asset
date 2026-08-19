@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Mariano Rajoy
   m_EditorClassIdentifier: Assembly-CSharp::PoliticalLeaderSO
   leaderName: Mariano Rajoy
-  portrait: {fileID: 0}
   party: {fileID: 11400000, guid: 1f20ba94eb5051046beeb106091531e2, type: 2}
+  portrait: {fileID: -8880539277889723062, guid: 9eda2e229c948484c90a4994b69f5a6c, type: 3}

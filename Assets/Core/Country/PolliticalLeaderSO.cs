@@ -27,6 +27,16 @@ public class PoliticalLeaderSO : ScriptableObject
 
 
     // =========================================================
+    // IMAGEN
+    // =========================================================
+
+    [Header("Visuals")]
+
+    [SerializeField]
+    private Sprite portrait;
+
+
+    // =========================================================
     // ACCESO PÚBLICO
     // =========================================================
 
@@ -35,4 +45,7 @@ public class PoliticalLeaderSO : ScriptableObject
 
     public PoliticalPartySO Party =>
         party;
+
+    public Sprite Portrait =>
+        portrait;
 }

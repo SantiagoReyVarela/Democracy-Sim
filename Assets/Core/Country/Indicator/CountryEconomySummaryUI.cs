@@ -7,7 +7,7 @@ public class CountryEconomySummaryUI : MonoBehaviour
     // UI
     // =========================================================
 
-    [Header("Economy Values")]
+    [Header("Economy UI")]
 
     [SerializeField]
     private TMP_Text fiscalResultText;
@@ -30,22 +30,32 @@ public class CountryEconomySummaryUI : MonoBehaviour
 
 
     // =========================================================
-    // UNITY
+    // ENABLE
     // =========================================================
 
     private void OnEnable()
     {
         BindCountryState();
+
         Refresh();
     }
 
+
+    // =========================================================
+    // START
+    // =========================================================
 
     private void Start()
     {
         BindCountryState();
+
         Refresh();
     }
 
+
+    // =========================================================
+    // DISABLE
+    // =========================================================
 
     private void OnDisable()
     {
@@ -54,7 +64,7 @@ public class CountryEconomySummaryUI : MonoBehaviour
 
 
     // =========================================================
-    // BIND
+    // CONECTAR COUNTRY STATE
     // =========================================================
 
     private void BindCountryState()
@@ -64,10 +74,13 @@ public class CountryEconomySummaryUI : MonoBehaviour
             return;
         }
 
+
         UnbindCountryState();
+
 
         countryState =
             CountryState.Instance;
+
 
         if (countryState != null)
         {
@@ -77,6 +90,10 @@ public class CountryEconomySummaryUI : MonoBehaviour
     }
 
 
+    // =========================================================
+    // DESCONECTAR COUNTRY STATE
+    // =========================================================
+
     private void UnbindCountryState()
     {
         if (countryState != null)
@@ -85,12 +102,14 @@ public class CountryEconomySummaryUI : MonoBehaviour
                 Refresh;
         }
 
-        countryState = null;
+
+        countryState =
+            null;
     }
 
 
     // =========================================================
-    // REFRESH
+    // REFRESCAR
     // =========================================================
 
     public void Refresh()
@@ -101,80 +120,126 @@ public class CountryEconomySummaryUI : MonoBehaviour
                 CountryState.Instance;
         }
 
+
         if (countryState == null)
         {
             return;
         }
 
 
-        // =====================================================
-        // RESULTADO FISCAL
-        // =====================================================
+        RefreshFiscalResult();
+        RefreshReserves();
+        RefreshDebt();
+        RefreshInflation();
+    }
 
-        if (fiscalResultText != null)
+
+    // =========================================================
+    // RESULTADO FISCAL
+    // =========================================================
+
+    private void RefreshFiscalResult()
+    {
+        if (fiscalResultText == null)
         {
-            float value =
-                countryState.FiscalResult;
-
-            fiscalResultText.text =
-                $"{value:+0.0;-0.0;0.0}";
-
-            if (value > 0.01f)
-            {
-                fiscalResultText.color =
-                    new Color(
-                        0.35f,
-                        0.85f,
-                        0.35f
-                    );
-            }
-            else if (value < -0.01f)
-            {
-                fiscalResultText.color =
-                    new Color(
-                        0.9f,
-                        0.3f,
-                        0.3f
-                    );
-            }
-            else
-            {
-                fiscalResultText.color =
-                    Color.white;
-            }
+            return;
         }
 
 
-        // =====================================================
-        // RESERVAS
-        // =====================================================
+        float value =
+            countryState.FiscalResult;
 
-        if (reservesText != null)
+
+        fiscalResultText.text =
+            value.ToString(
+                "+0.0;-0.0;0.0"
+            );
+
+
+        // -----------------------------------------------------
+        // COLOR
+        //
+        // Positivo = superávit
+        // Negativo = déficit
+        // -----------------------------------------------------
+
+        if (value > 0.01f)
         {
-            reservesText.text =
-                $"{countryState.Reserves:0.0}";
+            fiscalResultText.color =
+                new Color(
+                    0.35f,
+                    0.85f,
+                    0.35f
+                );
+        }
+        else if (value < -0.01f)
+        {
+            fiscalResultText.color =
+                new Color(
+                    0.9f,
+                    0.3f,
+                    0.3f
+                );
+        }
+        else
+        {
+            fiscalResultText.color =
+                Color.white;
+        }
+    }
+
+
+    // =========================================================
+    // RESERVAS
+    // =========================================================
+
+    private void RefreshReserves()
+    {
+        if (reservesText == null)
+        {
+            return;
         }
 
 
-        // =====================================================
-        // DEUDA
-        // =====================================================
+        reservesText.text =
+            countryState.Reserves.ToString(
+                "0.0"
+            );
+    }
 
-        if (debtText != null)
+
+    // =========================================================
+    // DEUDA
+    // =========================================================
+
+    private void RefreshDebt()
+    {
+        if (debtText == null)
         {
-            debtText.text =
-                $"{countryState.Debt:0.0}";
+            return;
         }
 
 
-        // =====================================================
-        // INFLACIÓN
-        // =====================================================
+        debtText.text =
+            countryState.Debt.ToString(
+                "0.0"
+            );
+    }
 
-        if (inflationText != null)
+
+    // =========================================================
+    // INFLACIÓN
+    // =========================================================
+
+    private void RefreshInflation()
+    {
+        if (inflationText == null)
         {
-            inflationText.text =
-                $"{countryState.Inflation:0.0}%";
+            return;
         }
+
+
+        inflationText.text =
+            $"{countryState.Inflation:0.0}%";
     }
 }

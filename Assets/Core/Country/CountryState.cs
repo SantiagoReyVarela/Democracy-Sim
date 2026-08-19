@@ -107,6 +107,18 @@ public class CountryState : MonoBehaviour
     public PoliticalLeaderSO GovernmentLeader => governmentLeader;
 
 
+    // =========================================================
+    // COUNTRY VISUALS
+    // =========================================================
+
+    [Header("Country Visuals")]
+
+    [SerializeField]
+    private Sprite countryMap;
+
+    public Sprite CountryMap => countryMap;
+
+
     [Header("Permanent Policy Slots")]
 
     [SerializeField]
