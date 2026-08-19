@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cc17026250bf6340883fc64926d75b8, type: 3}
+  m_Name: USA_1932
+  m_EditorClassIdentifier: Assembly-CSharp::GameScenarioSO
+  scenarioId: 
+  scenarioName: USA_1932
+  description: 
+  countryName: 
+  countryFlag: {fileID: 0}
+  stateType: 
+  governmentType: 
+  startYear: 1932
+  startMonth: 1
+  politicalSituation: 
+  economicSituation: 
+  initialParameters:
+    inflation: 0
+    fiscalResult: 0
+    reserves: 0
+    debt: 0
+    stability: 0
+    education: 0
+  parties:
+  - party: {fileID: 0}
+    available: 0
+    initialVoteShare: 0
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 0
+    economicCrisisSensitivity: 0
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  availableLeaders: []
+  policySlots:
+    economySlots: 2
+    governmentSlots: 2
+    immigrationSlots: 1
+    militarySlots: 1
+    religionSlots: 1
+    socialSlots: 1
+    tradeSlots: 1
