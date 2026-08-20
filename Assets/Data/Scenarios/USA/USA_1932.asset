@@ -32,7 +32,32 @@ MonoBehaviour:
     education: 0
   parties:
   - party: {fileID: 0}
+    scenarioPartyId: 
     available: 0
+    overridePartyData: 0
+    customName: 
+    customColor: {r: 1, g: 1, b: 1, a: 1}
+    customIdeology: 
+    ideologicalPositions:
+      overrides: []
+    initialVoteShare: 0
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 0
+    economicCrisisSensitivity: 0
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  - party: {fileID: 0}
+    scenarioPartyId: 
+    available: 0
+    overridePartyData: 0
+    customName: 
+    customColor: {r: 1, g: 1, b: 1, a: 1}
+    customIdeology: 
+    ideologicalPositions:
+      overrides: []
     initialVoteShare: 0
     useHistoricalTrend: 0
     historicalTrendPerTurn: 0
