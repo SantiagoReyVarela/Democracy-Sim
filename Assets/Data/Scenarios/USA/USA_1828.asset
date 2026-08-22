@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cc17026250bf6340883fc64926d75b8, type: 3}
+  m_Name: USA_1828
+  m_EditorClassIdentifier: Assembly-CSharp::GameScenarioSO
+  scenarioId: USA_1828
+  scenarioName: Estados Unidos - 1828
+  description: "La revancha entre John Quincy Adams y Andrew Jackson marca el nacimiento
+    de una nueva era de pol\xEDtica de masas en Estados Unidos."
+  countryName: Estados Unidos
+  countryFlag: {fileID: 0}
+  stateType: Estado Federal
+  governmentType: Republica presidencial
+  startYear: 1828
+  startMonth: 10
+  politicalSituation: "Estados Unidos afronta una amarga revancha electoral entre
+    el presidente John Quincy Adams y Andrew Jackson. La pol\xE9mica elecci\xF3n
+    de 1824, decidida por la C\xE1mara de Representantes pese a que Jackson hab\xEDa
+    obtenido m\xE1s votos populares y electorales que cualquier otro candidato, alimenta
+    las acusaciones de un \xABpacto corrupto\xBB contra Adams. La antigua coalici\xF3n
+    dem\xF3crata-republicana se ha fracturado y comienza a surgir un nuevo sistema
+    de partidos. Jackson moviliza un creciente movimiento pol\xEDtico de masas, mientras
+    Adams defiende su programa nacional de desarrollo econ\xF3mico e infraestructuras.
+    El controvertido arancel de 1828 agrava adem\xE1s las tensiones entre el Norte
+    industrial y el Sur agrario."
+  economicSituation: "La econom\xEDa estadounidense contin\xFAa expandi\xE9ndose
+    territorial y comercialmente, mientras el Gobierno federal disfruta de unos ingresos
+    elevados y reduce r\xE1pidamente la deuda p\xFAblica. Los aranceles constituyen
+    la principal fuente de ingresos federales y el recientemente aprobado Arancel
+    de 1828 protege a determinados productores estadounidenses, pero provoca una
+    fuerte oposici\xF3n en el Sur. Los precios presentan una ligera tendencia deflacionaria
+    y las cuentas del Tesoro se mantienen s\xF3lidas."
+  initialParameters:
+    inflation: -0.25
+    fiscalResult: 695850
+    reserves: 5972436
+    debt: 67435490
+    stability: 35
+    education: -15
+  parties:
+  - party: {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
+    scenarioPartyId: DEM
+    available: 1
+    overridePartyData: 1
+    customName: "Partido Dem\xF3crata"
+    customColor: {r: 0.047058824, g: 0, b: 0.6039216, a: 1}
+    customIdeology: Republicanismo jacksoniana
+    ideologicalPositions:
+      overrides:
+      - axis: 0
+        position: -3
+      - axis: 3
+        position: -1
+      - axis: 4
+        position: 1
+    initialVoteShare: 56
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: 0.1
+    minimumHistoricalSupport: 40
+    maximumHistoricalSupport: 70
+    economicCrisisSensitivity: 0.15
+    politicalInstabilitySensitivity: 0.2
+    inflationSensitivity: 0.05
+    unemploymentSensitivity: 0
+  - party: {fileID: 11400000, guid: 90bce1ed737f3dc4a84590ce144537d6, type: 2}
+    scenarioPartyId: N-R
+    available: 1
+    overridePartyData: 1
+    customName: Partido Nacional-Republicano
+    customColor: {r: 0.0061179707, g: 0.6039216, b: 0, a: 1}
+    customIdeology: Republicanismo nacional
+    ideologicalPositions:
+      overrides:
+      - axis: 0
+        position: 3
+      - axis: 3
+        position: 3
+    initialVoteShare: 43.6
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: -0.1
+    minimumHistoricalSupport: 25
+    maximumHistoricalSupport: 65
+    economicCrisisSensitivity: -0.15
+    politicalInstabilitySensitivity: -0.2
+    inflationSensitivity: -0.05
+    unemploymentSensitivity: 0
+  availableLeaders:
+  - leader: {fileID: 11400000, guid: dc9ff59cfbe212a4c89070002d1d09f0, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: DEM
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers:
+    - scenarioPartyId: 
+      voteChange: 0
+  - leader: {fileID: 11400000, guid: abf3eeb223f388644a3e4887980b7aa1, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: N-R
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers: []
+  policySlots:
+    economySlots: 2
+    governmentSlots: 2
+    immigrationSlots: 0
+    militarySlots: 1
+    religionSlots: 1
+    socialSlots: 1
+    tradeSlots: 2

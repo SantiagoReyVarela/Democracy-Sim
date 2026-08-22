@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abc42c0756ea5814996b1b2d33169376, type: 3}
+  m_Name: "Pr\xE1xeres Mateo Sagasta"
+  m_EditorClassIdentifier: Assembly-CSharp::PoliticalLeaderSO
+  leaderName: "Pr\xE1xeres Mateo Sagasta"
+  party: {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
+  portrait: {fileID: 1119333463252043614, guid: d6fde61da2aacaa41902dbc2f1e780cc, type: 3}

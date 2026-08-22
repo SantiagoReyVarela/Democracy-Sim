@@ -111,8 +111,8 @@ MonoBehaviour:
   policySlots:
     economySlots: 2
     governmentSlots: 2
-    immigrationSlots: 1
+    immigrationSlots: 0
     militarySlots: 1
     religionSlots: 1
-    socialSlots: 1
-    tradeSlots: 1
+    socialSlots: 0
+    tradeSlots: 2

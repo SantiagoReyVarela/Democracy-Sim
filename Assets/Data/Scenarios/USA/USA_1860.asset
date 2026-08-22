@@ -1,0 +1,118 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cc17026250bf6340883fc64926d75b8, type: 3}
+  m_Name: USA_1860
+  m_EditorClassIdentifier: Assembly-CSharp::GameScenarioSO
+  scenarioId: USA_1796
+  scenarioName: Estados Unidos - 1796
+  description: "La primera elecci\xF3n presidencial verdaderamente competitiva de
+    la historia de Estados Unidos."
+  countryName: Estados Unidos
+  countryFlag: {fileID: 0}
+  stateType: Estado Federal
+  governmentType: Republica presidencial
+  startYear: 1796
+  startMonth: 11
+  politicalSituation: "Estados Unidos afronta la primera elecci\xF3n presidencial
+    verdaderamente competitiva de su historia tras la decisi\xF3n de George Washington
+    de abandonar el poder. El joven sistema pol\xEDtico se est\xE1 dividiendo entre
+    federalistas, partidarios de un gobierno federal fuerte, y dem\xF3crata-republicanos,
+    defensores de una mayor autonom\xEDa de los estados. La pol\xEDtica exterior
+    tambi\xE9n divide al pa\xEDs entre quienes favorecen unas relaciones estrechas
+    con Gran Breta\xF1a y quienes simpatizan con la Francia revolucionaria."
+  economicSituation: "La joven rep\xFAblica atraviesa una etapa de consolidaci\xF3n
+    financiera y expansi\xF3n comercial. Las reformas impulsadas durante la presidencia
+    de Washington han fortalecido el cr\xE9dito federal y establecido el Banco de
+    los Estados Unidos, aunque la deuda heredada de la Revoluci\xF3n contin\xFAa
+    siendo muy elevada. Los ingresos federales dependen principalmente de los aranceles
+    aduaneros y, en 1796, las cuentas p\xFAblicas registran un importante super\xE1vit."
+  initialParameters:
+    inflation: 0.43
+    fiscalResult: 265000
+    reserves: 10000000
+    debt: 82000270
+    stability: 40
+    education: -25
+  parties:
+  - party: {fileID: 11400000, guid: 90bce1ed737f3dc4a84590ce144537d6, type: 2}
+    scenarioPartyId: FED
+    available: 1
+    overridePartyData: 1
+    customName: Partido Federalista
+    customColor: {r: 0.045266207, g: 0, b: 0.6037736, a: 1}
+    customIdeology: Federalism
+    ideologicalPositions:
+      overrides:
+      - axis: 0
+        position: 3
+      - axis: 3
+        position: 3
+    initialVoteShare: 51.1
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: -0.1
+    minimumHistoricalSupport: 30
+    maximumHistoricalSupport: 65
+    economicCrisisSensitivity: 0
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  - party: {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
+    scenarioPartyId: D-R
+    available: 1
+    overridePartyData: 1
+    customName: "Partido Dem\xF3crata-Republicano"
+    customColor: {r: 1, g: 0, b: 0, a: 1}
+    customIdeology: Republicanismo jeffersoniano
+    ideologicalPositions:
+      overrides:
+      - axis: 2
+        position: 1
+      - axis: 3
+        position: 1
+    initialVoteShare: 48.9
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: 0.1
+    minimumHistoricalSupport: 30
+    maximumHistoricalSupport: 70
+    economicCrisisSensitivity: 0
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  availableLeaders:
+  - leader: {fileID: 11400000, guid: 574b2d05d33034d4f9f4c5ebde8c01c4, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: FED
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers:
+    - scenarioPartyId: 
+      voteChange: 0
+  - leader: {fileID: 11400000, guid: 47e5c8b387f6eb94ebfe0068e3c60474, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: D-R
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers: []
+  policySlots:
+    economySlots: 2
+    governmentSlots: 2
+    immigrationSlots: 1
+    militarySlots: 1
+    religionSlots: 1
+    socialSlots: 1
+    tradeSlots: 1
