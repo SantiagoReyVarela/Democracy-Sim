@@ -151,9 +151,7 @@ public class CountryEconomySummaryUI : MonoBehaviour
 
 
         fiscalResultText.text =
-            value.ToString(
-                "+0.0;-0.0;0.0"
-            );
+            countryState.FormattedFiscalResult;
 
 
         // -----------------------------------------------------
@@ -202,9 +200,7 @@ public class CountryEconomySummaryUI : MonoBehaviour
 
 
         reservesText.text =
-            countryState.Reserves.ToString(
-                "0.0"
-            );
+            countryState.FormattedReserves;
     }
 
 
@@ -221,9 +217,7 @@ public class CountryEconomySummaryUI : MonoBehaviour
 
 
         debtText.text =
-            countryState.Debt.ToString(
-                "0.0"
-            );
+            countryState.FormattedDebt;
     }
 
 
@@ -240,6 +234,6 @@ public class CountryEconomySummaryUI : MonoBehaviour
 
 
         inflationText.text =
-            $"{countryState.Inflation:0.0}%";
+            countryState.FormattedInflation;
     }
 }

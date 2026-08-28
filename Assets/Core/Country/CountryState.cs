@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 /// <summary>
@@ -263,6 +264,18 @@ public class CountryState : MonoBehaviour
     public float Debt => debt;
     public float Inflation => inflation;
 
+    public string FormattedFiscalResult =>
+        FormatCompactNumber(fiscalResult);
+
+    public string FormattedReserves =>
+        FormatCompactNumber(reserves);
+
+    public string FormattedDebt =>
+        FormatCompactNumber(debt);
+
+    public string FormattedInflation =>
+        $"{FormatCompactNumber(inflation)}%";
+
     public float DebtPaymentPercentage => debtPaymentPercentage;
 
     public DeficitFinancingMode DeficitFinancingMode =>
@@ -501,6 +514,127 @@ public class CountryState : MonoBehaviour
         }
 
         return fallback;
+    }
+
+
+    // =========================================================
+    // NUMBER FORMATTING
+    // =========================================================
+
+    /// <summary>
+    /// Convierte valores grandes a formato compacto:
+    /// 1.000 -> 1K
+    /// 25.500 -> 25,5K
+    /// 1.250.000 -> 1,25M
+    /// 1.000.000.000 -> 1B
+    /// 1.000.000.000.000 -> 1T
+    /// 1.000.000.000.000.000 -> 1Q
+    ///
+    /// Se muestran aproximadamente tres cifras significativas
+    /// y nunca se añaden ceros decimales innecesarios.
+    /// </summary>
+    public static string FormatCompactNumber(double value)
+    {
+        string[] suffixes =
+        {
+            "",
+            "K",
+            "M",
+            "B",
+            "T",
+            "Q"
+        };
+
+        double absoluteValue =
+            Math.Abs(value);
+
+        int suffixIndex = 0;
+
+        while (
+            absoluteValue >= 1000d &&
+            suffixIndex < suffixes.Length - 1
+        )
+        {
+            value /= 1000d;
+            absoluteValue /= 1000d;
+            suffixIndex++;
+        }
+
+        int decimals =
+            GetCompactDecimalCount(
+                Math.Abs(value)
+            );
+
+        double roundedValue =
+            Math.Round(
+                value,
+                decimals,
+                MidpointRounding.AwayFromZero
+            );
+
+        if (
+            Math.Abs(roundedValue) >= 1000d &&
+            suffixIndex < suffixes.Length - 1
+        )
+        {
+            roundedValue /= 1000d;
+            suffixIndex++;
+
+            decimals =
+                GetCompactDecimalCount(
+                    Math.Abs(roundedValue)
+                );
+
+            roundedValue =
+                Math.Round(
+                    roundedValue,
+                    decimals,
+                    MidpointRounding.AwayFromZero
+                );
+        }
+
+        string numberFormat;
+
+        if (decimals <= 0)
+        {
+            numberFormat = "0";
+        }
+        else if (decimals == 1)
+        {
+            numberFormat = "0.#";
+        }
+        else
+        {
+            numberFormat = "0.##";
+        }
+
+        CultureInfo spanishCulture =
+            CultureInfo.GetCultureInfo("es-ES");
+
+        return
+            roundedValue.ToString(
+                numberFormat,
+                spanishCulture
+            ) +
+            suffixes[suffixIndex];
+    }
+
+
+    private static int GetCompactDecimalCount(
+        double absoluteCompactValue
+    )
+    {
+        if (absoluteCompactValue >= 100d)
+        {
+            return 0;
+        }
+
+        if (absoluteCompactValue >= 10d)
+        {
+            return 1;
+        }
+
+        return 2;
     }
 
 
