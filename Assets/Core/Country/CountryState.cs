@@ -108,6 +108,26 @@ public class CountryState : MonoBehaviour
 
 
     // =========================================================
+    // SCENARIO RUNTIME
+    // =========================================================
+
+    private ScenarioRuntimeState currentScenario;
+
+    public ScenarioRuntimeState CurrentScenario =>
+        currentScenario;
+
+    public int CurrentYear =>
+        currentScenario != null
+            ? currentScenario.CurrentYear
+            : 0;
+
+    public int CurrentMonth =>
+        currentScenario != null
+            ? currentScenario.CurrentMonth
+            : 0;
+
+
+    // =========================================================
     // COUNTRY VISUALS
     // =========================================================
 
@@ -269,6 +289,221 @@ public class CountryState : MonoBehaviour
     public IReadOnlyList<PolicySlotState> PolicySlots => policySlots;
 
 
+    // =========================================================
+    // INITIALIZE FROM SCENARIO
+    // =========================================================
+
+    public void InitializeFromScenario(
+        ScenarioRuntimeState scenario
+    )
+    {
+        if (scenario == null)
+        {
+            Debug.LogError(
+                "CountryState: no se puede inicializar desde un escenario nulo.",
+                this
+            );
+
+            return;
+        }
+
+        currentScenario = scenario;
+
+        if (!string.IsNullOrWhiteSpace(scenario.CountryName))
+        {
+            countryName = scenario.CountryName.Trim();
+        }
+
+        stateType =
+            ParseStateType(
+                scenario.StateType,
+                stateType
+            );
+
+        governmentSystem =
+            ParseGovernmentSystem(
+                scenario.GovernmentType,
+                governmentSystem
+            );
+
+        fiscalResult = scenario.FiscalResult;
+        reserves = Mathf.Max(0f, scenario.Reserves);
+        debt = Mathf.Max(0f, scenario.Debt);
+
+        inflation =
+            Mathf.Clamp(
+                scenario.Inflation,
+                minimumInflation,
+                100f
+            );
+
+        stability = ClampParameter(scenario.Stability);
+        education = ClampParameter(scenario.Education);
+
+        currentTurn = 1;
+
+        lastReservesUsed = 0f;
+        lastDebtPayment = 0f;
+        lastDebtIssued = 0f;
+        lastMoneyPrinted = 0f;
+
+        pendingInflation = 0f;
+        inflationPressureTurnsRemaining = 0;
+        inflationRecoveryTurnsRemaining = 0;
+
+        appliedPolicyHistory.Clear();
+        policySlotChangeHistory.Clear();
+
+        history.Clear();
+        RecordSnapshot();
+
+        SyncLeaderFromScenario();
+
+        Debug.Log(
+            $"CountryState inicializado desde escenario | " +
+            $"País: {countryName} | " +
+            $"Fecha: {CurrentMonth}/{CurrentYear} | " +
+            $"Líder: {(governmentLeader != null ? governmentLeader.LeaderName : "Sin seleccionar")}",
+            this
+        );
+
+        NotifyStateChanged();
+    }
+
+
+    public void SyncLeaderFromScenario()
+    {
+        if (
+            currentScenario == null ||
+            currentScenario.SelectedLeader == null
+        )
+        {
+            governmentLeader = null;
+            NotifyStateChanged();
+            return;
+        }
+
+        governmentLeader =
+            currentScenario.SelectedLeader.BaseLeader;
+
+        NotifyStateChanged();
+    }
+
+
+    public void SetGovernmentLeaderFromScenario(
+        ScenarioLeaderRuntime leader
+    )
+    {
+        if (currentScenario == null)
+        {
+            Debug.LogWarning(
+                "CountryState: no hay un escenario runtime cargado.",
+                this
+            );
+
+            return;
+        }
+
+        currentScenario.SelectLeader(leader);
+        SyncLeaderFromScenario();
+    }
+
+
+    private StateType ParseStateType(
+        string value,
+        StateType fallback
+    )
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return fallback;
+
+        string normalized =
+            value.Trim().ToLowerInvariant();
+
+        if (
+            normalized.Contains("federal") ||
+            normalized.Contains("república democrática") ||
+            normalized.Contains("democratic republic")
+        )
+        {
+            return StateType.DemocraticRepublic;
+        }
+
+        if (
+            normalized.Contains("autoritaria") ||
+            normalized.Contains("authoritarian")
+        )
+        {
+            return StateType.AuthoritarianRepublic;
+        }
+
+        if (
+            normalized.Contains("constitucional") ||
+            normalized.Contains("constitutional monarchy")
+        )
+        {
+            return StateType.ConstitutionalMonarchy;
+        }
+
+        if (
+            normalized.Contains("absoluta") ||
+            normalized.Contains("absolute monarchy")
+        )
+        {
+            return StateType.AbsoluteMonarchy;
+        }
+
+        if (
+            normalized.Contains("dictadura") ||
+            normalized.Contains("dictatorship")
+        )
+        {
+            return StateType.Dictatorship;
+        }
+
+        return fallback;
+    }
+
+
+    private GovernmentSystem ParseGovernmentSystem(
+        string value,
+        GovernmentSystem fallback
+    )
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return fallback;
+
+        string normalized =
+            value.Trim().ToLowerInvariant();
+
+        if (
+            normalized.Contains("presidencial") ||
+            normalized.Contains("presidential")
+        )
+        {
+            return GovernmentSystem.Presidential;
+        }
+
+        if (
+            normalized.Contains("parlament") ||
+            normalized.Contains("parliament")
+        )
+        {
+            return GovernmentSystem.Parliamentary;
+        }
+
+        if (
+            normalized.Contains("semipresid") ||
+            normalized.Contains("semi-presid")
+        )
+        {
+            return GovernmentSystem.SemiPresidential;
+        }
+
+        return fallback;
+    }
+
+
     /// <summary>
     /// Devuelve el valor actual almacenado del parámetro.
     /// Los efectos activos ya se incorporan al valor cuando avanza el turno.
@@ -424,6 +659,13 @@ public class CountryState : MonoBehaviour
 
 
         currentTurn++;
+
+
+        // Cada turno del juego representa un mes.
+        if (currentScenario != null)
+        {
+            currentScenario.AdvanceMonth();
+        }
 
 
         // 1. Políticas activas
@@ -786,6 +1028,8 @@ public class CountryState : MonoBehaviour
         float initialInflation = 2f
     )
     {
+        currentScenario = null;
+
         currentTurn = 1;
 
         prosperity = ClampParameter(initialProsperity);

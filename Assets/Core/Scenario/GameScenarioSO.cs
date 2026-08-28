@@ -37,6 +37,9 @@ public class GameScenarioSO : ScriptableObject
     [Tooltip("Flag displayed for this scenario.")]
     public Sprite countryFlag;
 
+    [Tooltip("Map image displayed for this scenario.")]
+    public Sprite countryMap;
+
     [Tooltip("Example: Federal State, Unitary State, Confederation...")]
     public string stateType;
 

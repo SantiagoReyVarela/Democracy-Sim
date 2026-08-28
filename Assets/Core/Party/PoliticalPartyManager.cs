@@ -18,6 +18,32 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
     // =========================================================
+    // ESCENARIO RUNTIME
+    // =========================================================
+
+    [Header("Inicialización")]
+
+    [Tooltip(
+        "Si está activo, el manager seguirá pudiendo inicializarse con " +
+        "Available Parties desde el Inspector cuando no se use un escenario."
+    )]
+    [SerializeField]
+    private bool initializeFromInspectorOnAwake = true;
+
+
+    private ScenarioRuntimeState currentScenario;
+
+
+    private readonly Dictionary<PoliticalPartyState, ScenarioPartyRuntime>
+        runtimePartyByState =
+            new Dictionary<PoliticalPartyState, ScenarioPartyRuntime>();
+
+
+    public ScenarioRuntimeState CurrentScenario =>
+        currentScenario;
+
+
+    // =========================================================
     // PARLAMENTO
     // =========================================================
 
@@ -130,7 +156,10 @@ public class PoliticalPartyManager : MonoBehaviour
 
     private void Awake()
     {
-        InitializeParties();
+        if (initializeFromInspectorOnAwake)
+        {
+            InitializeParties();
+        }
     }
 
 
@@ -140,6 +169,10 @@ public class PoliticalPartyManager : MonoBehaviour
 
     public void InitializeParties()
     {
+        currentScenario = null;
+
+        runtimePartyByState.Clear();
+
         partyStates.Clear();
 
         governmentLeader = null;
@@ -309,6 +342,346 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
     // =========================================================
+    // INICIALIZAR DESDE ESCENARIO
+    // =========================================================
+
+    public void InitializeFromScenario(
+        ScenarioRuntimeState scenario
+    )
+    {
+        if (scenario == null)
+        {
+            Debug.LogError(
+                "PoliticalPartyManager: no se puede inicializar " +
+                "desde un ScenarioRuntimeState nulo."
+            );
+
+            return;
+        }
+
+
+        currentScenario = scenario;
+
+        runtimePartyByState.Clear();
+
+        partyStates.Clear();
+
+        governmentLeader = null;
+
+
+        if (
+            scenario.Parties == null ||
+            scenario.Parties.Count == 0
+        )
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: el escenario no contiene " +
+                "partidos disponibles."
+            );
+
+            return;
+        }
+
+
+        foreach (
+            ScenarioPartyRuntime runtimeParty
+            in scenario.Parties
+        )
+        {
+            if (runtimeParty == null)
+            {
+                continue;
+            }
+
+
+            if (runtimeParty.BaseParty == null)
+            {
+                Debug.LogWarning(
+                    $"PoliticalPartyManager: el partido de escenario " +
+                    $"'{runtimeParty.DisplayName}' no tiene PoliticalPartySO base."
+                );
+
+                continue;
+            }
+
+
+            PoliticalPartyState newState =
+                new PoliticalPartyState
+                {
+                    // Se conserva el asset base para compatibilidad con
+                    // sistemas antiguos. Los datos personalizados del
+                    // escenario se obtienen mediante runtimePartyByState.
+                    party =
+                        runtimeParty.BaseParty,
+
+                    popularity =
+                        Mathf.Clamp(
+                            runtimeParty.VoteShare,
+                            0f,
+                            100f
+                        ),
+
+                    satisfaction =
+                        50f,
+
+                    lastSatisfactionChange =
+                        0f,
+
+                    seats =
+                        0,
+
+                    isGovernment =
+                        false
+                };
+
+
+            partyStates.Add(
+                newState
+            );
+
+
+            runtimePartyByState[
+                newState
+            ] =
+                runtimeParty;
+
+
+            Debug.Log(
+                $"PARTIDO DE ESCENARIO CARGADO | " +
+                $"ID local: {runtimeParty.ScenarioPartyId} | " +
+                $"Nombre: {runtimeParty.DisplayName} | " +
+                $"Base: {runtimeParty.BaseParty.partyName} | " +
+                $"Voto inicial: {runtimeParty.VoteShare:F2}%"
+            );
+        }
+
+
+        if (partyStates.Count == 0)
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: no se pudo crear ningún " +
+                "estado de partido desde el escenario."
+            );
+
+            return;
+        }
+
+
+        if (generateRandomParliament)
+        {
+            GenerateRandomSeats();
+        }
+
+
+        FormAutomaticGovernment();
+
+
+        Debug.Log(
+            $"PoliticalPartyManager: inicializado desde escenario " +
+            $"'{scenario.ScenarioName}' con {partyStates.Count} partidos."
+        );
+    }
+
+
+    // =========================================================
+    // OBTENER DATOS EFECTIVOS DEL PARTIDO
+    // =========================================================
+
+    public ScenarioPartyRuntime GetRuntimeParty(
+        PoliticalPartyState partyState
+    )
+    {
+        if (partyState == null)
+        {
+            return null;
+        }
+
+
+        runtimePartyByState.TryGetValue(
+            partyState,
+            out ScenarioPartyRuntime runtimeParty
+        );
+
+
+        return runtimeParty;
+    }
+
+
+    public string GetEffectivePartyName(
+        PoliticalPartyState partyState
+    )
+    {
+        if (partyState == null)
+        {
+            return "Unknown Party";
+        }
+
+
+        ScenarioPartyRuntime runtimeParty =
+            GetRuntimeParty(
+                partyState
+            );
+
+
+        if (
+            runtimeParty != null &&
+            !string.IsNullOrWhiteSpace(
+                runtimeParty.DisplayName
+            )
+        )
+        {
+            return runtimeParty.DisplayName;
+        }
+
+
+        if (partyState.party != null)
+        {
+            return partyState.party.partyName;
+        }
+
+
+        return "Unknown Party";
+    }
+
+
+    public Color GetEffectivePartyColor(
+        PoliticalPartyState partyState
+    )
+    {
+        ScenarioPartyRuntime runtimeParty =
+            GetRuntimeParty(
+                partyState
+            );
+
+
+        if (runtimeParty != null)
+        {
+            return runtimeParty.DisplayColor;
+        }
+
+
+        // Si más adelante quieres el color base aquí, sustituye
+        // Color.white por el campo real de PoliticalPartySO.
+        return Color.white;
+    }
+
+
+    public string GetEffectivePartyIdeology(
+        PoliticalPartyState partyState
+    )
+    {
+        ScenarioPartyRuntime runtimeParty =
+            GetRuntimeParty(
+                partyState
+            );
+
+
+        if (
+            runtimeParty != null &&
+            !string.IsNullOrWhiteSpace(
+                runtimeParty.DisplayIdeology
+            )
+        )
+        {
+            return runtimeParty.DisplayIdeology;
+        }
+
+
+        return string.Empty;
+    }
+
+
+    public float GetEffectivePartyPosition(
+        PoliticalPartyState partyState,
+        PoliticalAxis axis
+    )
+    {
+        if (
+            partyState == null ||
+            partyState.party == null
+        )
+        {
+            return 0f;
+        }
+
+
+        ScenarioPartyRuntime runtimeParty =
+            GetRuntimeParty(
+                partyState
+            );
+
+
+        if (runtimeParty != null)
+        {
+            if (
+                Enum.TryParse(
+                    axis.ToString(),
+                    true,
+                    out ScenarioIdeologicalAxis scenarioAxis
+                )
+            )
+            {
+                if (
+                    runtimeParty.TryGetIdeologicalOverride(
+                        scenarioAxis,
+                        out float overrideValue
+                    )
+                )
+                {
+                    return overrideValue;
+                }
+            }
+        }
+
+
+        // Si no existe override para ese eje,
+        // heredamos SIEMPRE la postura del asset base.
+        return partyState.party.GetPosition(
+            axis
+        );
+    }
+
+
+    public PoliticalPartyState GetPartyStateByScenarioId(
+        string scenarioPartyId
+    )
+    {
+        if (string.IsNullOrWhiteSpace(scenarioPartyId))
+        {
+            return null;
+        }
+
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
+        {
+            ScenarioPartyRuntime runtimeParty =
+                GetRuntimeParty(
+                    partyState
+                );
+
+
+            if (
+                runtimeParty != null &&
+                string.Equals(
+                    runtimeParty.ScenarioPartyId,
+                    scenarioPartyId,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            {
+                return partyState;
+            }
+        }
+
+
+        return null;
+    }
+
+
+    // =========================================================
     // BUSCAR ESTADO DE PARTIDO
     // =========================================================
 
@@ -316,6 +689,21 @@ public class PoliticalPartyManager : MonoBehaviour
         string partyId
     )
     {
+        // Primero intentamos resolver el ID LOCAL del escenario.
+        PoliticalPartyState scenarioPartyState =
+            GetPartyStateByScenarioId(
+                partyId
+            );
+
+
+        if (scenarioPartyState != null)
+        {
+            return scenarioPartyState;
+        }
+
+
+        // Fallback para partidas antiguas que siguen usando
+        // directamente el partyId del PoliticalPartySO.
         foreach (
             PoliticalPartyState partyState
             in partyStates
@@ -484,14 +872,16 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
             float partyPosition =
-                partyState.party.GetPosition(
+                GetEffectivePartyPosition(
+                    partyState,
                     testAxis
                 );
 
 
             float opinion =
                 PartyPolicyEvaluator.EvaluateOpinion(
-                    partyState.party,
+                    partyState,
+                    this,
                     testAxis,
                     testPolicyPosition
                 );
@@ -499,7 +889,8 @@ public class PoliticalPartyManager : MonoBehaviour
 
             float impact =
                 PartyPolicyEvaluator.CalculateSatisfactionImpact(
-                    partyState.party,
+                    partyState,
+                    this,
                     testAxis,
                     testPolicyPosition,
                     testRelevance
@@ -507,7 +898,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
             Debug.Log(
-                $"{partyState.party.partyName} | " +
+                $"{GetEffectivePartyName(partyState)} | " +
                 $"Posición: {partyPosition:F1} | " +
                 $"Opinión: {opinion:F2} | " +
                 $"Impacto: {impact:+0.00;-0.00;0.00}"
@@ -568,7 +959,8 @@ public class PoliticalPartyManager : MonoBehaviour
 
             float impact =
                 PartyPolicyEvaluator.CalculateSatisfactionImpact(
-                    partyState.party,
+                    partyState,
+                    this,
                     axis,
                     policyPosition,
                     policyRelevance
@@ -594,7 +986,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
             Debug.Log(
-                $"{partyState.party.partyName} | " +
+                $"{GetEffectivePartyName(partyState)} | " +
                 $"Impacto calculado: " +
                 $"{impact:+0.00;-0.00;0.00} | " +
                 $"Cambio real: " +
@@ -655,7 +1047,7 @@ public class PoliticalPartyManager : MonoBehaviour
         {
             Debug.Log(
                 $"LÍDER DEL GOBIERNO | " +
-                $"{governmentLeader.party.partyName} | " +
+                $"{GetEffectivePartyName(governmentLeader)} | " +
                 $"{governmentLeader.seats} asientos"
             );
         }
@@ -696,7 +1088,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
             Debug.Log(
-                $"{partyState.party.partyName} | " +
+                $"{GetEffectivePartyName(partyState)} | " +
                 $"Asientos: {partyState.seats} | " +
                 $"Porcentaje: {percentage:F2}%" +
                 governmentLabel +
@@ -1186,14 +1578,14 @@ public class PoliticalPartyManager : MonoBehaviour
 
                 Debug.Log(
                     $"Gobierno formado por " +
-                    $"{partyState.party.partyName} " +
+                    $"{GetEffectivePartyName(partyState)} " +
                     $"con {partyState.seats} asientos."
                 );
 
 
                 Debug.Log(
                     $"LÍDER DEL GOBIERNO | " +
-                    $"{governmentLeader.party.partyName}"
+                    $"{GetEffectivePartyName(governmentLeader)}"
                 );
 
 
@@ -1281,7 +1673,7 @@ public class PoliticalPartyManager : MonoBehaviour
         {
             Debug.Log(
                 $"LÍDER DEL GOBIERNO | " +
-                $"{governmentLeader.party.partyName} | " +
+                $"{GetEffectivePartyName(governmentLeader)} | " +
                 $"{governmentLeader.seats} asientos"
             );
         }
@@ -1300,7 +1692,7 @@ public class PoliticalPartyManager : MonoBehaviour
 
             Debug.Log(
                 $"GOBIERNO | " +
-                $"{partyState.party.partyName} | " +
+                $"{GetEffectivePartyName(partyState)} | " +
                 $"{partyState.seats} asientos" +
                 leaderLabel
             );
@@ -1390,15 +1782,15 @@ public class PoliticalPartyManager : MonoBehaviour
                 {
                     float distanceA =
                         CalculatePartyIdeologicalDistance(
-                            leader.party,
-                            a.party
+                            leader,
+                            a
                         );
 
 
                     float distanceB =
                         CalculatePartyIdeologicalDistance(
-                            leader.party,
-                            b.party
+                            leader,
+                            b
                         );
 
 
@@ -1535,13 +1927,15 @@ public class PoliticalPartyManager : MonoBehaviour
     // =========================================================
 
     private float CalculatePartyIdeologicalDistance(
-        PoliticalPartySO partyA,
-        PoliticalPartySO partyB
+        PoliticalPartyState partyA,
+        PoliticalPartyState partyB
     )
     {
         if (
             partyA == null ||
-            partyB == null
+            partyB == null ||
+            partyA.party == null ||
+            partyB.party == null
         )
         {
             return float.MaxValue;
@@ -1564,13 +1958,15 @@ public class PoliticalPartyManager : MonoBehaviour
         )
         {
             float positionA =
-                partyA.GetPosition(
+                GetEffectivePartyPosition(
+                    partyA,
                     axis
                 );
 
 
             float positionB =
-                partyB.GetPosition(
+                GetEffectivePartyPosition(
+                    partyB,
                     axis
                 );
 
@@ -1635,12 +2031,12 @@ public class PoliticalPartyManager : MonoBehaviour
                 j++
             )
             {
-                PoliticalPartySO partyA =
-                    coalition[i].party;
+                PoliticalPartyState partyA =
+                    coalition[i];
 
 
-                PoliticalPartySO partyB =
-                    coalition[j].party;
+                PoliticalPartyState partyB =
+                    coalition[j];
 
 
                 foreach (
@@ -1651,13 +2047,15 @@ public class PoliticalPartyManager : MonoBehaviour
                 )
                 {
                     float positionA =
-                        partyA.GetPosition(
+                        GetEffectivePartyPosition(
+                            partyA,
                             axis
                         );
 
 
                     float positionB =
-                        partyB.GetPosition(
+                        GetEffectivePartyPosition(
+                            partyB,
                             axis
                         );
 
@@ -1685,4 +2083,74 @@ public class PoliticalPartyManager : MonoBehaviour
             totalDistance /
             comparisons;
     }
+    [ContextMenu("Probar posiciones ideológicas del escenario")]
+    private void DebugScenarioIdeologicalPositions()
+    {
+        if (
+            partyStates == null ||
+            partyStates.Count == 0
+        )
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: no hay partidos inicializados."
+            );
+
+            return;
+        }
+
+        Debug.Log("=== POSICIONES IDEOLÓGICAS EFECTIVAS ===");
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
+        {
+            if (
+                partyState == null ||
+                partyState.party == null
+            )
+            {
+                continue;
+            }
+
+            Debug.Log(
+                $"--- {GetEffectivePartyName(partyState)} ---"
+            );
+
+            foreach (
+                PoliticalAxis axis
+                in Enum.GetValues(
+                    typeof(PoliticalAxis)
+                )
+            )
+            {
+                float basePosition =
+                    partyState.party.GetPosition(
+                        axis
+                    );
+
+                float effectivePosition =
+                    GetEffectivePartyPosition(
+                        partyState,
+                        axis
+                    );
+
+                string overrideLabel =
+                    Mathf.Approximately(
+                        basePosition,
+                        effectivePosition
+                    )
+                    ? "HEREDADO"
+                    : "OVERRIDE";
+
+                Debug.Log(
+                    $"{axis} | " +
+                    $"Base: {basePosition:+0.0;-0.0;0.0} | " +
+                    $"Efectivo: {effectivePosition:+0.0;-0.0;0.0} | " +
+                    $"{overrideLabel}"
+                );
+            }
+        }
+    }
+
 }

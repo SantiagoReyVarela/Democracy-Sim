@@ -3820,10 +3820,13 @@ MonoBehaviour:
   countryNameText: {fileID: 567123352}
   stateTypeText: {fileID: 34916649}
   governmentSystemText: {fileID: 1317769964}
+  countryFlagImage: {fileID: 736955468}
+  countryMapImage: {fileID: 1130920904}
+  leaderNameText: {fileID: 534039994}
+  leaderPartyText: {fileID: 960295872}
+  dateText: {fileID: 83121992}
   turnText: {fileID: 568698914}
   electionCountdownText: {fileID: 786842396}
-  leaderNameText: {fileID: 0}
-  leaderPartyText: {fileID: 0}
 --- !u!1 &1360576454
 GameObject:
   m_ObjectHideFlags: 0

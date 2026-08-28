@@ -17,7 +17,8 @@ MonoBehaviour:
   description: "La primera elecci\xF3n presidencial verdaderamente competitiva de
     la historia de Estados Unidos."
   countryName: Estados Unidos
-  countryFlag: {fileID: 0}
+  countryFlag: {fileID: 2543279097530367353, guid: 5edb47c13fb202e46922d4f25c77c156, type: 3}
+  countryMap: {fileID: 4947700601781519916, guid: 12ad4ac596a9afb4693210b248bc6e17, type: 3}
   stateType: Estado Federal
   governmentType: Republica presidencial
   startYear: 1796

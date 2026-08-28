@@ -1,5 +1,7 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CountryHeaderUI : MonoBehaviour
 {
@@ -7,55 +9,98 @@ public class CountryHeaderUI : MonoBehaviour
     [SerializeField] private TMP_Text countryNameText;
     [SerializeField] private TMP_Text stateTypeText;
     [SerializeField] private TMP_Text governmentSystemText;
+    [SerializeField] private Image countryFlagImage;
+    [SerializeField] private Image countryMapImage;
+
+    [Header("Leader")]
+    [SerializeField] private TMP_Text leaderNameText;
+    [SerializeField] private TMP_Text leaderPartyText;
+
+    [Header("Date")]
+    [SerializeField] private TMP_Text dateText;
 
     [Header("Turn")]
     [SerializeField] private TMP_Text turnText;
     [SerializeField] private TMP_Text electionCountdownText;
 
+
     private CountryState countryState;
-
-    [SerializeField]
-    private TMP_Text leaderNameText;
-
-    [SerializeField]
-    private TMP_Text leaderPartyText;
+    private Coroutine bindRoutine;
 
 
     private void OnEnable()
     {
-        BindCountryState();
-        Refresh();
+        TryBindCountryState();
+
+        if (bindRoutine == null)
+        {
+            bindRoutine =
+                StartCoroutine(
+                    WaitForCountryState()
+                );
+        }
     }
 
 
     private void Start()
     {
-        BindCountryState();
+        TryBindCountryState();
         Refresh();
+
+        ValidateReferences();
     }
 
 
     private void OnDisable()
     {
+        if (bindRoutine != null)
+        {
+            StopCoroutine(bindRoutine);
+            bindRoutine = null;
+        }
+
         UnbindCountryState();
     }
 
 
-    private void BindCountryState()
+    private IEnumerator WaitForCountryState()
     {
-        if (countryState == CountryState.Instance)
+        while (countryState == null)
+        {
+            TryBindCountryState();
+
+            if (countryState != null)
+            {
+                Refresh();
+                break;
+            }
+
+            yield return null;
+        }
+
+        bindRoutine = null;
+    }
+
+
+    private void TryBindCountryState()
+    {
+        CountryState instance =
+            CountryState.Instance;
+
+        if (instance == null)
+        {
+            return;
+        }
+
+        if (countryState == instance)
         {
             return;
         }
 
         UnbindCountryState();
 
-        countryState = CountryState.Instance;
-
-        if (countryState != null)
-        {
-            countryState.OnStateChanged += Refresh;
-        }
+        countryState = instance;
+        countryState.OnStateChanged += Refresh;
     }
 
 
@@ -67,6 +112,42 @@ public class CountryHeaderUI : MonoBehaviour
         }
 
         countryState = null;
+    }
+
+
+    private void ValidateReferences()
+    {
+        if (leaderNameText == null)
+        {
+            Debug.LogWarning(
+                "CountryHeaderUI: Leader Name Text no está asignado en el Inspector.",
+                this
+            );
+        }
+
+        if (dateText == null)
+        {
+            Debug.LogWarning(
+                "CountryHeaderUI: Date Text no está asignado en el Inspector.",
+                this
+            );
+        }
+
+        if (countryFlagImage == null)
+        {
+            Debug.LogWarning(
+                "CountryHeaderUI: Country Flag Image no está asignada en el Inspector.",
+                this
+            );
+        }
+
+        if (countryMapImage == null)
+        {
+            Debug.LogWarning(
+                "CountryHeaderUI: Country Map Image no está asignada en el Inspector.",
+                this
+            );
+        }
     }
 
 
@@ -112,6 +193,36 @@ public class CountryHeaderUI : MonoBehaviour
         }
 
 
+        // BANDERA DEL PAÍS
+        if (
+            countryFlagImage != null &&
+            countryState.CurrentScenario != null &&
+            countryState.CurrentScenario.CountryFlag != null
+        )
+        {
+            countryFlagImage.sprite =
+                countryState.CurrentScenario.CountryFlag;
+
+            countryFlagImage.enabled = true;
+            countryFlagImage.preserveAspect = true;
+        }
+
+
+        // MAPA DEL PAÍS
+        if (
+            countryMapImage != null &&
+            countryState.CurrentScenario != null &&
+            countryState.CurrentScenario.CountryMap != null
+        )
+        {
+            countryMapImage.sprite =
+                countryState.CurrentScenario.CountryMap;
+
+            countryMapImage.enabled = true;
+            countryMapImage.preserveAspect = true;
+        }
+
+
         // TIPO DE ESTADO
         if (stateTypeText != null)
         {
@@ -129,6 +240,25 @@ public class CountryHeaderUI : MonoBehaviour
                 GetGovernmentSystemName(
                     countryState.GovernmentSystem
                 );
+        }
+
+
+        // FECHA
+        if (dateText != null)
+        {
+            int month = countryState.CurrentMonth;
+            int year = countryState.CurrentYear;
+
+            if (month >= 1 && month <= 12 && year > 0)
+            {
+                dateText.text =
+                    $"{GetMonthName(month)} de {year}";
+            }
+            else
+            {
+                dateText.text =
+                    string.Empty;
+            }
         }
 
 
@@ -166,6 +296,29 @@ public class CountryHeaderUI : MonoBehaviour
                 electionCountdownText.text =
                     $"{remainingTurns} turnos";
             }
+        }
+    }
+
+
+    private string GetMonthName(
+        int month
+    )
+    {
+        switch (month)
+        {
+            case 1: return "Enero";
+            case 2: return "Febrero";
+            case 3: return "Marzo";
+            case 4: return "Abril";
+            case 5: return "Mayo";
+            case 6: return "Junio";
+            case 7: return "Julio";
+            case 8: return "Agosto";
+            case 9: return "Septiembre";
+            case 10: return "Octubre";
+            case 11: return "Noviembre";
+            case 12: return "Diciembre";
+            default: return string.Empty;
         }
     }
 
