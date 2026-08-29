@@ -804,6 +804,48 @@ public class ElectionPollManager : MonoBehaviour
 
 
     // =========================================================
+    // RESET TRAS ELECCIONES
+    // =========================================================
+
+    /// <summary>
+    /// Reinicia las gráficas de encuestas conservando como primer punto
+    /// el último dato disponible de cada partido. La fecha no se toca.
+    /// </summary>
+    public void ResetHistoryKeepingLatest()
+    {
+        currentTurn = 0;
+
+        foreach (PollPartyData data in partyPollingData)
+        {
+            if (data == null)
+            {
+                continue;
+            }
+
+            float latest = data.currentPolling;
+
+            if (data.history != null && data.history.Count > 0)
+            {
+                latest = data.history[data.history.Count - 1];
+            }
+
+            data.currentPolling = latest;
+
+            if (data.history == null)
+            {
+                data.history = new List<float>();
+            }
+
+            data.history.Clear();
+            data.history.Add(latest);
+        }
+
+        SelectTopTrackedParties();
+        OnPollUpdated?.Invoke();
+    }
+
+
+    // =========================================================
     // DESTROY
     // =========================================================
 

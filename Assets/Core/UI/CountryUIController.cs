@@ -234,22 +234,22 @@ public class CountryUIController : MonoBehaviour
 
         SetText(
             fiscalResultText,
-            $"Resultado fiscal: {countryState.FiscalResult:+0.#;-0.#;0}"
+            $"Resultado fiscal: {countryState.FormattedFiscalResult}"
         );
 
         SetText(
             reservesText,
-            $"Reservas: {countryState.Reserves:0.#}"
+            $"Reservas: {countryState.FormattedReserves}"
         );
 
         SetText(
             debtText,
-            $"Deuda: {countryState.Debt:0.#}"
+            $"Deuda: {countryState.FormattedDebt}"
         );
 
         SetText(
             inflationText,
-            $"Inflación: {countryState.Inflation:0.#}%"
+            $"Inflación: {countryState.FormattedInflation}"
         );
 
         if (skipTurnButton != null)
@@ -432,16 +432,16 @@ public class CountryUIController : MonoBehaviour
 
             message =
                 $"Último turno: deuda amortizada " +
-                $"{countryState.LastDebtPayment:0.#} | " +
-                $"reservas añadidas {amountAddedToReserves:0.#}";
+                $"{CountryState.FormatCompactNumber(countryState.LastDebtPayment)} | " +
+                $"reservas añadidas {CountryState.FormatCompactNumber(amountAddedToReserves)}";
         }
         else
         {
             message =
                 $"Último turno: reservas utilizadas " +
-                $"{countryState.LastReservesUsed:0.#} | " +
-                $"deuda emitida {countryState.LastDebtIssued:0.#} | " +
-                $"dinero impreso {countryState.LastMoneyPrinted:0.#}";
+                $"{CountryState.FormatCompactNumber(countryState.LastReservesUsed)} | " +
+                $"deuda emitida {CountryState.FormatCompactNumber(countryState.LastDebtIssued)} | " +
+                $"dinero impreso {CountryState.FormatCompactNumber(countryState.LastMoneyPrinted)}";
         }
 
         SetText(lastFiscalResultText, message);

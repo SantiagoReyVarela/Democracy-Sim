@@ -18,12 +18,77 @@ public sealed class PolicyEffect
     [SerializeField]
     private CountryParameter parameter;
 
+    [Tooltip(
+        "Cantidad fija que se suma o resta al parámetro. " +
+        "Ejemplo: 500000 suma 500.000; -3 resta 3 puntos."
+    )]
+    [FormerlySerializedAs("amount")]
     [SerializeField]
-    private float amount;
+    private float absoluteAmount;
+
+    [Tooltip(
+        "Porcentaje del valor actual que se suma o resta. " +
+        "Ejemplo: 5 aumenta un 5%; -10 reduce un 10%. " +
+        "Puede combinarse con Absolute Amount."
+    )]
+    [SerializeField]
+    private float percentageModifier;
+
 
     public CountryParameter Parameter => parameter;
 
-    public float Amount => amount;
+    public float AbsoluteAmount => absoluteAmount;
+
+    public float PercentageModifier => percentageModifier;
+
+    public bool HasAbsoluteEffect =>
+        !Mathf.Approximately(absoluteAmount, 0f);
+
+    public bool HasPercentageEffect =>
+        !Mathf.Approximately(percentageModifier, 0f);
+
+
+    /// <summary>
+    /// Calcula cuánto cambia realmente el parámetro partiendo de
+    /// su valor actual.
+    ///
+    /// Ejemplo:
+    /// valor actual = 1.000.000
+    /// porcentaje = +5
+    /// absoluto = +100.000
+    /// cambio total = +150.000
+    /// resultado = 1.150.000
+    /// </summary>
+    public float CalculateDelta(float currentValue)
+    {
+        float percentageDelta =
+            currentValue *
+            (percentageModifier / 100f);
+
+        return percentageDelta + absoluteAmount;
+    }
+
+
+    /// <summary>
+    /// Calcula el valor final después de aplicar simultáneamente
+    /// el porcentaje y la cantidad absoluta.
+    /// </summary>
+    public float CalculateFinalValue(float currentValue)
+    {
+        return currentValue + CalculateDelta(currentValue);
+    }
+
+
+    /*
+     * Compatibilidad temporal con scripts antiguos que todavía
+     * consulten effect.Amount. Devuelve únicamente la parte absoluta,
+     * porque un porcentaje necesita conocer el valor actual para poder
+     * convertirse en una cantidad real.
+     */
+    [Obsolete(
+        "Utiliza AbsoluteAmount, PercentageModifier o CalculateDelta."
+    )]
+    public float Amount => absoluteAmount;
 
 
     /*
@@ -193,8 +258,10 @@ public class PolicyDefinitionSO : ScriptableObject
 
 
     /// <summary>
-    /// Suma todos los efectos de primer impacto
+    /// Suma las cantidades absolutas de primer impacto
     /// que afectan al parámetro indicado.
+    /// Los porcentajes se consultan por separado porque necesitan
+    /// conocer el valor actual del parámetro.
     /// </summary>
     public float GetTotalFirstImpactEffectOnParameter(
         CountryParameter parameter
@@ -217,7 +284,7 @@ public class PolicyDefinitionSO : ScriptableObject
                 effect.Parameter == parameter
             )
             {
-                totalEffect += effect.Amount;
+                totalEffect += effect.AbsoluteAmount;
             }
         }
 
@@ -226,8 +293,10 @@ public class PolicyDefinitionSO : ScriptableObject
 
 
     /// <summary>
-    /// Suma todos los modificadores permanentes
+    /// Suma las cantidades absolutas activas
     /// que afectan al parámetro indicado.
+    /// Los porcentajes se consultan por separado porque necesitan
+    /// conocer el valor actual del parámetro.
     /// </summary>
     public float GetTotalActiveEffectOnParameter(
         CountryParameter parameter
@@ -250,12 +319,78 @@ public class PolicyDefinitionSO : ScriptableObject
                 effect.Parameter == parameter
             )
             {
-                totalEffect += effect.Amount;
+                totalEffect += effect.AbsoluteAmount;
             }
         }
 
         return totalEffect;
     }
+
+    /// <summary>
+    /// Suma los porcentajes de primer impacto configurados para
+    /// el parámetro indicado. El valor 5 representa +5%.
+    /// </summary>
+    public float GetTotalFirstImpactPercentageOnParameter(
+        CountryParameter parameter
+    )
+    {
+        if (firstImpactEffects == null)
+        {
+            return 0f;
+        }
+
+        float totalPercentage = 0f;
+
+        foreach (
+            PolicyEffect effect
+            in firstImpactEffects
+        )
+        {
+            if (
+                effect != null &&
+                effect.Parameter == parameter
+            )
+            {
+                totalPercentage += effect.PercentageModifier;
+            }
+        }
+
+        return totalPercentage;
+    }
+
+
+    /// <summary>
+    /// Suma los porcentajes activos configurados para
+    /// el parámetro indicado. El valor 5 representa +5% por turno.
+    /// </summary>
+    public float GetTotalActivePercentageOnParameter(
+        CountryParameter parameter
+    )
+    {
+        if (activeEffects == null)
+        {
+            return 0f;
+        }
+
+        float totalPercentage = 0f;
+
+        foreach (
+            PolicyEffect effect
+            in activeEffects
+        )
+        {
+            if (
+                effect != null &&
+                effect.Parameter == parameter
+            )
+            {
+                totalPercentage += effect.PercentageModifier;
+            }
+        }
+
+        return totalPercentage;
+    }
+
 
 
 #if UNITY_EDITOR

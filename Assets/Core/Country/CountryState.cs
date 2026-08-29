@@ -65,8 +65,8 @@ public class CountryState : MonoBehaviour
     [SerializeField]
     private string countryName = "New Country";
 
-    [SerializeField, Min(1)]
-    private int currentTurn = 1;
+    [SerializeField, Min(0)]
+    private int currentTurn = 0;
 
     [SerializeField, Min(1)]
     private int maximumTurns = 48;
@@ -149,7 +149,7 @@ public class CountryState : MonoBehaviour
 
     [Header("Fiscal economy")]
 
-    [SerializeField, Range(-100f, 100f)]
+    [SerializeField]
     private float fiscalResult = -10f;
 
     [SerializeField, Min(0f)]
@@ -253,6 +253,9 @@ public class CountryState : MonoBehaviour
     public int MaximumTurns => maximumTurns;
     public bool HasReachedFinalTurn => currentTurn >= maximumTurns;
 
+    public int TurnsUntilElection =>
+        Mathf.Max(0, maximumTurns - currentTurn);
+
     public float Prosperity => prosperity;
     public float Equality => equality;
     public float Employment => employment;
@@ -353,7 +356,7 @@ public class CountryState : MonoBehaviour
         stability = ClampParameter(scenario.Stability);
         education = ClampParameter(scenario.Education);
 
-        currentTurn = 1;
+        currentTurn = 0;
 
         lastReservesUsed = 0f;
         lastDebtPayment = 0f;
@@ -733,6 +736,36 @@ public class CountryState : MonoBehaviour
 
 
     /// <summary>
+    /// Modifica un parámetro usando simultáneamente una cantidad absoluta
+    /// y un porcentaje de su valor actual.
+    ///
+    /// Ejemplo:
+    /// current = 1.000.000, absolute = 100.000, percentage = 5
+    /// resultado = 1.150.000.
+    /// </summary>
+    public void ModifyParameter(
+        CountryParameter parameter,
+        float absoluteAmount,
+        float percentageModifier
+    )
+    {
+        float currentValue =
+            GetBaseParameterValue(parameter);
+
+        float percentageDelta =
+            currentValue *
+            (percentageModifier / 100f);
+
+        ModifyParameterWithoutNotification(
+            parameter,
+            absoluteAmount + percentageDelta
+        );
+
+        NotifyStateChanged();
+    }
+
+
+    /// <summary>
     /// Método de compatibilidad con interfaces antiguas.
     /// Asigna la política al primer slot compatible vacío.
     /// </summary>
@@ -829,7 +862,14 @@ public class CountryState : MonoBehaviour
         }
 
 
-        // 7. Avisar a la interfaz
+        // 7. Comprobar si corresponde celebrar elecciones.
+        if (ElectionManager.Instance != null)
+        {
+            ElectionManager.Instance.TryTriggerElection();
+        }
+
+
+        // 8. Avisar a la interfaz
         NotifyStateChanged();
 
 
@@ -868,16 +908,29 @@ public class CountryState : MonoBehaviour
                     continue;
                 }
 
+                float currentValue =
+                    GetBaseParameterValue(
+                        effect.Parameter
+                    );
+
+                float appliedDelta =
+                    effect.CalculateDelta(
+                        currentValue
+                    );
+
                 ModifyParameterWithoutNotification(
                     effect.Parameter,
-                    effect.Amount
+                    appliedDelta
                 );
 
                 Debug.Log(
                     $"Active policy effect | " +
                     $"Policy: {slot.ActivePolicy.PolicyName} | " +
                     $"Parameter: {effect.Parameter} | " +
-                    $"Amount: {effect.Amount:+0.##;-0.##;0}"
+                    $"Current: {currentValue:0.##} | " +
+                    $"Absolute: {effect.AbsoluteAmount:+0.##;-0.##;0} | " +
+                    $"Percentage: {effect.PercentageModifier:+0.##;-0.##;0}% | " +
+                    $"Applied delta: {appliedDelta:+0.##;-0.##;0}"
                 );
             }
         }
@@ -1089,11 +1142,7 @@ public class CountryState : MonoBehaviour
                 break;
 
             case CountryParameter.FiscalResult:
-                fiscalResult = Mathf.Clamp(
-                    newValue,
-                    -100f,
-                    100f
-                );
+                fiscalResult = newValue;
                 break;
 
             case CountryParameter.Reserves:
@@ -1124,6 +1173,25 @@ public class CountryState : MonoBehaviour
                 );
                 break;
         }
+    }
+
+
+    /// <summary>
+    /// Inicia un nuevo ciclo electoral conservando el estado actual del país
+    /// y la fecha del escenario. El historial se reinicia dejando el estado
+    /// actual como primer snapshot de las nuevas gráficas.
+    /// </summary>
+    public void ResetElectionCycle(
+        int turnsUntilNextElection = 100
+    )
+    {
+        maximumTurns = Mathf.Max(1, turnsUntilNextElection);
+        currentTurn = 0;
+
+        history.Clear();
+        RecordSnapshot();
+
+        NotifyStateChanged();
     }
 
 
@@ -1164,7 +1232,7 @@ public class CountryState : MonoBehaviour
     {
         currentScenario = null;
 
-        currentTurn = 1;
+        currentTurn = 0;
 
         prosperity = ClampParameter(initialProsperity);
         equality = ClampParameter(initialEquality);
@@ -1172,11 +1240,7 @@ public class CountryState : MonoBehaviour
         education = ClampParameter(initialEducation);
         stability = ClampParameter(initialStability);
 
-        fiscalResult = Mathf.Clamp(
-            initialFiscalResult,
-            -100f,
-            100f
-        );
+        fiscalResult = initialFiscalResult;
 
         reserves = Mathf.Max(
             0f,
@@ -1618,9 +1682,29 @@ public class CountryState : MonoBehaviour
                 continue;
             }
 
+            float currentValue =
+                GetBaseParameterValue(
+                    effect.Parameter
+                );
+
+            float appliedDelta =
+                effect.CalculateDelta(
+                    currentValue
+                );
+
             ModifyParameterWithoutNotification(
                 effect.Parameter,
-                effect.Amount
+                appliedDelta
+            );
+
+            Debug.Log(
+                $"First impact policy effect | " +
+                $"Policy: {policy.PolicyName} | " +
+                $"Parameter: {effect.Parameter} | " +
+                $"Current: {currentValue:0.##} | " +
+                $"Absolute: {effect.AbsoluteAmount:+0.##;-0.##;0} | " +
+                $"Percentage: {effect.PercentageModifier:+0.##;-0.##;0}% | " +
+                $"Applied delta: {appliedDelta:+0.##;-0.##;0}"
             );
         }
     }
@@ -1642,26 +1726,43 @@ public class CountryState : MonoBehaviour
             return 0f;
         }
 
-        float totalPerTurnEffect = 0f;
+        float simulatedValue =
+            GetBaseParameterValue(parameter);
+
+        float initialValue = simulatedValue;
 
         foreach (PolicySlotState slot in policySlots)
         {
             if (
                 slot == null ||
-                slot.ActivePolicy == null
+                slot.ActivePolicy == null ||
+                slot.ActivePolicy.ActiveEffects == null
             )
             {
                 continue;
             }
 
-            totalPerTurnEffect +=
-                slot.ActivePolicy
-                    .GetTotalActiveEffectOnParameter(
-                        parameter
+            foreach (
+                PolicyEffect effect
+                in slot.ActivePolicy.ActiveEffects
+            )
+            {
+                if (
+                    effect == null ||
+                    effect.Parameter != parameter
+                )
+                {
+                    continue;
+                }
+
+                simulatedValue =
+                    effect.CalculateFinalValue(
+                        simulatedValue
                     );
+            }
         }
 
-        return totalPerTurnEffect;
+        return simulatedValue - initialValue;
     }
 
 
@@ -1764,7 +1865,7 @@ public class CountryState : MonoBehaviour
 
         currentTurn = Mathf.Clamp(
             currentTurn,
-            1,
+            0,
             maximumTurns
         );
 
@@ -1774,11 +1875,8 @@ public class CountryState : MonoBehaviour
         education = ClampParameter(education);
         stability = ClampParameter(stability);
 
-        fiscalResult = Mathf.Clamp(
-            fiscalResult,
-            -100f,
-            100f
-        );
+        // El resultado fiscal puede representar economías de cualquier tamaño,
+        // por lo que no se limita artificialmente al rango -100..100.
 
         reserves = Mathf.Max(
             0f,
