@@ -6,14 +6,23 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: fc3ca4e9beb333c4f8b2d102c298c7e2
+  - enabled: 1
+    path: Assets/Scenes/Campaign.unity
+    guid: d85c6dc3b5b02d444ac5e595995c2564
+  - enabled: 1
+    path: Assets/Scenes/CustomScenarios.unity
+    guid: 1d1b326b4dbb71943bba45c7667f8fd7
+  - enabled: 1
+    path: Assets/Scenes/SimulationManager.unity
+    guid: 196a61f2acc139149a47c066f68cd716
+  - enabled: 1
     path: Assets/Scenes/Economy.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
     path: Assets/Scenes/Country.unity
     guid: 56b3a4a8070f15d44b4f041b33428900
-  - enabled: 0
-    path: Assets/Scenes/Economy.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
     path: Assets/Scenes/Policies.unity
     guid: 395e0f0190747394f9cff8ccaf19819c
@@ -23,6 +32,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Election.unity
     guid: 77a1032cdd3a20d4e9ed81a8a09579e9
+  - enabled: 1
+    path: Assets/Scenes/Economy.unity
+    guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
