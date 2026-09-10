@@ -50,10 +50,17 @@ public class ScenarioLoader : MonoBehaviour
 
     private void Start()
     {
-        if (loadOnStart)
+        if (!loadOnStart)
         {
-            LoadScenario(scenarioToLoad);
+            return;
         }
+
+        GameScenarioSO scenario =
+            CampaignMenuManager.SelectedScenario != null
+                ? CampaignMenuManager.SelectedScenario
+                : scenarioToLoad;
+
+        LoadScenario(scenario);
     }
 
 
