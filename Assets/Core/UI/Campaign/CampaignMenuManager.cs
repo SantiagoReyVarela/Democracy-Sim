@@ -6,10 +6,6 @@ using UnityEngine.UI;
 
 public class CampaignMenuManager : MonoBehaviour
 {
-    // =========================================================
-    // ESCENARIOS DISPONIBLES
-    // =========================================================
-
     [Header("Available Scenarios")]
     [Tooltip(
         "Arrastra aquí todos los GameScenarioSO " +
@@ -19,11 +15,6 @@ public class CampaignMenuManager : MonoBehaviour
     private List<GameScenarioSO> availableScenarios =
         new List<GameScenarioSO>();
 
-
-    // =========================================================
-    // DROPDOWNS
-    // =========================================================
-
     [Header("Selection")]
     [SerializeField]
     private TMP_Dropdown countryDropdown;
@@ -31,10 +22,8 @@ public class CampaignMenuManager : MonoBehaviour
     [SerializeField]
     private TMP_Dropdown scenarioDropdown;
 
-
-    // =========================================================
-    // INFORMACIÓN DEL ESCENARIO
-    // =========================================================
+    [SerializeField]
+    private TMP_Dropdown leaderDropdown;
 
     [Header("Scenario Information")]
     [SerializeField]
@@ -64,58 +53,41 @@ public class CampaignMenuManager : MonoBehaviour
     [SerializeField]
     private Image countryFlagImage;
 
-
-    // =========================================================
-    // BOTONES
-    // =========================================================
-
     [Header("Buttons")]
     [SerializeField]
     private Button playButton;
 
-    [SerializeField]
-    private Button backButton;
-
-
-    // =========================================================
-    // ESCENAS
-    // =========================================================
-
     [Header("Scenes")]
     [Tooltip(
-        "Nombre exacto de la escena principal " +
-        "de simulación."
+        "Nombre exacto de la escena principal de simulación."
     )]
     [SerializeField]
-    private string simulationSceneName = "SimulationManager";
-
-    [Tooltip(
-        "Nombre exacto de la escena del menú principal."
-    )]
-    [SerializeField]
-    private string mainMenuSceneName = "MainMenu";
-
+    private string simulationSceneName = "Simulation Manager";
 
     // =========================================================
-    // SELECCIÓN ENTRE ESCENAS
+    // STATIC SELECTION
     // =========================================================
 
-    /*
-     * La referencia queda disponible cuando cambiamos
-     * desde Campaign hacia Simulation.
-     *
-     * ScenarioLoader podrá leer esta propiedad para saber
-     * qué escenario eligió el jugador.
-     */
     public static GameScenarioSO SelectedScenario
     {
         get;
         private set;
     }
 
+    public static ScenarioLeaderConfig SelectedLeader
+    {
+        get;
+        private set;
+    }
+
+    public static bool RandomLeaderSelection
+    {
+        get;
+        private set;
+    }
 
     // =========================================================
-    // ESTADO INTERNO
+    // INTERNAL DATA
     // =========================================================
 
     private readonly List<string> countries =
@@ -124,8 +96,12 @@ public class CampaignMenuManager : MonoBehaviour
     private readonly List<GameScenarioSO> filteredScenarios =
         new List<GameScenarioSO>();
 
-    private GameScenarioSO currentScenario;
+    private readonly List<ScenarioLeaderConfig> filteredLeaders =
+        new List<ScenarioLeaderConfig>();
 
+    private GameScenarioSO currentScenario;
+    private ScenarioLeaderConfig currentLeader;
+    private bool randomLeaderSelection = true;
 
     // =========================================================
     // UNITY
@@ -137,38 +113,33 @@ public class CampaignMenuManager : MonoBehaviour
         ConfigureDropdowns();
     }
 
-
     private void Start()
     {
         BuildCountryList();
     }
-
 
     private void OnDestroy()
     {
         RemoveListeners();
     }
 
-
     // =========================================================
-    // CONFIGURACIÓN
+    // LISTENERS
     // =========================================================
 
     private void ConfigureButtons()
     {
         if (playButton != null)
         {
-            playButton.onClick.RemoveListener(PlaySelectedScenario);
-            playButton.onClick.AddListener(PlaySelectedScenario);
-        }
+            playButton.onClick.RemoveListener(
+                PlaySelectedScenario
+            );
 
-        if (backButton != null)
-        {
-            backButton.onClick.RemoveListener(ReturnToMainMenu);
-            backButton.onClick.AddListener(ReturnToMainMenu);
+            playButton.onClick.AddListener(
+                PlaySelectedScenario
+            );
         }
     }
-
 
     private void ConfigureDropdowns()
     {
@@ -193,8 +164,18 @@ public class CampaignMenuManager : MonoBehaviour
                 OnScenarioChanged
             );
         }
-    }
 
+        if (leaderDropdown != null)
+        {
+            leaderDropdown.onValueChanged.RemoveListener(
+                OnLeaderChanged
+            );
+
+            leaderDropdown.onValueChanged.AddListener(
+                OnLeaderChanged
+            );
+        }
+    }
 
     private void RemoveListeners()
     {
@@ -212,24 +193,23 @@ public class CampaignMenuManager : MonoBehaviour
             );
         }
 
+        if (leaderDropdown != null)
+        {
+            leaderDropdown.onValueChanged.RemoveListener(
+                OnLeaderChanged
+            );
+        }
+
         if (playButton != null)
         {
             playButton.onClick.RemoveListener(
                 PlaySelectedScenario
             );
         }
-
-        if (backButton != null)
-        {
-            backButton.onClick.RemoveListener(
-                ReturnToMainMenu
-            );
-        }
     }
 
-
     // =========================================================
-    // PAÍSES
+    // COUNTRY
     // =========================================================
 
     private void BuildCountryList()
@@ -239,14 +219,10 @@ public class CampaignMenuManager : MonoBehaviour
         foreach (GameScenarioSO scenario in availableScenarios)
         {
             if (scenario == null)
-            {
                 continue;
-            }
 
             if (string.IsNullOrWhiteSpace(scenario.countryName))
-            {
                 continue;
-            }
 
             if (!countries.Contains(scenario.countryName))
             {
@@ -254,16 +230,13 @@ public class CampaignMenuManager : MonoBehaviour
             }
         }
 
-
         countries.Sort();
-
 
         if (countryDropdown != null)
         {
             countryDropdown.ClearOptions();
             countryDropdown.AddOptions(countries);
         }
-
 
         if (countries.Count > 0)
         {
@@ -277,6 +250,7 @@ public class CampaignMenuManager : MonoBehaviour
         else
         {
             ClearScenarioInformation();
+            ClearLeaderSelection();
 
             if (playButton != null)
             {
@@ -284,18 +258,15 @@ public class CampaignMenuManager : MonoBehaviour
             }
 
             Debug.LogWarning(
-                "[CampaignMenuManager] " +
-                "No hay escenarios disponibles."
+                "[CampaignMenuManager] No hay escenarios disponibles."
             );
         }
     }
-
 
     private void OnCountryChanged(int index)
     {
         SelectCountry(index);
     }
-
 
     private void SelectCountry(int index)
     {
@@ -313,22 +284,18 @@ public class CampaignMenuManager : MonoBehaviour
         BuildScenarioList(selectedCountry);
     }
 
-
     // =========================================================
-    // ESCENARIOS
+    // SCENARIOS
     // =========================================================
 
     private void BuildScenarioList(string countryName)
     {
         filteredScenarios.Clear();
 
-
         foreach (GameScenarioSO scenario in availableScenarios)
         {
             if (scenario == null)
-            {
                 continue;
-            }
 
             if (scenario.countryName == countryName)
             {
@@ -336,10 +303,6 @@ public class CampaignMenuManager : MonoBehaviour
             }
         }
 
-
-        /*
-         * Los escenarios se ordenan cronológicamente.
-         */
         filteredScenarios.Sort(
             (a, b) =>
             {
@@ -351,13 +314,11 @@ public class CampaignMenuManager : MonoBehaviour
                     return yearComparison;
                 }
 
-                return
-                    a.startMonth.CompareTo(
-                        b.startMonth
-                    );
+                return a.startMonth.CompareTo(
+                    b.startMonth
+                );
             }
         );
-
 
         if (scenarioDropdown != null)
         {
@@ -371,17 +332,13 @@ public class CampaignMenuManager : MonoBehaviour
                 in filteredScenarios
             )
             {
-                string displayName =
-                    BuildScenarioDropdownName(
-                        scenario
-                    );
-
-                names.Add(displayName);
+                names.Add(
+                    BuildScenarioDropdownName(scenario)
+                );
             }
 
             scenarioDropdown.AddOptions(names);
         }
-
 
         if (filteredScenarios.Count > 0)
         {
@@ -397,6 +354,7 @@ public class CampaignMenuManager : MonoBehaviour
             currentScenario = null;
 
             ClearScenarioInformation();
+            ClearLeaderSelection();
 
             if (playButton != null)
             {
@@ -404,7 +362,6 @@ public class CampaignMenuManager : MonoBehaviour
             }
         }
     }
-
 
     private string BuildScenarioDropdownName(
         GameScenarioSO scenario
@@ -426,12 +383,10 @@ public class CampaignMenuManager : MonoBehaviour
             $"{name} ({scenario.startYear})";
     }
 
-
     private void OnScenarioChanged(int index)
     {
         SelectScenario(index);
     }
-
 
     private void SelectScenario(int index)
     {
@@ -443,24 +398,114 @@ public class CampaignMenuManager : MonoBehaviour
             return;
         }
 
-
         currentScenario =
             filteredScenarios[index];
 
-
         UpdateScenarioInformation();
 
+        BuildLeaderList();
 
-        if (playButton != null)
+        UpdatePlayButtonState();
+    }
+
+    // =========================================================
+    // LEADERS
+    // =========================================================
+
+    private void BuildLeaderList()
+    {
+        filteredLeaders.Clear();
+        currentLeader = null;
+        randomLeaderSelection = true;
+
+        if (leaderDropdown != null)
+            leaderDropdown.ClearOptions();
+
+        if (currentScenario == null || currentScenario.availableLeaders == null)
         {
-            playButton.interactable =
-                currentScenario != null;
+            UpdatePlayButtonState();
+            return;
+        }
+
+        foreach (ScenarioLeaderConfig leader in currentScenario.availableLeaders)
+        {
+            if (leader == null || !leader.selectableByPlayer)
+                continue;
+
+            filteredLeaders.Add(leader);
+        }
+
+        List<string> leaderNames = new List<string>();
+        leaderNames.Add("Aleatorio");
+
+        foreach (ScenarioLeaderConfig leader in filteredLeaders)
+            leaderNames.Add(leader.GetDisplayName());
+
+        if (leaderDropdown != null)
+        {
+            leaderDropdown.AddOptions(leaderNames);
+            leaderDropdown.interactable = true;
+            leaderDropdown.SetValueWithoutNotify(0);
+        }
+
+        SelectLeader(0);
+    }
+
+    private void OnLeaderChanged(int index)
+    {
+        SelectLeader(index);
+    }
+
+    private void SelectLeader(int index)
+    {
+        if (index == 0)
+        {
+            currentLeader = null;
+            randomLeaderSelection = true;
+            UpdatePlayButtonState();
+
+            Debug.Log(
+                "[CampaignMenuManager] Selección de líder: Aleatorio"
+            );
+            return;
+        }
+
+        int leaderIndex = index - 1;
+
+        if (leaderIndex < 0 || leaderIndex >= filteredLeaders.Count)
+        {
+            currentLeader = null;
+            randomLeaderSelection = true;
+            UpdatePlayButtonState();
+            return;
+        }
+
+        currentLeader = filteredLeaders[leaderIndex];
+        randomLeaderSelection = false;
+
+        UpdatePlayButtonState();
+
+        Debug.Log(
+            "[CampaignMenuManager] " +
+            $"Líder seleccionado: {currentLeader.GetDisplayName()}"
+        );
+    }
+
+    private void ClearLeaderSelection()
+    {
+        filteredLeaders.Clear();
+        currentLeader = null;
+        randomLeaderSelection = true;
+
+        if (leaderDropdown != null)
+        {
+            leaderDropdown.ClearOptions();
+            leaderDropdown.interactable = false;
         }
     }
 
-
     // =========================================================
-    // INFORMACIÓN
+    // SCENARIO INFORMATION
     // =========================================================
 
     private void UpdateScenarioInformation()
@@ -471,20 +516,17 @@ public class CampaignMenuManager : MonoBehaviour
             return;
         }
 
-
         if (scenarioTitleText != null)
         {
             scenarioTitleText.text =
                 currentScenario.scenarioName;
         }
 
-
         if (countryNameText != null)
         {
             countryNameText.text =
                 currentScenario.countryName;
         }
-
 
         if (dateText != null)
         {
@@ -498,13 +540,11 @@ public class CampaignMenuManager : MonoBehaviour
                 currentScenario.startYear;
         }
 
-
         if (descriptionText != null)
         {
             descriptionText.text =
                 currentScenario.description;
         }
-
 
         if (politicalSituationText != null)
         {
@@ -512,13 +552,11 @@ public class CampaignMenuManager : MonoBehaviour
                 currentScenario.politicalSituation;
         }
 
-
         if (economicSituationText != null)
         {
             economicSituationText.text =
                 currentScenario.economicSituation;
         }
-
 
         if (governmentTypeText != null)
         {
@@ -526,13 +564,11 @@ public class CampaignMenuManager : MonoBehaviour
                 currentScenario.governmentType;
         }
 
-
         if (stateTypeText != null)
         {
             stateTypeText.text =
                 currentScenario.stateType;
         }
-
 
         if (countryFlagImage != null)
         {
@@ -544,11 +580,9 @@ public class CampaignMenuManager : MonoBehaviour
         }
     }
 
-
     private void ClearScenarioInformation()
     {
         currentScenario = null;
-
 
         if (scenarioTitleText != null)
             scenarioTitleText.text = "";
@@ -574,7 +608,6 @@ public class CampaignMenuManager : MonoBehaviour
         if (stateTypeText != null)
             stateTypeText.text = "";
 
-
         if (countryFlagImage != null)
         {
             countryFlagImage.sprite = null;
@@ -582,10 +615,19 @@ public class CampaignMenuManager : MonoBehaviour
         }
     }
 
+    // =========================================================
+    // PLAY BUTTON
+    // =========================================================
 
-    // =========================================================
-    // JUGAR
-    // =========================================================
+    private void UpdatePlayButtonState()
+    {
+        if (playButton == null)
+            return;
+
+        playButton.interactable =
+            currentScenario != null &&
+            (randomLeaderSelection || currentLeader != null);
+    }
 
     public void PlaySelectedScenario()
     {
@@ -599,10 +641,16 @@ public class CampaignMenuManager : MonoBehaviour
             return;
         }
 
-
         SelectedScenario =
             currentScenario;
 
+        RandomLeaderSelection =
+            randomLeaderSelection;
+
+        SelectedLeader =
+            randomLeaderSelection
+                ? null
+                : currentLeader;
 
         Debug.Log(
             "[CampaignMenuManager] " +
@@ -610,8 +658,18 @@ public class CampaignMenuManager : MonoBehaviour
             $"{SelectedScenario.scenarioName}"
         );
 
+        Debug.Log(
+            "[CampaignMenuManager] " +
+            (RandomLeaderSelection
+                ? "Líder seleccionado: Aleatorio"
+                : $"Líder seleccionado: {SelectedLeader.GetDisplayName()}")
+        );
 
-        if (string.IsNullOrWhiteSpace(simulationSceneName))
+        if (
+            string.IsNullOrWhiteSpace(
+                simulationSceneName
+            )
+        )
         {
             Debug.LogError(
                 "[CampaignMenuManager] " +
@@ -621,85 +679,43 @@ public class CampaignMenuManager : MonoBehaviour
             return;
         }
 
-
         SceneManager.LoadScene(
             simulationSceneName
         );
     }
 
-
     // =========================================================
-    // VOLVER
+    // STATIC RESET
     // =========================================================
 
-    public void ReturnToMainMenu()
+    public static void ClearSelection()
     {
         SelectedScenario = null;
-
-
-        if (string.IsNullOrWhiteSpace(mainMenuSceneName))
-        {
-            Debug.LogError(
-                "[CampaignMenuManager] " +
-                "No se ha definido la escena del menú principal."
-            );
-
-            return;
-        }
-
-
-        SceneManager.LoadScene(
-            mainMenuSceneName
-        );
+        SelectedLeader = null;
+        RandomLeaderSelection = false;
     }
 
-
     // =========================================================
-    // MESES
+    // DATE
     // =========================================================
 
     private string GetMonthName(int month)
     {
         switch (month)
         {
-            case 1:
-                return "Enero";
-
-            case 2:
-                return "Febrero";
-
-            case 3:
-                return "Marzo";
-
-            case 4:
-                return "Abril";
-
-            case 5:
-                return "Mayo";
-
-            case 6:
-                return "Junio";
-
-            case 7:
-                return "Julio";
-
-            case 8:
-                return "Agosto";
-
-            case 9:
-                return "Septiembre";
-
-            case 10:
-                return "Octubre";
-
-            case 11:
-                return "Noviembre";
-
-            case 12:
-                return "Diciembre";
-
-            default:
-                return "";
+            case 1: return "Enero";
+            case 2: return "Febrero";
+            case 3: return "Marzo";
+            case 4: return "Abril";
+            case 5: return "Mayo";
+            case 6: return "Junio";
+            case 7: return "Julio";
+            case 8: return "Agosto";
+            case 9: return "Septiembre";
+            case 10: return "Octubre";
+            case 11: return "Noviembre";
+            case 12: return "Diciembre";
+            default: return "";
         }
     }
 }

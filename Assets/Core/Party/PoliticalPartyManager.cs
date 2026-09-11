@@ -472,6 +472,10 @@ public class PoliticalPartyManager : MonoBehaviour
             GenerateRandomSeats();
         }
 
+        // Con líder concreto, su partido debe comenzar como primera fuerza.
+        // En modo Aleatorio se conserva el reparto natural.
+        EnsureSelectedLeaderPartyIsLargest();
+
 
         FormAutomaticGovernment();
 
@@ -1495,6 +1499,100 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
         return total;
+    }
+
+
+    // =========================================================
+    // GARANTIZAR PRIMERA FUERZA DEL LÍDER ELEGIDO
+    // =========================================================
+
+    private void EnsureSelectedLeaderPartyIsLargest()
+    {
+        if (
+            currentScenario == null ||
+            currentScenario.SelectedLeader == null ||
+            CampaignMenuManager.RandomLeaderSelection
+        )
+        {
+            return;
+        }
+
+        ScenarioLeaderRuntime selectedLeader =
+            currentScenario.SelectedLeader;
+
+        if (selectedLeader.Party == null)
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: el líder seleccionado no tiene " +
+                "un partido de escenario válido."
+            );
+            return;
+        }
+
+        PoliticalPartyState playerParty =
+            GetPartyStateByScenarioId(
+                selectedLeader.Party.ScenarioPartyId
+            );
+
+        if (playerParty == null)
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: no se encontró el partido " +
+                "parlamentario del líder seleccionado."
+            );
+            return;
+        }
+
+        while (true)
+        {
+            PoliticalPartyState largestOpponent = null;
+
+            foreach (PoliticalPartyState partyState in partyStates)
+            {
+                if (
+                    partyState == null ||
+                    partyState == playerParty
+                )
+                {
+                    continue;
+                }
+
+                if (
+                    largestOpponent == null ||
+                    partyState.seats > largestOpponent.seats
+                )
+                {
+                    largestOpponent = partyState;
+                }
+            }
+
+            if (
+                largestOpponent == null ||
+                playerParty.seats > largestOpponent.seats
+            )
+            {
+                break;
+            }
+
+            if (largestOpponent.seats <= minimumSeatsPerParty)
+            {
+                Debug.LogWarning(
+                    "PoliticalPartyManager: no hay suficientes escaños " +
+                    "transferibles para garantizar la primera fuerza."
+                );
+                break;
+            }
+
+            largestOpponent.seats--;
+            playerParty.seats++;
+        }
+
+        Debug.Log(
+            "PoliticalPartyManager: parlamento inicial ajustado para " +
+            $"'{selectedLeader.DisplayName}'. " +
+            $"{GetEffectivePartyName(playerParty)} queda como primera " +
+            $"fuerza con {playerParty.seats}/{TotalSeats} escaños."
+        );
     }
 
 
