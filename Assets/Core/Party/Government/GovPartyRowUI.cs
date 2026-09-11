@@ -15,7 +15,8 @@ public class GovPartyRowUI : MonoBehaviour
 
 
     public void Configure(
-        PoliticalPartyState partyState
+        PoliticalPartyState partyState,
+        PoliticalPartyManager politicalPartyManager
     )
     {
         if (
@@ -35,13 +36,17 @@ public class GovPartyRowUI : MonoBehaviour
         if (partyColor != null)
         {
             partyColor.color =
-                party.partyColor;
+                politicalPartyManager != null
+                    ? politicalPartyManager.GetEffectivePartyColor(partyState)
+                    : party.partyColor;
         }
 
         if (partyNameText != null)
         {
             partyNameText.text =
-                party.partyName;
+                politicalPartyManager != null
+                    ? politicalPartyManager.GetEffectivePartyName(partyState)
+                    : party.partyName;
         }
 
         if (seatsText != null)

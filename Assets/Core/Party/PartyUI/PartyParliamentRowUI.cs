@@ -31,7 +31,8 @@ public class PartyParliamentRowUI : MonoBehaviour
 
     public void Configure(
         PoliticalPartyState partyState,
-        int totalSeats
+        int totalSeats,
+        PoliticalPartyManager politicalPartyManager
     )
     {
         if (
@@ -54,7 +55,9 @@ public class PartyParliamentRowUI : MonoBehaviour
         if (partyNameText != null)
         {
             partyNameText.text =
-                party.partyName;
+                politicalPartyManager != null
+                    ? politicalPartyManager.GetEffectivePartyName(partyState)
+                    : party.partyName;
         }
 
 
@@ -63,7 +66,9 @@ public class PartyParliamentRowUI : MonoBehaviour
         if (ideologicalLineText != null)
         {
             ideologicalLineText.text =
-                party.IdeologicalLine;
+                politicalPartyManager != null
+                    ? politicalPartyManager.GetEffectivePartyIdeology(partyState)
+                    : party.IdeologicalLine;
         }
 
 
@@ -72,7 +77,9 @@ public class PartyParliamentRowUI : MonoBehaviour
         if (partyColorStripe != null)
         {
             partyColorStripe.color =
-                party.partyColor;
+                politicalPartyManager != null
+                    ? politicalPartyManager.GetEffectivePartyColor(partyState)
+                    : party.partyColor;
         }
 
 

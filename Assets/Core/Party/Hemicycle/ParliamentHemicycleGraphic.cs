@@ -199,7 +199,7 @@ public class ParliamentHemicycleGraphic : MaskableGraphic
                         partyState,
 
                     color =
-                        partyState.party.partyColor,
+                        manager.GetEffectivePartyColor(partyState),
 
                     seats =
                         partyState.seats,

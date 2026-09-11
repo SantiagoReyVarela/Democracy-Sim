@@ -176,11 +176,39 @@ public class CountryHeaderUI : MonoBehaviour
                 countryState.GovernmentLeader.Party != null
             )
             {
-                leaderPartyText.text =
-                    countryState.GovernmentLeader.Party.partyName;
+                PoliticalPartyManager politicalPartyManager =
+                    FindObjectOfType<PoliticalPartyManager>();
 
-                leaderPartyText.color =
-                    countryState.GovernmentLeader.Party.partyColor;
+                PoliticalPartyState governmentPartyState =
+                    politicalPartyManager != null
+                        ? politicalPartyManager.GovernmentLeader
+                        : null;
+
+                if (
+                    politicalPartyManager != null &&
+                    governmentPartyState != null
+                )
+                {
+                    leaderPartyText.text =
+                        politicalPartyManager.GetEffectivePartyName(
+                            governmentPartyState
+                        );
+
+                    leaderPartyText.color =
+                        politicalPartyManager.GetEffectivePartyColor(
+                            governmentPartyState
+                        );
+                }
+                else
+                {
+                    // Fallback por compatibilidad si el manager todavía
+                    // no está disponible durante la inicialización.
+                    leaderPartyText.text =
+                        countryState.GovernmentLeader.Party.partyName;
+
+                    leaderPartyText.color =
+                        countryState.GovernmentLeader.Party.partyColor;
+                }
             }
         }
 

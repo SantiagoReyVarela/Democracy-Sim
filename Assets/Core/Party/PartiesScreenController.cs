@@ -253,7 +253,8 @@ public class PartiesScreenController : MonoBehaviour
 
                 newRow.Configure(
                     partyState,
-                    totalSeats
+                    totalSeats,
+                    politicalPartyManager
                 );
 
 
@@ -381,7 +382,8 @@ public class PartiesScreenController : MonoBehaviour
 
 
                 newRow.Configure(
-                    partyState
+                    partyState,
+                    politicalPartyManager
                 );
 
 
@@ -441,7 +443,7 @@ public class PartiesScreenController : MonoBehaviour
             {
                 governmentLeaderText.text =
                     $"Leading Party: " +
-                    $"{leader.party.partyName}";
+                    $"{politicalPartyManager.GetEffectivePartyName(leader)}";
             }
             else
             {
@@ -623,7 +625,8 @@ public class PartiesScreenController : MonoBehaviour
 
 
             float partyPosition =
-                partyState.party.GetPosition(
+                politicalPartyManager.GetEffectivePartyPosition(
+                    partyState,
                     axis
                 );
 

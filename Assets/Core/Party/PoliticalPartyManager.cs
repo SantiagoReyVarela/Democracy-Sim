@@ -469,12 +469,8 @@ public class PoliticalPartyManager : MonoBehaviour
 
         if (generateRandomParliament)
         {
-            GenerateRandomSeats();
+            GenerateLeaderBasedParliament();
         }
-
-        // Con líder concreto, su partido debe comenzar como primera fuerza.
-        // En modo Aleatorio se conserva el reparto natural.
-        EnsureSelectedLeaderPartyIsLargest();
 
 
         FormAutomaticGovernment();
@@ -1099,6 +1095,185 @@ public class PoliticalPartyManager : MonoBehaviour
                 leaderLabel
             );
         }
+    }
+
+
+    // =========================================================
+    // GENERAR PARLAMENTO SEGÚN EL LÍDER ELEGIDO
+    // =========================================================
+
+    private void GenerateLeaderBasedParliament()
+    {
+        if (
+            partyStates == null ||
+            partyStates.Count == 0
+        )
+        {
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // ESTE SISTEMA SIMPLIFICADO ESTÁ PENSADO PARA
+        // ESCENARIOS DE DOS PARTIDOS / DOS CANDIDATOS.
+        // -----------------------------------------------------
+
+        if (partyStates.Count != 2)
+        {
+            Debug.LogWarning(
+                "PoliticalPartyManager: el reparto simplificado por líder " +
+                "requiere exactamente 2 partidos. Se usará el generador " +
+                "aleatorio anterior como respaldo."
+            );
+
+            GenerateRandomSeats();
+            return;
+        }
+
+
+        PoliticalPartyState winnerParty = null;
+        PoliticalPartyState loserParty = null;
+
+
+        // -----------------------------------------------------
+        // 1. LÍDER CONCRETO ELEGIDO POR EL JUGADOR
+        // -----------------------------------------------------
+
+        if (
+            currentScenario != null &&
+            currentScenario.SelectedLeader != null &&
+            currentScenario.SelectedLeader.Party != null
+        )
+        {
+            winnerParty =
+                GetPartyStateByScenarioId(
+                    currentScenario.SelectedLeader.Party.ScenarioPartyId
+                );
+
+
+            if (winnerParty != null)
+            {
+                loserParty =
+                    partyStates[0] == winnerParty
+                        ? partyStates[1]
+                        : partyStates[0];
+            }
+        }
+
+
+        // -----------------------------------------------------
+        // 2. MODO ALEATORIO
+        // -----------------------------------------------------
+        // Si todavía no hay líder seleccionado, elegimos al azar
+        // cuál de los dos partidos gana. ScenarioLoader elegirá
+        // después un líder jugable del partido que forme gobierno.
+
+        if (winnerParty == null)
+        {
+            int winnerIndex =
+                Random.Range(
+                    0,
+                    partyStates.Count
+                );
+
+            winnerParty =
+                partyStates[winnerIndex];
+
+            loserParty =
+                partyStates[
+                    winnerIndex == 0
+                        ? 1
+                        : 0
+                ];
+        }
+
+
+        if (
+            winnerParty == null ||
+            loserParty == null
+        )
+        {
+            Debug.LogError(
+                "PoliticalPartyManager: no se pudo determinar " +
+                "ganador y rival para el parlamento inicial."
+            );
+
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // 3. PORCENTAJE DE VOTO
+        // -----------------------------------------------------
+        // El ganador recibe entre 50,1% y 60,0%.
+        // El rival recibe exactamente el resto.
+
+        float winnerVotePercentage =
+            Random.Range(
+                50.1f,
+                60.0001f
+            );
+
+        float loserVotePercentage =
+            100f -
+            winnerVotePercentage;
+
+
+        // Guardamos también estos porcentajes como popularidad inicial,
+        // para que el estado de los partidos coincida con el Congreso.
+
+        winnerParty.popularity =
+            winnerVotePercentage;
+
+        loserParty.popularity =
+            loserVotePercentage;
+
+
+        // -----------------------------------------------------
+        // 4. CONVERTIR PORCENTAJE A ESCAÑOS
+        // -----------------------------------------------------
+
+        int winnerSeats =
+            Mathf.RoundToInt(
+                parliamentSeatCount *
+                winnerVotePercentage /
+                100f
+            );
+
+        winnerSeats =
+            Mathf.Clamp(
+                winnerSeats,
+                0,
+                parliamentSeatCount
+            );
+
+        int loserSeats =
+            parliamentSeatCount -
+            winnerSeats;
+
+
+        winnerParty.seats =
+            winnerSeats;
+
+        loserParty.seats =
+            loserSeats;
+
+
+        Debug.Log(
+            "=== PARLAMENTO INICIAL BASADO EN EL LÍDER ==="
+        );
+
+        Debug.Log(
+            $"{GetEffectivePartyName(winnerParty)} | " +
+            $"Voto: {winnerVotePercentage:F1}% | " +
+            $"Escaños: {winnerSeats}/{parliamentSeatCount}"
+        );
+
+        Debug.Log(
+            $"{GetEffectivePartyName(loserParty)} | " +
+            $"Voto: {loserVotePercentage:F1}% | " +
+            $"Escaños: {loserSeats}/{parliamentSeatCount}"
+        );
     }
 
 
