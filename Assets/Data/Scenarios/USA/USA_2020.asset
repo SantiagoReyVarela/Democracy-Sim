@@ -12,96 +12,104 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cc17026250bf6340883fc64926d75b8, type: 3}
   m_Name: USA_2020
   m_EditorClassIdentifier: Assembly-CSharp::GameScenarioSO
-  scenarioId: USA_1796
-  scenarioName: Estados Unidos - 1796
-  description: "La primera elecci\xF3n presidencial verdaderamente competitiva de
-    la historia de Estados Unidos."
+  scenarioId: USA_2020
+  scenarioName: Estados Unidos - 2020
+  description: "Estados Unidos celebra sus elecciones presidenciales en medio de
+    la pandemia de COVID-19, una grave crisis econ\xF3mica y una intensa polarizaci\xF3n
+    pol\xEDtica. El presidente republicano Donald Trump busca un segundo mandato
+    defendiendo su pol\xEDtica econ\xF3mica, migratoria y nacionalista, mientras
+    el dem\xF3crata Joe Biden promete contener la pandemia, recuperar la econom\xEDa
+    y restaurar una l\xEDnea pol\xEDtica m\xE1s moderada e institucional"
   countryName: Estados Unidos
-  countryFlag: {fileID: 0}
-  stateType: Estado Federal
+  countryFlag: {fileID: 2543279097530367353, guid: 5edb47c13fb202e46922d4f25c77c156, type: 3}
+  countryMap: {fileID: 4947700601781519916, guid: 12ad4ac596a9afb4693210b248bc6e17, type: 3}
+  stateType: Estado federal
   governmentType: Republica presidencial
-  startYear: 1796
+  startYear: 2020
   startMonth: 11
-  politicalSituation: "Estados Unidos afronta la primera elecci\xF3n presidencial
-    verdaderamente competitiva de su historia tras la decisi\xF3n de George Washington
-    de abandonar el poder. El joven sistema pol\xEDtico se est\xE1 dividiendo entre
-    federalistas, partidarios de un gobierno federal fuerte, y dem\xF3crata-republicanos,
-    defensores de una mayor autonom\xEDa de los estados. La pol\xEDtica exterior
-    tambi\xE9n divide al pa\xEDs entre quienes favorecen unas relaciones estrechas
-    con Gran Breta\xF1a y quienes simpatizan con la Francia revolucionaria."
-  economicSituation: "La joven rep\xFAblica atraviesa una etapa de consolidaci\xF3n
-    financiera y expansi\xF3n comercial. Las reformas impulsadas durante la presidencia
-    de Washington han fortalecido el cr\xE9dito federal y establecido el Banco de
-    los Estados Unidos, aunque la deuda heredada de la Revoluci\xF3n contin\xFAa
-    siendo muy elevada. Los ingresos federales dependen principalmente de los aranceles
-    aduaneros y, en 1796, las cuentas p\xFAblicas registran un importante super\xE1vit."
+  politicalSituation: "La sociedad estadounidense se encuentra profundamente polarizada.
+    La gesti\xF3n de la pandemia, las protestas tras la muerte de George Floyd, las
+    relaciones raciales, la inmigraci\xF3n, el Tribunal Supremo y el papel de Estados
+    Unidos en el mundo dominan el debate. Biden presenta su candidatura como una
+    recuperaci\xF3n de la estabilidad institucional, mientras Trump defiende continuar
+    su programa \xABAmerica First\xBB."
+  economicSituation: "La pandemia ha interrumpido bruscamente la expansi\xF3n econ\xF3mica
+    anterior. Los confinamientos y restricciones provocaron una ca\xEDda hist\xF3rica
+    de la actividad y un r\xE1pido aumento del desempleo durante la primavera, aunque
+    para noviembre se encuentra en marcha una recuperaci\xF3n parcial. Las enormes
+    medidas federales de emergencia han disparado simult\xE1neamente el d\xE9ficit
+    y la deuda p\xFAblica."
   initialParameters:
-    inflation: 0.43
-    fiscalResult: 265000
-    reserves: 10000000
-    debt: 82000270
-    stability: 40
-    education: -25
+    inflation: 1.2
+    fiscalResult: -3.1319e+12
+    reserves: 1.9269e+12
+    debt: 2.69e+13
+    stability: 50
+    education: 82
   parties:
-  - party: {fileID: 11400000, guid: 90bce1ed737f3dc4a84590ce144537d6, type: 2}
-    scenarioPartyId: FED
+  - party: {fileID: 11400000, guid: ca12372d69a312840a6654d44b596f08, type: 2}
+    scenarioPartyId: DEM
     available: 1
     overridePartyData: 1
-    customName: Partido Federalista
-    customColor: {r: 0.045266207, g: 0, b: 0.6037736, a: 1}
-    customIdeology: Federalism
+    customName: "Partido Dem\xF3crata"
+    customColor: {r: 0.19215687, g: 0.36862746, b: 0.6784314, a: 1}
+    customIdeology: Liberalismo progresista
     ideologicalPositions:
       overrides:
       - axis: 0
-        position: 3
-      - axis: 3
-        position: 3
-    initialVoteShare: 51.1
-    useHistoricalTrend: 1
-    historicalTrendPerTurn: -0.1
-    minimumHistoricalSupport: 30
-    maximumHistoricalSupport: 65
-    economicCrisisSensitivity: 0
-    politicalInstabilitySensitivity: 0
-    inflationSensitivity: 0
-    unemploymentSensitivity: 0
-  - party: {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
-    scenarioPartyId: D-R
-    available: 1
-    overridePartyData: 1
-    customName: "Partido Dem\xF3crata-Republicano"
-    customColor: {r: 1, g: 0, b: 0, a: 1}
-    customIdeology: Republicanismo jeffersoniano
-    ideologicalPositions:
-      overrides:
+        position: 0
+      - axis: 6
+        position: 0
       - axis: 2
         position: 1
-      - axis: 3
-        position: 1
-    initialVoteShare: 48.9
-    useHistoricalTrend: 1
-    historicalTrendPerTurn: 0.1
-    minimumHistoricalSupport: 30
-    maximumHistoricalSupport: 70
-    economicCrisisSensitivity: 0
-    politicalInstabilitySensitivity: 0
-    inflationSensitivity: 0
-    unemploymentSensitivity: 0
+    initialVoteShare: 48.38
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 100
+    economicCrisisSensitivity: 1
+    politicalInstabilitySensitivity: 1
+    inflationSensitivity: 0.7
+    unemploymentSensitivity: 1
+  - party: {fileID: 11400000, guid: 90bce1ed737f3dc4a84590ce144537d6, type: 2}
+    scenarioPartyId: REP
+    available: 1
+    overridePartyData: 1
+    customName: Partido Republicano
+    customColor: {r: 0.764151, g: 0.16220188, b: 0.16220188, a: 1}
+    customIdeology: Conservadurismo nacional
+    ideologicalPositions:
+      overrides:
+      - axis: 0
+        position: -2
+      - axis: 2
+        position: 3
+      - axis: 2
+        position: 3
+      - axis: 1
+        position: 3
+    initialVoteShare: 46.85
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 100
+    economicCrisisSensitivity: 0.7
+    politicalInstabilitySensitivity: 1.2
+    inflationSensitivity: 0.5
+    unemploymentSensitivity: 0.8
   availableLeaders:
-  - leader: {fileID: 11400000, guid: 574b2d05d33034d4f9f4c5ebde8c01c4, type: 2}
+  - leader: {fileID: 11400000, guid: 015ac32765a17ec49ac46eb26aae1ec6, type: 2}
     selectableByPlayer: 1
-    scenarioPartyId: FED
+    scenarioPartyId: DEM
     overrideLeaderData: 0
     customName: 
     customPortrait: {fileID: 0}
     parameterOverrides: []
     ownPartyVoteModifier: 0
-    voteModifiers:
-    - scenarioPartyId: 
-      voteChange: 0
-  - leader: {fileID: 11400000, guid: 47e5c8b387f6eb94ebfe0068e3c60474, type: 2}
+    voteModifiers: []
+  - leader: {fileID: 11400000, guid: ed8510bd9e5dde843aaa7b0f8de07e39, type: 2}
     selectableByPlayer: 1
-    scenarioPartyId: D-R
+    scenarioPartyId: REP
     overrideLeaderData: 0
     customName: 
     customPortrait: {fileID: 0}
@@ -111,8 +119,8 @@ MonoBehaviour:
   policySlots:
     economySlots: 2
     governmentSlots: 2
-    immigrationSlots: 1
+    immigrationSlots: 0
     militarySlots: 1
     religionSlots: 1
     socialSlots: 1
-    tradeSlots: 1
+    tradeSlots: 2

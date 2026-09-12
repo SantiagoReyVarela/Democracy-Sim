@@ -1114,30 +1114,13 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
         // -----------------------------------------------------
-        // ESTE SISTEMA SIMPLIFICADO ESTÁ PENSADO PARA
-        // ESCENARIOS DE DOS PARTIDOS / DOS CANDIDATOS.
-        // -----------------------------------------------------
-
-        if (partyStates.Count != 2)
-        {
-            Debug.LogWarning(
-                "PoliticalPartyManager: el reparto simplificado por líder " +
-                "requiere exactamente 2 partidos. Se usará el generador " +
-                "aleatorio anterior como respaldo."
-            );
-
-            GenerateRandomSeats();
-            return;
-        }
-
-
-        PoliticalPartyState winnerParty = null;
-        PoliticalPartyState loserParty = null;
-
-
-        // -----------------------------------------------------
         // 1. LÍDER CONCRETO ELEGIDO POR EL JUGADOR
         // -----------------------------------------------------
+        // Si existe un líder seleccionado, su partido recibe SIEMPRE
+        // entre el 51,0% y el 60,0% del voto, independientemente del
+        // número total de partidos del escenario.
+
+        PoliticalPartyState winnerParty = null;
 
         if (
             currentScenario != null &&
@@ -1149,48 +1132,53 @@ public class PoliticalPartyManager : MonoBehaviour
                 GetPartyStateByScenarioId(
                     currentScenario.SelectedLeader.Party.ScenarioPartyId
                 );
-
-
-            if (winnerParty != null)
-            {
-                loserParty =
-                    partyStates[0] == winnerParty
-                        ? partyStates[1]
-                        : partyStates[0];
-            }
         }
 
 
-        // -----------------------------------------------------
-        // 2. MODO ALEATORIO
-        // -----------------------------------------------------
-        // Si todavía no hay líder seleccionado, elegimos al azar
-        // cuál de los dos partidos gana. ScenarioLoader elegirá
-        // después un líder jugable del partido que forme gobierno.
-
-        if (winnerParty == null)
+        if (winnerParty != null)
         {
-            int winnerIndex =
-                Random.Range(
-                    0,
-                    partyStates.Count
-                );
+            GenerateSelectedLeaderMajority(
+                winnerParty
+            );
 
-            winnerParty =
-                partyStates[winnerIndex];
-
-            loserParty =
-                partyStates[
-                    winnerIndex == 0
-                        ? 1
-                        : 0
-                ];
+            return;
         }
+
+
+        // -----------------------------------------------------
+        // 2. MODO ALEATORIO / SIN LÍDER CONCRETO
+        // -----------------------------------------------------
+        // Conservamos el comportamiento anterior:
+        // - con dos partidos, uno de ellos gana entre 51% y 60%;
+        // - con más de dos partidos, se usa el generador general.
+
+        if (partyStates.Count != 2)
+        {
+            GenerateRandomSeats();
+            return;
+        }
+
+
+        int randomWinnerIndex =
+            Random.Range(
+                0,
+                partyStates.Count
+            );
+
+        PoliticalPartyState randomWinner =
+            partyStates[randomWinnerIndex];
+
+        PoliticalPartyState randomLoser =
+            partyStates[
+                randomWinnerIndex == 0
+                    ? 1
+                    : 0
+            ];
 
 
         if (
-            winnerParty == null ||
-            loserParty == null
+            randomWinner == null ||
+            randomLoser == null
         )
         {
             Debug.LogError(
@@ -1202,35 +1190,198 @@ public class PoliticalPartyManager : MonoBehaviour
         }
 
 
+        float randomWinnerPercentage =
+            Random.Range(
+                510,
+                601
+            ) / 10f;
+
+        float randomLoserPercentage =
+            100f -
+            randomWinnerPercentage;
+
+
+        randomWinner.popularity =
+            randomWinnerPercentage;
+
+        randomLoser.popularity =
+            randomLoserPercentage;
+
+
+        int randomWinnerSeats =
+            Mathf.RoundToInt(
+                parliamentSeatCount *
+                randomWinnerPercentage /
+                100f
+            );
+
+        randomWinnerSeats =
+            Mathf.Clamp(
+                randomWinnerSeats,
+                0,
+                parliamentSeatCount
+            );
+
+        randomWinner.seats =
+            randomWinnerSeats;
+
+        randomLoser.seats =
+            parliamentSeatCount -
+            randomWinnerSeats;
+
+
+        Debug.Log(
+            "=== PARLAMENTO INICIAL ALEATORIO ==="
+        );
+
+        Debug.Log(
+            $"{GetEffectivePartyName(randomWinner)} | " +
+            $"Voto: {randomWinnerPercentage:F1}% | " +
+            $"Escaños: {randomWinner.seats}/{parliamentSeatCount}"
+        );
+
+        Debug.Log(
+            $"{GetEffectivePartyName(randomLoser)} | " +
+            $"Voto: {randomLoserPercentage:F1}% | " +
+            $"Escaños: {randomLoser.seats}/{parliamentSeatCount}"
+        );
+    }
+
+
+    // =========================================================
+    // MAYORÍA DEL PARTIDO DEL LÍDER SELECCIONADO
+    // =========================================================
+
+    private void GenerateSelectedLeaderMajority(
+        PoliticalPartyState winnerParty
+    )
+    {
+        if (
+            winnerParty == null ||
+            partyStates == null ||
+            partyStates.Count == 0
+        )
+        {
+            return;
+        }
+
+
+        // Caso excepcional: escenario con un único partido.
+
+        if (partyStates.Count == 1)
+        {
+            winnerParty.popularity = 100f;
+            winnerParty.seats = parliamentSeatCount;
+            return;
+        }
+
+
         // -----------------------------------------------------
-        // 3. PORCENTAJE DE VOTO
+        // 1. GUARDAR LOS PESOS HISTÓRICOS DE LOS RIVALES
         // -----------------------------------------------------
-        // El ganador recibe entre 50,1% y 60,0%.
-        // El rival recibe exactamente el resto.
+        // Antes de modificar la popularidad, usamos la popularidad
+        // inicial cargada desde VoteShare como peso para repartir
+        // proporcionalmente el porcentaje restante.
+
+        Dictionary<PoliticalPartyState, float> opponentWeights =
+            new Dictionary<PoliticalPartyState, float>();
+
+        float totalOpponentWeight =
+            0f;
+
+
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
+        {
+            if (
+                partyState == null ||
+                partyState == winnerParty
+            )
+            {
+                continue;
+            }
+
+
+            float weight =
+                Mathf.Max(
+                    0f,
+                    partyState.popularity
+                );
+
+
+            opponentWeights[
+                partyState
+            ] =
+                weight;
+
+
+            totalOpponentWeight +=
+                weight;
+        }
+
+
+        // Si todos los rivales tienen peso 0, los tratamos por igual.
+
+        bool useEqualOpponentWeights =
+            totalOpponentWeight <= 0f;
+
+
+        if (useEqualOpponentWeights)
+        {
+            totalOpponentWeight =
+                opponentWeights.Count;
+        }
+
+
+        // -----------------------------------------------------
+        // 2. PORCENTAJE DEL PARTIDO DEL JUGADOR
+        // -----------------------------------------------------
+        // Valores exactos de una décima: 51,0% ... 60,0%.
 
         float winnerVotePercentage =
             Random.Range(
-                50.1f,
-                60.0001f
-            );
+                510,
+                601
+            ) / 10f;
 
-        float loserVotePercentage =
+        float remainingVotePercentage =
             100f -
             winnerVotePercentage;
 
 
-        // Guardamos también estos porcentajes como popularidad inicial,
-        // para que el estado de los partidos coincida con el Congreso.
-
         winnerParty.popularity =
             winnerVotePercentage;
 
-        loserParty.popularity =
-            loserVotePercentage;
+
+        // -----------------------------------------------------
+        // 3. REPARTIR EL RESTO DEL VOTO ENTRE LOS RIVALES
+        // -----------------------------------------------------
+
+        foreach (
+            KeyValuePair<PoliticalPartyState, float> entry
+            in opponentWeights
+        )
+        {
+            PoliticalPartyState opponent =
+                entry.Key;
+
+            float weight =
+                useEqualOpponentWeights
+                    ? 1f
+                    : entry.Value;
+
+
+            opponent.popularity =
+                remainingVotePercentage *
+                weight /
+                totalOpponentWeight;
+        }
 
 
         // -----------------------------------------------------
-        // 4. CONVERTIR PORCENTAJE A ESCAÑOS
+        // 4. CONVERTIR VOTO A ESCAÑOS
         // -----------------------------------------------------
 
         int winnerSeats =
@@ -1247,35 +1398,146 @@ public class PoliticalPartyManager : MonoBehaviour
                 parliamentSeatCount
             );
 
-        int loserSeats =
-            parliamentSeatCount -
-            winnerSeats;
-
 
         winnerParty.seats =
             winnerSeats;
 
-        loserParty.seats =
-            loserSeats;
 
+        int remainingSeats =
+            parliamentSeatCount -
+            winnerSeats;
+
+
+        // Método de restos mayores para que el total sea EXACTAMENTE
+        // parliamentSeatCount sin favorecer siempre al último partido.
+
+        Dictionary<PoliticalPartyState, float> seatRemainders =
+            new Dictionary<PoliticalPartyState, float>();
+
+        int assignedOpponentSeats =
+            0;
+
+
+        foreach (
+            KeyValuePair<PoliticalPartyState, float> entry
+            in opponentWeights
+        )
+        {
+            PoliticalPartyState opponent =
+                entry.Key;
+
+            float exactSeats =
+                remainingSeats *
+                opponent.popularity /
+                remainingVotePercentage;
+
+
+            int baseSeats =
+                Mathf.FloorToInt(
+                    exactSeats
+                );
+
+
+            opponent.seats =
+                baseSeats;
+
+            assignedOpponentSeats +=
+                baseSeats;
+
+            seatRemainders[
+                opponent
+            ] =
+                exactSeats -
+                baseSeats;
+        }
+
+
+        int seatsLeft =
+            remainingSeats -
+            assignedOpponentSeats;
+
+
+        while (
+            seatsLeft > 0 &&
+            seatRemainders.Count > 0
+        )
+        {
+            PoliticalPartyState bestParty =
+                null;
+
+            float bestRemainder =
+                float.MinValue;
+
+
+            foreach (
+                KeyValuePair<PoliticalPartyState, float> entry
+                in seatRemainders
+            )
+            {
+                if (entry.Value > bestRemainder)
+                {
+                    bestRemainder =
+                        entry.Value;
+
+                    bestParty =
+                        entry.Key;
+                }
+            }
+
+
+            if (bestParty == null)
+            {
+                break;
+            }
+
+
+            bestParty.seats++;
+
+            // Evita otorgarle dos veces el mismo resto antes de
+            // haber considerado a los demás.
+            seatRemainders[
+                bestParty
+            ] =
+                -1f;
+
+            seatsLeft--;
+        }
+
+
+        // -----------------------------------------------------
+        // 5. DEBUG
+        // -----------------------------------------------------
 
         Debug.Log(
-            "=== PARLAMENTO INICIAL BASADO EN EL LÍDER ==="
+            "=== PARLAMENTO INICIAL BASADO EN EL LÍDER SELECCIONADO ==="
         );
 
-        Debug.Log(
-            $"{GetEffectivePartyName(winnerParty)} | " +
-            $"Voto: {winnerVotePercentage:F1}% | " +
-            $"Escaños: {winnerSeats}/{parliamentSeatCount}"
-        );
 
-        Debug.Log(
-            $"{GetEffectivePartyName(loserParty)} | " +
-            $"Voto: {loserVotePercentage:F1}% | " +
-            $"Escaños: {loserSeats}/{parliamentSeatCount}"
-        );
+        foreach (
+            PoliticalPartyState partyState
+            in partyStates
+        )
+        {
+            if (partyState == null)
+            {
+                continue;
+            }
+
+
+            string playerLabel =
+                partyState == winnerParty
+                    ? " | PARTIDO DEL JUGADOR"
+                    : string.Empty;
+
+
+            Debug.Log(
+                $"{GetEffectivePartyName(partyState)} | " +
+                $"Voto: {partyState.popularity:F1}% | " +
+                $"Escaños: {partyState.seats}/{parliamentSeatCount}" +
+                playerLabel
+            );
+        }
     }
-
 
     // =========================================================
     // GENERAR ESCAÑOS

@@ -171,43 +171,21 @@ public class CountryHeaderUI : MonoBehaviour
                     countryState.GovernmentLeader.LeaderName;
             }
 
-            if (
-                leaderPartyText != null &&
-                countryState.GovernmentLeader.Party != null
-            )
+            ScenarioLeaderRuntime selectedLeader =
+                countryState.CurrentScenario != null
+                    ? countryState.CurrentScenario.SelectedLeader
+                    : null;
+
+            if (leaderPartyText != null)
             {
-                PoliticalPartyManager politicalPartyManager =
-                    FindObjectOfType<PoliticalPartyManager>();
-
-                PoliticalPartyState governmentPartyState =
-                    politicalPartyManager != null
-                        ? politicalPartyManager.GovernmentLeader
-                        : null;
-
-                if (
-                    politicalPartyManager != null &&
-                    governmentPartyState != null
-                )
+                if (selectedLeader != null && selectedLeader.Party != null)
                 {
-                    leaderPartyText.text =
-                        politicalPartyManager.GetEffectivePartyName(
-                            governmentPartyState
-                        );
-
-                    leaderPartyText.color =
-                        politicalPartyManager.GetEffectivePartyColor(
-                            governmentPartyState
-                        );
+                    leaderPartyText.text = selectedLeader.Party.DisplayName;
+                    leaderPartyText.color = selectedLeader.Party.DisplayColor;
                 }
                 else
                 {
-                    // Fallback por compatibilidad si el manager todavía
-                    // no está disponible durante la inicialización.
-                    leaderPartyText.text =
-                        countryState.GovernmentLeader.Party.partyName;
-
-                    leaderPartyText.color =
-                        countryState.GovernmentLeader.Party.partyColor;
+                    leaderPartyText.text = string.Empty;
                 }
             }
         }

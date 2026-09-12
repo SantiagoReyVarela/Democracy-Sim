@@ -4632,6 +4632,14 @@ MonoBehaviour:
   availableScenarios:
   - {fileID: 11400000, guid: bbc4a3368b5066840bdba512ff926af0, type: 2}
   - {fileID: 11400000, guid: 249d38664ed384647953d8e1cf9a1cae, type: 2}
+  - {fileID: 11400000, guid: 7a54af4d1672cfe4d86990cbe4822d82, type: 2}
+  - {fileID: 11400000, guid: f4854c564828e0a4f88553f5cc2cd3d1, type: 2}
+  - {fileID: 11400000, guid: 96ab69cfa7167724e9a5a3b0d0f4f767, type: 2}
+  - {fileID: 11400000, guid: b6cc81f9aad05f64bbd68184d97116f8, type: 2}
+  - {fileID: 11400000, guid: 3afc1c09883378849aed9bd383d49236, type: 2}
+  - {fileID: 11400000, guid: 7e2fd110a4649a2498908385aafa0cac, type: 2}
+  - {fileID: 11400000, guid: 5df8f78bf99767c438f06f2db46224f4, type: 2}
+  - {fileID: 11400000, guid: 17f4d5ad2b4b55942a8dfe980916e6ef, type: 2}
   countryDropdown: {fileID: 1860272327}
   scenarioDropdown: {fileID: 1092448735}
   leaderDropdown: {fileID: 1490137528}

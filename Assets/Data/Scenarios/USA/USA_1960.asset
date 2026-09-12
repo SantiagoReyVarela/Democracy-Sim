@@ -12,96 +12,103 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cc17026250bf6340883fc64926d75b8, type: 3}
   m_Name: USA_1960
   m_EditorClassIdentifier: Assembly-CSharp::GameScenarioSO
-  scenarioId: USA_1796
-  scenarioName: Estados Unidos - 1796
-  description: "La primera elecci\xF3n presidencial verdaderamente competitiva de
-    la historia de Estados Unidos."
+  scenarioId: USA_1960
+  scenarioName: Estados Unidos - 1960
+  description: "Estados Unidos entra en una nueva d\xE9cada como una de las dos grandes
+    superpotencias mundiales. El vicepresidente republicano Richard Nixon intenta
+    suceder a Dwight D. Eisenhower, mientras el joven senador dem\xF3crata John F.
+    Kennedy promete una \xABNueva Frontera\xBB de crecimiento econ\xF3mico, reformas
+    sociales y renovaci\xF3n del liderazgo estadounidense frente a la Uni\xF3n Sovi\xE9tica."
   countryName: Estados Unidos
-  countryFlag: {fileID: 0}
-  stateType: Estado Federal
+  countryFlag: {fileID: 2543279097530367353, guid: 5edb47c13fb202e46922d4f25c77c156, type: 3}
+  countryMap: {fileID: 4947700601781519916, guid: 12ad4ac596a9afb4693210b248bc6e17, type: 3}
+  stateType: Estado federal
   governmentType: Republica presidencial
-  startYear: 1796
+  startYear: 1960
   startMonth: 11
-  politicalSituation: "Estados Unidos afronta la primera elecci\xF3n presidencial
-    verdaderamente competitiva de su historia tras la decisi\xF3n de George Washington
-    de abandonar el poder. El joven sistema pol\xEDtico se est\xE1 dividiendo entre
-    federalistas, partidarios de un gobierno federal fuerte, y dem\xF3crata-republicanos,
-    defensores de una mayor autonom\xEDa de los estados. La pol\xEDtica exterior
-    tambi\xE9n divide al pa\xEDs entre quienes favorecen unas relaciones estrechas
-    con Gran Breta\xF1a y quienes simpatizan con la Francia revolucionaria."
-  economicSituation: "La joven rep\xFAblica atraviesa una etapa de consolidaci\xF3n
-    financiera y expansi\xF3n comercial. Las reformas impulsadas durante la presidencia
-    de Washington han fortalecido el cr\xE9dito federal y establecido el Banco de
-    los Estados Unidos, aunque la deuda heredada de la Revoluci\xF3n contin\xFAa
-    siendo muy elevada. Los ingresos federales dependen principalmente de los aranceles
-    aduaneros y, en 1796, las cuentas p\xFAblicas registran un importante super\xE1vit."
+  politicalSituation: "La Guerra Fr\xEDa domina la pol\xEDtica exterior. La expansi\xF3n
+    sovi\xE9tica, la revoluci\xF3n cubana, Berl\xEDn y la carrera nuclear alimentan
+    la preocupaci\xF3n por la posici\xF3n internacional estadounidense. En pol\xEDtica
+    interior crece el movimiento por los derechos civiles y ambos partidos prometen
+    combatir la discriminaci\xF3n racial. Kennedy plantea una Administraci\xF3n federal
+    m\xE1s activa, mientras Nixon reivindica la prosperidad y estabilidad de los
+    a\xF1os de Eisenhower. Las plataformas de ambos partidos eran, de hecho, bastante
+    m\xE1s pr\xF3ximas en derechos civiles e inmigraci\xF3n de lo que podr\xEDa sugerir
+    la posterior evoluci\xF3n ideol\xF3gica de dem\xF3cratas y republicanos."
+  economicSituation: "Estados Unidos posee una econom\xEDa industrial enormemente
+    desarrollada y disfruta de niveles de prosperidad hist\xF3ricamente elevados.
+    Sin embargo, el crecimiento econ\xF3mico se ha ralentizado y durante 1960 comienza
+    una nueva recesi\xF3n. El desempleo est\xE1 aumentando y Kennedy critica el ritmo
+    de crecimiento de los a\xF1os de Eisenhower. Al mismo tiempo, las cuentas federales
+    acaban de recuperarse del gran d\xE9ficit de 1959 y el ejercicio fiscal de 1960
+    termina aproximadamente equilibrado."
   initialParameters:
-    inflation: 0.43
-    fiscalResult: 265000
-    reserves: 10000000
-    debt: 82000270
-    stability: 40
-    education: -25
+    inflation: 1.7
+    fiscalResult: 1.1e+9
+    reserves: 3.5e+9
+    debt: 2.863e+11
+    stability: 78
+    education: 55
   parties:
-  - party: {fileID: 11400000, guid: 90bce1ed737f3dc4a84590ce144537d6, type: 2}
-    scenarioPartyId: FED
+  - party: {fileID: 11400000, guid: ca12372d69a312840a6654d44b596f08, type: 2}
+    scenarioPartyId: DEM
     available: 1
     overridePartyData: 1
-    customName: Partido Federalista
-    customColor: {r: 0.045266207, g: 0, b: 0.6037736, a: 1}
-    customIdeology: Federalism
+    customName: "Partido Dem\xF3crata"
+    customColor: {r: 0.19215687, g: 0.36862746, b: 0.6784314, a: 1}
+    customIdeology: Liberalismo moderno
     ideologicalPositions:
       overrides:
       - axis: 0
-        position: 3
-      - axis: 3
-        position: 3
-    initialVoteShare: 51.1
-    useHistoricalTrend: 1
-    historicalTrendPerTurn: -0.1
-    minimumHistoricalSupport: 30
-    maximumHistoricalSupport: 65
-    economicCrisisSensitivity: 0
-    politicalInstabilitySensitivity: 0
-    inflationSensitivity: 0
-    unemploymentSensitivity: 0
-  - party: {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
-    scenarioPartyId: D-R
+        position: 1
+      - axis: 6
+        position: 2
+    initialVoteShare: 57.4
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 100
+    economicCrisisSensitivity: 1
+    politicalInstabilitySensitivity: 1
+    inflationSensitivity: 0.7
+    unemploymentSensitivity: 1
+  - party: {fileID: 11400000, guid: 4acc4cc062325a345b91eaa3f4c4b912, type: 2}
+    scenarioPartyId: REP
     available: 1
     overridePartyData: 1
-    customName: "Partido Dem\xF3crata-Republicano"
-    customColor: {r: 1, g: 0, b: 0, a: 1}
-    customIdeology: Republicanismo jeffersoniano
+    customName: Partido Republicano
+    customColor: {r: 0.764151, g: 0.16220188, b: 0.16220188, a: 1}
+    customIdeology: Republicanismo moderado
     ideologicalPositions:
       overrides:
-      - axis: 2
-        position: 1
-      - axis: 3
-        position: 1
-    initialVoteShare: 48.9
-    useHistoricalTrend: 1
-    historicalTrendPerTurn: 0.1
-    minimumHistoricalSupport: 30
-    maximumHistoricalSupport: 70
-    economicCrisisSensitivity: 0
-    politicalInstabilitySensitivity: 0
-    inflationSensitivity: 0
-    unemploymentSensitivity: 0
+      - axis: 4
+        position: -2
+      - axis: 5
+        position: -3
+      - axis: 6
+        position: 3
+    initialVoteShare: 49.55
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 100
+    economicCrisisSensitivity: 0.7
+    politicalInstabilitySensitivity: 1.2
+    inflationSensitivity: 0.5
+    unemploymentSensitivity: 0.8
   availableLeaders:
-  - leader: {fileID: 11400000, guid: 574b2d05d33034d4f9f4c5ebde8c01c4, type: 2}
+  - leader: {fileID: 11400000, guid: 61c96c244deb3634dac6956a4db1bf45, type: 2}
     selectableByPlayer: 1
-    scenarioPartyId: FED
+    scenarioPartyId: DEM
     overrideLeaderData: 0
     customName: 
     customPortrait: {fileID: 0}
     parameterOverrides: []
     ownPartyVoteModifier: 0
-    voteModifiers:
-    - scenarioPartyId: 
-      voteChange: 0
-  - leader: {fileID: 11400000, guid: 47e5c8b387f6eb94ebfe0068e3c60474, type: 2}
+    voteModifiers: []
+  - leader: {fileID: 11400000, guid: cc3742d0779164246aea81bf7595c6d9, type: 2}
     selectableByPlayer: 1
-    scenarioPartyId: D-R
+    scenarioPartyId: REP
     overrideLeaderData: 0
     customName: 
     customPortrait: {fileID: 0}
@@ -111,8 +118,8 @@ MonoBehaviour:
   policySlots:
     economySlots: 2
     governmentSlots: 2
-    immigrationSlots: 1
+    immigrationSlots: 0
     militarySlots: 1
     religionSlots: 1
     socialSlots: 1
-    tradeSlots: 1
+    tradeSlots: 2

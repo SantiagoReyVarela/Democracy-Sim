@@ -12,96 +12,133 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cc17026250bf6340883fc64926d75b8, type: 3}
   m_Name: USA_1912
   m_EditorClassIdentifier: Assembly-CSharp::GameScenarioSO
-  scenarioId: USA_1796
-  scenarioName: Estados Unidos - 1796
-  description: "La primera elecci\xF3n presidencial verdaderamente competitiva de
-    la historia de Estados Unidos."
+  scenarioId: USA_1912
+  scenarioName: Estados Unidos - 1912
+  description: "Estados Unidos vive una de las elecciones m\xE1s excepcionales de
+    su historia. El expresidente Theodore Roosevelt ha roto con el Partido Republicano
+    despu\xE9s de enfrentarse al presidente William Howard Taft y ha creado el Partido
+    Progresista. La divisi\xF3n republicana abre una oportunidad al dem\xF3crata
+    Woodrow Wilson, mientras las tres candidaturas presentan distintas respuestas
+    al crecimiento de las grandes corporaciones, la desigualdad y las demandas de
+    reforma de la Era Progresista."
   countryName: Estados Unidos
-  countryFlag: {fileID: 0}
-  stateType: Estado Federal
+  countryFlag: {fileID: 2543279097530367353, guid: 5edb47c13fb202e46922d4f25c77c156, type: 3}
+  countryMap: {fileID: 4947700601781519916, guid: 12ad4ac596a9afb4693210b248bc6e17, type: 3}
+  stateType: Estado federal
   governmentType: Republica presidencial
-  startYear: 1796
+  startYear: 1912
   startMonth: 11
-  politicalSituation: "Estados Unidos afronta la primera elecci\xF3n presidencial
-    verdaderamente competitiva de su historia tras la decisi\xF3n de George Washington
-    de abandonar el poder. El joven sistema pol\xEDtico se est\xE1 dividiendo entre
-    federalistas, partidarios de un gobierno federal fuerte, y dem\xF3crata-republicanos,
-    defensores de una mayor autonom\xEDa de los estados. La pol\xEDtica exterior
-    tambi\xE9n divide al pa\xEDs entre quienes favorecen unas relaciones estrechas
-    con Gran Breta\xF1a y quienes simpatizan con la Francia revolucionaria."
-  economicSituation: "La joven rep\xFAblica atraviesa una etapa de consolidaci\xF3n
-    financiera y expansi\xF3n comercial. Las reformas impulsadas durante la presidencia
-    de Washington han fortalecido el cr\xE9dito federal y establecido el Banco de
-    los Estados Unidos, aunque la deuda heredada de la Revoluci\xF3n contin\xFAa
-    siendo muy elevada. Los ingresos federales dependen principalmente de los aranceles
-    aduaneros y, en 1796, las cuentas p\xFAblicas registran un importante super\xE1vit."
+  politicalSituation: "La pol\xEDtica estadounidense est\xE1 dominada por el movimiento
+    progresista y el debate sobre el poder de las grandes corporaciones. El Partido
+    Republicano se encuentra dividido entre el sector conservador que respalda al
+    presidente Taft y los progresistas de Theodore Roosevelt, que han formado un
+    nuevo partido. Los dem\xF3cratas presentan a Woodrow Wilson con un programa reformista
+    basado en la competencia econ\xF3mica y la lucha contra los monopolios. La regulaci\xF3n
+    empresarial, los aranceles, las reformas democr\xE1ticas y las condiciones laborales
+    ocupan el centro del debate electoral. Las plataformas de los tres partidos reflejan
+    claramente esas diferencias."
+  economicSituation: "Estados Unidos es ya una de las principales potencias industriales
+    del mundo. La producci\xF3n industrial, las grandes corporaciones, los ferrocarriles
+    y el comercio han transformado r\xE1pidamente la econom\xEDa, pero la concentraci\xF3n
+    empresarial y las condiciones laborales provocan un intenso debate pol\xEDtico.
+    Republicanos, dem\xF3cratas y progresistas discrepan sobre c\xF3mo regular los
+    trusts, proteger a los trabajadores y reformar los elevados aranceles."
   initialParameters:
-    inflation: 0.43
-    fiscalResult: 265000
-    reserves: 10000000
-    debt: 82000270
-    stability: 40
-    education: -25
+    inflation: 3.6
+    fiscalResult: 10225000
+    reserves: 166263800
+    debt: 1.0275747e+9
+    stability: 70
+    education: 20
   parties:
-  - party: {fileID: 11400000, guid: 90bce1ed737f3dc4a84590ce144537d6, type: 2}
-    scenarioPartyId: FED
+  - party: {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
+    scenarioPartyId: DEM
     available: 1
     overridePartyData: 1
-    customName: Partido Federalista
-    customColor: {r: 0.045266207, g: 0, b: 0.6037736, a: 1}
-    customIdeology: Federalism
+    customName: "Partido Dem\xF3crata"
+    customColor: {r: 0.19215687, g: 0.36862746, b: 0.6784314, a: 1}
+    customIdeology: Nuevo liberalismo
+    ideologicalPositions:
+      overrides:
+      - axis: 2
+        position: 1
+    initialVoteShare: 41.8
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 100
+    economicCrisisSensitivity: 1
+    politicalInstabilitySensitivity: 1
+    inflationSensitivity: 0.7
+    unemploymentSensitivity: 1
+  - party: {fileID: 11400000, guid: 4acc4cc062325a345b91eaa3f4c4b912, type: 2}
+    scenarioPartyId: REP
+    available: 1
+    overridePartyData: 1
+    customName: Partido Republicano
+    customColor: {r: 0.764151, g: 0.16220188, b: 0.16220188, a: 1}
+    customIdeology: Republicanismo conservador
+    ideologicalPositions:
+      overrides:
+      - axis: 5
+        position: 2
+      - axis: 3
+        position: 1
+    initialVoteShare: 23.2
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 100
+    economicCrisisSensitivity: 0.7
+    politicalInstabilitySensitivity: 1.2
+    inflationSensitivity: 0.5
+    unemploymentSensitivity: 0.8
+  - party: {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
+    scenarioPartyId: PROG
+    available: 1
+    overridePartyData: 1
+    customName: Partido Progresista
+    customColor: {r: 0.43264714, g: 0.8509804, b: 0.29019606, a: 1}
+    customIdeology: Progresismo
     ideologicalPositions:
       overrides:
       - axis: 0
         position: 3
       - axis: 3
+        position: 1
+      - axis: 6
         position: 3
-    initialVoteShare: 51.1
-    useHistoricalTrend: 1
-    historicalTrendPerTurn: -0.1
-    minimumHistoricalSupport: 30
-    maximumHistoricalSupport: 65
-    economicCrisisSensitivity: 0
-    politicalInstabilitySensitivity: 0
-    inflationSensitivity: 0
-    unemploymentSensitivity: 0
-  - party: {fileID: 11400000, guid: 5b687a8e1488fca4dbd689851d0d40c1, type: 2}
-    scenarioPartyId: D-R
-    available: 1
-    overridePartyData: 1
-    customName: "Partido Dem\xF3crata-Republicano"
-    customColor: {r: 1, g: 0, b: 0, a: 1}
-    customIdeology: Republicanismo jeffersoniano
-    ideologicalPositions:
-      overrides:
-      - axis: 2
-        position: 1
-      - axis: 3
-        position: 1
-    initialVoteShare: 48.9
-    useHistoricalTrend: 1
-    historicalTrendPerTurn: 0.1
-    minimumHistoricalSupport: 30
-    maximumHistoricalSupport: 70
-    economicCrisisSensitivity: 0
-    politicalInstabilitySensitivity: 0
-    inflationSensitivity: 0
-    unemploymentSensitivity: 0
+    initialVoteShare: 27.4
+    useHistoricalTrend: 0
+    historicalTrendPerTurn: 0
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 100
+    economicCrisisSensitivity: 0.7
+    politicalInstabilitySensitivity: 1.2
+    inflationSensitivity: 0.5
+    unemploymentSensitivity: 0.8
   availableLeaders:
-  - leader: {fileID: 11400000, guid: 574b2d05d33034d4f9f4c5ebde8c01c4, type: 2}
+  - leader: {fileID: 11400000, guid: e04d1756d3a44ef4ea9f7a03fc8ab68f, type: 2}
     selectableByPlayer: 1
-    scenarioPartyId: FED
+    scenarioPartyId: DEM
     overrideLeaderData: 0
     customName: 
     customPortrait: {fileID: 0}
     parameterOverrides: []
     ownPartyVoteModifier: 0
-    voteModifiers:
-    - scenarioPartyId: 
-      voteChange: 0
-  - leader: {fileID: 11400000, guid: 47e5c8b387f6eb94ebfe0068e3c60474, type: 2}
+    voteModifiers: []
+  - leader: {fileID: 11400000, guid: 9215bb05e6a71114b97e859304d7e48a, type: 2}
     selectableByPlayer: 1
-    scenarioPartyId: D-R
+    scenarioPartyId: PROG
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers: []
+  - leader: {fileID: 11400000, guid: c9376399eed4fdd4db0407cfabf57d24, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: REP
     overrideLeaderData: 0
     customName: 
     customPortrait: {fileID: 0}
@@ -111,8 +148,8 @@ MonoBehaviour:
   policySlots:
     economySlots: 2
     governmentSlots: 2
-    immigrationSlots: 1
+    immigrationSlots: 0
     militarySlots: 1
     religionSlots: 1
     socialSlots: 1
-    tradeSlots: 1
+    tradeSlots: 2

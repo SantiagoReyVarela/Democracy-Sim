@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abc42c0756ea5814996b1b2d33169376, type: 3}
+  m_Name: Stephen A. Douglas
+  m_EditorClassIdentifier: Assembly-CSharp::PoliticalLeaderSO
+  leaderName: Stephen A. Douglas
+  portrait: {fileID: 8652420135583103694, guid: d3490ef66e28a49448af0c8012f24c65, type: 3}

@@ -17,16 +17,6 @@ public class PoliticalLeaderSO : ScriptableObject
 
 
     // =========================================================
-    // PARTIDO
-    // =========================================================
-
-    [Header("Party")]
-
-    [SerializeField]
-    private PoliticalPartySO party;
-
-
-    // =========================================================
     // IMAGEN
     // =========================================================
 
@@ -42,9 +32,6 @@ public class PoliticalLeaderSO : ScriptableObject
 
     public string LeaderName =>
         leaderName;
-
-    public PoliticalPartySO Party =>
-        party;
 
     public Sprite Portrait =>
         portrait;
