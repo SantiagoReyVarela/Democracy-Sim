@@ -4640,6 +4640,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7e2fd110a4649a2498908385aafa0cac, type: 2}
   - {fileID: 11400000, guid: 5df8f78bf99767c438f06f2db46224f4, type: 2}
   - {fileID: 11400000, guid: 17f4d5ad2b4b55942a8dfe980916e6ef, type: 2}
+  - {fileID: 11400000, guid: 431e064031d7f3843b4140a89fb93d60, type: 2}
   countryDropdown: {fileID: 1860272327}
   scenarioDropdown: {fileID: 1092448735}
   leaderDropdown: {fileID: 1490137528}

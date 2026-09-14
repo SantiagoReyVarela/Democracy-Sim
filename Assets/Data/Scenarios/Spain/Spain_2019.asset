@@ -1,0 +1,222 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cc17026250bf6340883fc64926d75b8, type: 3}
+  m_Name: Spain_2019
+  m_EditorClassIdentifier: Assembly-CSharp::GameScenarioSO
+  scenarioId: Spain_2019
+  scenarioName: "Espa\xF1a - 2019"
+  description: "Espa\xF1a afronta sus segundas elecciones generales en apenas siete
+    meses despu\xE9s del fracaso de las negociaciones para formar gobierno. El PSOE
+    de Pedro S\xE1nchez parte como primera fuerza, mientras el Partido Popular intenta
+    recuperarse, Vox experimenta un fuerte crecimiento, Unidas Podemos mantiene una
+    importante presencia a la izquierda y Ciudadanos intenta sobrevivir tras su giro
+    hacia la derecha. La crisis territorial catalana, el bloqueo institucional y
+    la desaceleraci\xF3n econ\xF3mica dominan la campa\xF1a."
+  countryName: "Espa\xF1a"
+  countryFlag: {fileID: 2543279097530367353, guid: 5edb47c13fb202e46922d4f25c77c156, type: 3}
+  countryMap: {fileID: 4947700601781519916, guid: 12ad4ac596a9afb4693210b248bc6e17, type: 3}
+  stateType: "Estado Auton\xF3micp"
+  governmentType: "Monarqu\xEDa parlamentaria"
+  startYear: 2019
+  startMonth: 11
+  politicalSituation: "Espa\xF1a atraviesa un periodo de considerable fragmentaci\xF3n
+    parlamentaria. Ning\xFAn partido parece capaz de gobernar en solitario y el sistema
+    bipartidista tradicional ha dado paso a cinco grandes fuerzas nacionales. A ello
+    se suma la crisis catalana, intensificada tras la sentencia del proc\xE9s de
+    octubre de 2019, y la dificultad para formar gobiernos estables. El 10N acabar\xEDa
+    produciendo un Congreso con PSOE 120 esca\xF1os, PP 89, Vox 52, Unidas Podemos
+    35 y Ciudadanos 10."
+  economicSituation: "La econom\xEDa contin\xFAa creciendo, pero muestra signos claros
+    de desaceleraci\xF3n. En el tercer trimestre de 2019 el PIB crec\xEDa un 2,0
+    % interanual, mientras que la tasa de paro permanec\xEDa elevada, en 13,92 %.
+    La inflaci\xF3n es pr\xE1cticamente inexistente, pero Espa\xF1a sigue arrastrando
+    una deuda p\xFAblica cercana al 100 % del PIB y un d\xE9ficit p\xFAblico persistente."
+  initialParameters:
+    inflation: 0.4
+    fiscalResult: -3.5195e+10
+    reserves: 1.67286e+11
+    debt: 1.188862e+12
+    stability: 58
+    education: 78
+  parties:
+  - party: {fileID: 11400000, guid: 94a04fb5b8907e44f95698b8235caa7c, type: 2}
+    scenarioPartyId: PSOE
+    available: 1
+    overridePartyData: 1
+    customName: PSOE
+    customColor: {r: 1, g: 0, b: 0.008883953, a: 1}
+    customIdeology: Socialdemocracia
+    ideologicalPositions:
+      overrides:
+      - axis: 2
+        position: -1
+    initialVoteShare: 28
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: -0.1
+    minimumHistoricalSupport: 0
+    maximumHistoricalSupport: 65
+    economicCrisisSensitivity: -10
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  - party: {fileID: 11400000, guid: 4acc4cc062325a345b91eaa3f4c4b912, type: 2}
+    scenarioPartyId: PP
+    available: 1
+    overridePartyData: 1
+    customName: PP
+    customColor: {r: 0.19290671, g: 0.29165626, b: 0.8018868, a: 1}
+    customIdeology: Conservadurismo liberal
+    ideologicalPositions:
+      overrides:
+      - axis: 4
+        position: 2
+      - axis: 5
+        position: 1
+      - axis: 6
+        position: 2
+    initialVoteShare: 48.9
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: 0.1
+    minimumHistoricalSupport: 30
+    maximumHistoricalSupport: 80
+    economicCrisisSensitivity: 0
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  - party: {fileID: 11400000, guid: bbe3cfbc29dcd2144afd7ca00e7e34fb, type: 2}
+    scenarioPartyId: VOX
+    available: 1
+    overridePartyData: 1
+    customName: VOX
+    customColor: {r: 0.054399423, g: 0.6226415, b: 0.014684939, a: 1}
+    customIdeology: Conservadurismo nacional
+    ideologicalPositions:
+      overrides:
+      - axis: 4
+        position: 2
+      - axis: 5
+        position: 1
+      - axis: 6
+        position: 2
+    initialVoteShare: 48.9
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: 0.1
+    minimumHistoricalSupport: 30
+    maximumHistoricalSupport: 80
+    economicCrisisSensitivity: 0
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  - party: {fileID: 11400000, guid: b2099c1df35185c44ac79039dc07c85f, type: 2}
+    scenarioPartyId: PODEMOS
+    available: 1
+    overridePartyData: 1
+    customName: Podemos
+    customColor: {r: 0.5471698, g: 0.16260235, b: 0.5031375, a: 1}
+    customIdeology: Socialismo progresista
+    ideologicalPositions:
+      overrides:
+      - axis: 4
+        position: -5
+      - axis: 0
+        position: 4
+      - axis: 2
+        position: -4
+    initialVoteShare: 48.9
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: 0.1
+    minimumHistoricalSupport: 30
+    maximumHistoricalSupport: 80
+    economicCrisisSensitivity: 0
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  - party: {fileID: 11400000, guid: 29dfc0551243124448349776fa3d7d36, type: 2}
+    scenarioPartyId: CS
+    available: 1
+    overridePartyData: 1
+    customName: Ciudadanos
+    customColor: {r: 0.8207547, g: 0.48334143, b: 0.21293166, a: 1}
+    customIdeology: Liberalismo centrista
+    ideologicalPositions:
+      overrides:
+      - axis: 3
+        position: 4
+      - axis: 2
+        position: 2
+      - axis: 4
+        position: -2
+    initialVoteShare: 48.9
+    useHistoricalTrend: 1
+    historicalTrendPerTurn: 0.1
+    minimumHistoricalSupport: 30
+    maximumHistoricalSupport: 80
+    economicCrisisSensitivity: 0
+    politicalInstabilitySensitivity: 0
+    inflationSensitivity: 0
+    unemploymentSensitivity: 0
+  availableLeaders:
+  - leader: {fileID: 11400000, guid: f4cc4f1db544a134db4062ac8f6bd3a5, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: PSOE
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers:
+    - scenarioPartyId: 
+      voteChange: 0
+  - leader: {fileID: 11400000, guid: d68a287cf449c9443a221f8a84011562, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: PP
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers: []
+  - leader: {fileID: 11400000, guid: 7ec2e73cd61177343992bab047a45edd, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: VOX
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers: []
+  - leader: {fileID: 11400000, guid: a4260b138363bad4c94d913239a4ee14, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: PODEMOS
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers: []
+  - leader: {fileID: 11400000, guid: 7304e51f6bc4e03448af9e308193e072, type: 2}
+    selectableByPlayer: 1
+    scenarioPartyId: CS
+    overrideLeaderData: 0
+    customName: 
+    customPortrait: {fileID: 0}
+    parameterOverrides: []
+    ownPartyVoteModifier: 0
+    voteModifiers: []
+  policySlots:
+    economySlots: 2
+    governmentSlots: 2
+    immigrationSlots: 0
+    militarySlots: 1
+    religionSlots: 1
+    socialSlots: 0
+    tradeSlots: 2
