@@ -137,7 +137,10 @@ public class GameScenarioSO : ScriptableObject
         if (party == null || parties == null)
             return null;
 
-        return parties.Find(p => p.party == party);
+        return parties.Find(
+            p => p != null &&
+                 p.GetResolvedBaseParty() == party
+        );
     }
 
     public bool IsPartyAvailable(PoliticalPartySO party)
@@ -225,12 +228,21 @@ public class ScenarioInitialParameters
 public class ScenarioPartyConfig
 {
     // ---------------------------------------------------------
-    // BASE PARTY
+    // HISTORICAL PARTY
     // ---------------------------------------------------------
 
-    [Header("Base Party")]
+    [Header("Historical Party")]
 
-    [Tooltip("Base PoliticalPartySO used as a template.")]
+    [Tooltip(
+        "Historical political party represented by this scenario entry. " +
+        "Example: PSOE, Republican Party, Communist Party of China."
+    )]
+    public PoliticalPartyProfileSO partyProfile;
+
+    [Tooltip(
+        "Legacy PoliticalPartySO reference. " +
+        "Kept temporarily so existing scenarios do not break."
+    )]
     public PoliticalPartySO party;
 
     [Tooltip(
@@ -337,6 +349,19 @@ public class ScenarioPartyConfig
     // HELPERS
     // =========================================================
 
+    public PoliticalPartySO GetResolvedBaseParty()
+    {
+        if (
+            partyProfile != null &&
+            partyProfile.BaseParty != null
+        )
+        {
+            return partyProfile.BaseParty;
+        }
+
+        return party;
+    }
+
     public string GetDisplayName()
     {
         if (
@@ -347,8 +372,23 @@ public class ScenarioPartyConfig
             return customName;
         }
 
-        if (party != null)
-            return party.name;
+        if (
+            partyProfile != null &&
+            !string.IsNullOrWhiteSpace(
+                partyProfile.PartyName
+            )
+        )
+        {
+            return partyProfile.PartyName;
+        }
+
+        PoliticalPartySO baseParty =
+            GetResolvedBaseParty();
+
+        if (baseParty != null)
+        {
+            return baseParty.partyName;
+        }
 
         return "Unknown Party";
     }
@@ -357,6 +397,15 @@ public class ScenarioPartyConfig
     {
         if (overridePartyData)
             return customColor;
+
+        if (partyProfile != null)
+            return partyProfile.PartyColor;
+
+        PoliticalPartySO baseParty =
+            GetResolvedBaseParty();
+
+        if (baseParty != null)
+            return baseParty.partyColor;
 
         return Color.white;
     }
@@ -371,6 +420,22 @@ public class ScenarioPartyConfig
             return customIdeology;
         }
 
+        if (
+            partyProfile != null &&
+            !string.IsNullOrWhiteSpace(
+                partyProfile.IdeologicalLine
+            )
+        )
+        {
+            return partyProfile.IdeologicalLine;
+        }
+
+        PoliticalPartySO baseParty =
+            GetResolvedBaseParty();
+
+        if (baseParty != null)
+            return baseParty.IdeologicalLine;
+
         return string.Empty;
     }
 
@@ -381,7 +446,7 @@ public class ScenarioPartyConfig
             ideologicalPositions.HasOverrides;
     }
 
-    public bool HasIdeologicalOverride(ScenarioIdeologicalAxis axis)
+    public bool HasIdeologicalOverride(PoliticalAxis axis)
     {
         return
             ideologicalPositions != null &&
@@ -389,7 +454,7 @@ public class ScenarioPartyConfig
     }
 
     public bool TryGetIdeologicalOverride(
-        ScenarioIdeologicalAxis axis,
+        PoliticalAxis axis,
         out float position
     )
     {
@@ -406,17 +471,6 @@ public class ScenarioPartyConfig
 // IDEOLOGICAL POSITIONS
 // ============================================================================
 
-public enum ScenarioIdeologicalAxis
-{
-    Government,
-    Religion,
-    Economy,
-    Trade,
-    Society,
-    Immigration,
-    Military
-}
-
 
 [Serializable]
 public class ScenarioIdeologicalPosition
@@ -425,7 +479,7 @@ public class ScenarioIdeologicalPosition
         "Ideological axis that differs from the base party. " +
         "Do not add an entry if the scenario should keep the original value."
     )]
-    public ScenarioIdeologicalAxis axis;
+    public PoliticalAxis axis;
 
     [Range(-5f, 5f)]
     [Tooltip(
@@ -453,7 +507,7 @@ public class ScenarioIdeologicalPositions
         overrides.Count > 0;
 
 
-    public bool HasOverride(ScenarioIdeologicalAxis axis)
+    public bool HasOverride(PoliticalAxis axis)
     {
         if (overrides == null)
             return false;
@@ -465,7 +519,7 @@ public class ScenarioIdeologicalPositions
 
 
     public bool TryGetOverride(
-        ScenarioIdeologicalAxis axis,
+        PoliticalAxis axis,
         out float position
     )
     {
@@ -489,7 +543,7 @@ public class ScenarioIdeologicalPositions
 
 
     public void SetOverride(
-        ScenarioIdeologicalAxis axis,
+        PoliticalAxis axis,
         float value
     )
     {
@@ -515,7 +569,7 @@ public class ScenarioIdeologicalPositions
     }
 
 
-    public bool RemoveOverride(ScenarioIdeologicalAxis axis)
+    public bool RemoveOverride(PoliticalAxis axis)
     {
         if (overrides == null)
             return false;

@@ -10,6 +10,8 @@ public class ScenarioPartyRuntime
 
     public ScenarioPartyConfig SourceConfig { get; private set; }
 
+    public PoliticalPartyProfileSO PartyProfile { get; private set; }
+
     public PoliticalPartySO BaseParty { get; private set; }
 
 
@@ -24,6 +26,10 @@ public class ScenarioPartyRuntime
     public Color DisplayColor { get; private set; }
 
     public string DisplayIdeology { get; private set; }
+
+    public HemicycleBloc HemicycleBloc { get; private set; }
+
+    public PoliticalRadicalizationLayer RadicalizationLayer { get; private set; }
 
 
     // =========================================================
@@ -58,9 +64,9 @@ public class ScenarioPartyRuntime
     // IDEOLOGICAL OVERRIDES
     // =========================================================
 
-    private Dictionary<ScenarioIdeologicalAxis, float>
+    private Dictionary<PoliticalAxis, float>
         ideologicalOverrides =
-            new Dictionary<ScenarioIdeologicalAxis, float>();
+            new Dictionary<PoliticalAxis, float>();
 
 
     // =========================================================
@@ -75,11 +81,13 @@ public class ScenarioPartyRuntime
             throw new ArgumentNullException(nameof(config));
 
         SourceConfig = config;
-        BaseParty = config.party;
+        PartyProfile = config.partyProfile;
+        BaseParty = config.GetResolvedBaseParty();
 
         ScenarioPartyId = config.scenarioPartyId;
 
         LoadDisplayData(config);
+        LoadPoliticalIdentity();
         LoadElectoralData(config);
         LoadSensitivities(config);
         LoadIdeologicalOverrides(config);
@@ -113,6 +121,27 @@ public class ScenarioPartyRuntime
         // -----------------------------------------
 
         DisplayIdeology = config.GetDisplayIdeology();
+    }
+
+
+    // =========================================================
+    // POLITICAL IDENTITY
+    // =========================================================
+
+    private void LoadPoliticalIdentity()
+    {
+        if (PartyProfile != null)
+        {
+            HemicycleBloc = PartyProfile.HemicycleBloc;
+            RadicalizationLayer = PartyProfile.RadicalizationLayer;
+            return;
+        }
+
+        if (BaseParty != null)
+        {
+            HemicycleBloc = BaseParty.HemicycleBloc;
+            RadicalizationLayer = BaseParty.RadicalizationLayer;
+        }
     }
 
 
@@ -201,7 +230,7 @@ public class ScenarioPartyRuntime
     // =========================================================
 
     public bool HasIdeologicalOverride(
-        ScenarioIdeologicalAxis axis
+        PoliticalAxis axis
     )
     {
         return ideologicalOverrides.ContainsKey(axis);
@@ -209,13 +238,55 @@ public class ScenarioPartyRuntime
 
 
     public bool TryGetIdeologicalOverride(
-        ScenarioIdeologicalAxis axis,
+        PoliticalAxis axis,
         out float value
     )
     {
         return ideologicalOverrides.TryGetValue(
             axis,
             out value
+        );
+    }
+
+
+    public float GetInheritedPosition(
+        PoliticalAxis axis
+    )
+    {
+        if (PartyProfile != null)
+        {
+            return PartyProfile.GetPosition(
+                axis
+            );
+        }
+
+        if (BaseParty != null)
+        {
+            return BaseParty.GetPosition(
+                axis
+            );
+        }
+
+        return 0f;
+    }
+
+
+    public float GetEffectivePosition(
+        PoliticalAxis axis
+    )
+    {
+        if (
+            TryGetIdeologicalOverride(
+                axis,
+                out float scenarioOverride
+            )
+        )
+        {
+            return scenarioOverride;
+        }
+
+        return GetInheritedPosition(
+            axis
         );
     }
 

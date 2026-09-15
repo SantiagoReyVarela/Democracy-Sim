@@ -35,6 +35,22 @@ MonoBehaviour:
   - axis: 5
     position: -4
   - axis: 6
-    position: -3
+    position: -2
+  - axis: 7
+    position: -2
+  - axis: 8
+    position: -2
+  - axis: 9
+    position: -5
+  - axis: 10
+    position: -4
+  - axis: 11
+    position: 0
+  - axis: 12
+    position: 3
+  - axis: 13
+    position: 0
+  - axis: 14
+    position: 0
   hemicycleBloc: 0
   radicalizationLayer: 2

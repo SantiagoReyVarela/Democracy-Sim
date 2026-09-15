@@ -23,7 +23,7 @@ MonoBehaviour:
   ideologicalLine: Leninismo
   ideologicalPositions:
   - axis: 0
-    position: 4
+    position: 5
   - axis: 1
     position: -5
   - axis: 2
@@ -31,10 +31,26 @@ MonoBehaviour:
   - axis: 3
     position: -4
   - axis: 4
-    position: -2
+    position: -3
   - axis: 5
     position: -1
   - axis: 6
     position: 3
+  - axis: 7
+    position: -4
+  - axis: 8
+    position: 2
+  - axis: 9
+    position: 5
+  - axis: 10
+    position: 4
+  - axis: 11
+    position: -5
+  - axis: 12
+    position: -2
+  - axis: 13
+    position: 3
+  - axis: 14
+    position: 5
   hemicycleBloc: 0
   radicalizationLayer: 3

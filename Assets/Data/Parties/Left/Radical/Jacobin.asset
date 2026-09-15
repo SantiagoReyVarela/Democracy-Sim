@@ -23,18 +23,34 @@ MonoBehaviour:
   ideologicalLine: Jacobinismo
   ideologicalPositions:
   - axis: 0
-    position: 5
+    position: 3
   - axis: 1
-    position: -5
+    position: -4
   - axis: 2
-    position: -3
-  - axis: 3
     position: -2
+  - axis: 3
+    position: 1
   - axis: 4
-    position: -3
+    position: -4
   - axis: 5
     position: 0
   - axis: 6
+    position: 3
+  - axis: 7
+    position: 3
+  - axis: 8
+    position: 1
+  - axis: 9
+    position: 2
+  - axis: 10
     position: 4
+  - axis: 11
+    position: -3
+  - axis: 12
+    position: -1
+  - axis: 13
+    position: 5
+  - axis: 14
+    position: 5
   hemicycleBloc: 0
   radicalizationLayer: 3

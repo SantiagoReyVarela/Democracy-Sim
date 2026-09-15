@@ -560,8 +560,14 @@ public class PoliticalPartyManager : MonoBehaviour
         }
 
 
-        // Si más adelante quieres el color base aquí, sustituye
-        // Color.white por el campo real de PoliticalPartySO.
+        if (
+            partyState != null &&
+            partyState.party != null
+        )
+        {
+            return partyState.party.partyColor;
+        }
+
         return Color.white;
     }
 
@@ -587,7 +593,67 @@ public class PoliticalPartyManager : MonoBehaviour
         }
 
 
+        if (
+            partyState != null &&
+            partyState.party != null
+        )
+        {
+            return partyState.party.IdeologicalLine;
+        }
+
         return string.Empty;
+    }
+
+
+    public HemicycleBloc GetEffectiveHemicycleBloc(
+        PoliticalPartyState partyState
+    )
+    {
+        ScenarioPartyRuntime runtimeParty =
+            GetRuntimeParty(
+                partyState
+            );
+
+        if (runtimeParty != null)
+        {
+            return runtimeParty.HemicycleBloc;
+        }
+
+        if (
+            partyState != null &&
+            partyState.party != null
+        )
+        {
+            return partyState.party.HemicycleBloc;
+        }
+
+        return default;
+    }
+
+
+    public PoliticalRadicalizationLayer GetEffectiveRadicalizationLayer(
+        PoliticalPartyState partyState
+    )
+    {
+        ScenarioPartyRuntime runtimeParty =
+            GetRuntimeParty(
+                partyState
+            );
+
+        if (runtimeParty != null)
+        {
+            return runtimeParty.RadicalizationLayer;
+        }
+
+        if (
+            partyState != null &&
+            partyState.party != null
+        )
+        {
+            return partyState.party.RadicalizationLayer;
+        }
+
+        return PoliticalRadicalizationLayer.Mainstream;
     }
 
 
@@ -613,29 +679,13 @@ public class PoliticalPartyManager : MonoBehaviour
 
         if (runtimeParty != null)
         {
-            if (
-                Enum.TryParse(
-                    axis.ToString(),
-                    true,
-                    out ScenarioIdeologicalAxis scenarioAxis
-                )
-            )
-            {
-                if (
-                    runtimeParty.TryGetIdeologicalOverride(
-                        scenarioAxis,
-                        out float overrideValue
-                    )
-                )
-                {
-                    return overrideValue;
-                }
-            }
+            return runtimeParty.GetEffectivePosition(
+                axis
+            );
         }
 
 
-        // Si no existe override para ese eje,
-        // heredamos SIEMPRE la postura del asset base.
+        // Compatibilidad con partidas antiguas sin ScenarioPartyRuntime.
         return partyState.party.GetPosition(
             axis
         );
@@ -1624,7 +1674,9 @@ public class PoliticalPartyManager : MonoBehaviour
 
 
             switch (
-                partyState.party.RadicalizationLayer
+                GetEffectiveRadicalizationLayer(
+                    partyState
+                )
             )
             {
                 case PoliticalRadicalizationLayer.Center:
@@ -2659,10 +2711,19 @@ public class PoliticalPartyManager : MonoBehaviour
                 )
             )
             {
-                float basePosition =
-                    partyState.party.GetPosition(
-                        axis
+                ScenarioPartyRuntime runtimeParty =
+                    GetRuntimeParty(
+                        partyState
                     );
+
+                float inheritedPosition =
+                    runtimeParty != null
+                        ? runtimeParty.GetInheritedPosition(
+                            axis
+                        )
+                        : partyState.party.GetPosition(
+                            axis
+                        );
 
                 float effectivePosition =
                     GetEffectivePartyPosition(
@@ -2672,15 +2733,15 @@ public class PoliticalPartyManager : MonoBehaviour
 
                 string overrideLabel =
                     Mathf.Approximately(
-                        basePosition,
+                        inheritedPosition,
                         effectivePosition
                     )
                     ? "HEREDADO"
-                    : "OVERRIDE";
+                    : "OVERRIDE DE ESCENARIO";
 
                 Debug.Log(
                     $"{axis} | " +
-                    $"Base: {basePosition:+0.0;-0.0;0.0} | " +
+                    $"Heredado: {inheritedPosition:+0.0;-0.0;0.0} | " +
                     $"Efectivo: {effectivePosition:+0.0;-0.0;0.0} | " +
                     $"{overrideLabel}"
                 );
